@@ -3,6 +3,7 @@ import { Inter, Ubuntu, JetBrains_Mono, Outfit } from "next/font/google";
 import { RouteProvider } from "@/providers/router-provider";
 import { Theme } from "@/providers/theme";
 import { AuthProvider } from "@/providers/auth-provider";
+import { ScrollProvider } from "@/providers/scroll-provider";
 import "@/styles/globals.css";
 import { cx } from "@/utils/cx";
 
@@ -67,7 +68,9 @@ export default function RootLayout({
             >
                 <RouteProvider>
                     <Theme>
-                        <AuthProvider>{children}</AuthProvider>
+                        <AuthProvider>
+                            <ScrollProvider>{children}</ScrollProvider>
+                        </AuthProvider>
                     </Theme>
                 </RouteProvider>
             </body>
