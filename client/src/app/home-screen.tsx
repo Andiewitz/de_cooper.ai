@@ -78,30 +78,62 @@ export default function HomePage() {
         <div className="bg-primary">
             {/* Top Fold: Nav + Hero centered in full viewport height */}
             <div className="flex min-h-dvh flex-col border-b border-secondary">
-                {/* Nav */}
-                <nav className="border-b border-secondary">
-                <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-                    <span className="font-logo text-xl font-bold text-primary tracking-tight">
-                        de_cooper.ai
-                    </span>
-                    <div className="flex items-center gap-3">
-                        {isAuthenticated ? (
-                            <Button href="/learn" color="primary" size="sm">
-                                Go to Lessons
-                            </Button>
-                        ) : (
-                            <>
-                                <Button href="/login" color="tertiary" size="sm">
-                                    Sign In
-                                </Button>
-                                <Button href="/register" color="primary" size="sm">
-                                    Get Started
-                                </Button>
-                            </>
-                        )}
+                {/* Top Promo Banner (Clay inspired) */}
+                <div className="w-full bg-[#FEF08A] text-black py-2 px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between border-b border-secondary font-sans text-[10px] tracking-wider uppercase font-semibold">
+                    <div className="flex items-center gap-2">
+                        <span className="font-logo font-black text-xs">COOPER.AI</span>
+                        <span className="opacity-50">//</span>
+                        <span>THE RIGOROUS MATHEMATICAL COLLOQUIUM BY DR. COOPER</span>
+                    </div>
+                    <div className="mt-0.5 md:mt-0 flex items-center gap-2">
+                        <span>OCT 23, 2026, PASADENA, CA</span>
+                        <span className="text-[#2563EB] font-bold">→ COOPER.AI/PASADENA</span>
                     </div>
                 </div>
-            </nav>
+
+                {/* Main Floating Nav (Clay inspired) */}
+                <div className="w-full px-6 lg:px-16 mt-4">
+                    <nav className="border border-secondary bg-primary/80 backdrop-blur-md rounded-2xl px-6 py-3 shadow-sm flex items-center justify-between transition-all duration-300 hover:shadow-md">
+                        {/* Left: Brand logo */}
+                        <Link href="/" className="font-logo text-xl font-extrabold text-primary tracking-tight select-none">
+                            de_cooper.ai
+                        </Link>
+
+                        {/* Center: Navigation Links */}
+                        <div className="hidden md:flex items-center gap-6 text-xs font-medium text-secondary">
+                            <Link href="/learn" className="hover:text-primary transition-colors">Sandbox</Link>
+                            <Link href="/learn" className="hover:text-primary transition-colors">Mentorship</Link>
+                            <Link href="/learn" className="hover:text-primary transition-colors">Leaderboard</Link>
+                            <Link href="/learn" className="hover:text-primary transition-colors">FAQ</Link>
+                        </div>
+
+                        {/* Right: Dynamic Actions & Commands */}
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <div className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded-md border border-secondary bg-secondary/30 text-[9px] font-mono text-tertiary select-none">
+                                <span>⌘</span>
+                                <span>K</span>
+                                <span className="opacity-65">🔍</span>
+                            </div>
+
+                            <div className="hidden lg:block w-px h-5 bg-secondary/50 mx-1" />
+
+                            {isAuthenticated ? (
+                                <Button href="/learn" color="primary" size="sm">
+                                    Go to Lessons
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button href="/login" color="tertiary" size="sm">
+                                        Sign In
+                                    </Button>
+                                    <Button href="/register" color="primary" size="sm">
+                                        Get Started &rarr;
+                                    </Button>
+                                </>
+                            )}
+                        </div>
+                    </nav>
+                </div>
 
             <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-24 lg:pt-36">
                 <div className="grid max-w-none w-full items-center gap-12 lg:grid-cols-12 text-left px-6 lg:px-16">
