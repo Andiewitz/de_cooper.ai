@@ -42,9 +42,11 @@ export default function HomePage() {
     const { isAuthenticated } = useAuth();
 
     return (
-        <div className="min-h-dvh bg-primary">
-            {/* Nav */}
-            <nav className="border-b border-secondary">
+        <div className="bg-primary">
+            {/* Top Fold: Nav + Hero centered in full viewport height */}
+            <div className="flex min-h-dvh flex-col border-b border-secondary">
+                {/* Nav */}
+                <nav className="border-b border-secondary">
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
                     <span className="font-logo text-xl font-bold text-primary tracking-tight">
                         de_cooper.ai
@@ -69,14 +71,14 @@ export default function HomePage() {
             </nav>
 
             {/* Hero */}
-            <section className="px-6 py-24 text-center">
+            <section className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center md:py-0">
                 <div className="mx-auto max-w-3xl">
                     <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary px-4 py-1.5 text-sm font-medium text-secondary">
                         <span className="size-2 rounded-full bg-green-500" />
                         Powered by Llama 70B via OpenRouter
                     </div>
 
-                    <h1 className="font-display text-display-lg font-bold tracking-tight text-primary">
+                    <h1 className="font-display text-display-lg font-bold tracking-tight text-primary leading-tight">
                         Learn from the smartest
                         <br />
                         <span className="text-fg-brand-primary">person in the room.</span>
@@ -102,9 +104,10 @@ export default function HomePage() {
                     </div>
                 </div>
             </section>
+        </div>
 
-            {/* Quote */}
-            <section className="border-y border-secondary bg-secondary px-6 py-12">
+        {/* Quote */}
+        <section className="border-b border-secondary bg-secondary px-6 py-12">
                 <blockquote className="mx-auto max-w-2xl text-center">
                     <p className="font-display text-xl font-medium italic text-primary">
                         &ldquo;I cry because others are stupid, and that makes me sad.&rdquo;
