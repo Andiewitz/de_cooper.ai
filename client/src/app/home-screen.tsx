@@ -72,26 +72,26 @@ export default function HomePage() {
 
             {/* Hero */}
             <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
-                <div className="mx-auto grid max-w-6xl w-full items-center gap-12 lg:grid-cols-12 text-left">
+                <div className="mx-auto grid max-w-7xl w-full items-center gap-12 lg:grid-cols-12 text-left px-4 lg:px-8">
                     <div className="lg:col-span-7">
-                        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary px-4 py-1.5 text-sm font-medium text-secondary">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary px-4 py-1.5 text-sm font-medium text-secondary">
                             <span className="size-2 rounded-full bg-green-500" />
                             Powered by Llama 70B via OpenRouter
                         </div>
 
-                        <h1 className="font-logo text-5xl lg:text-7xl font-extrabold tracking-tight text-primary leading-[1.05]">
+                        <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88]">
                             Be the most obnoxious
                             <br />
                             <span className="text-fg-brand-primary">person in the room.</span>
                         </h1>
 
-                        <p className="mt-6 max-w-xl text-lg text-tertiary">
+                        <p className="mt-4 max-w-xl text-lg text-tertiary">
                             An uncompromisingly rigorous academic sandbox. No watered-down concepts,
                             no participation awards—just beautiful, elegant mathematical proofs
                             and a mentor who is mathematically certain he is smarter than you.
                         </p>
 
-                        <div className="mt-8 flex items-center gap-4">
+                        <div className="mt-5 flex items-center gap-4">
                             <Button
                                 href={isAuthenticated ? "/learn" : "/register"}
                                 color="primary"
