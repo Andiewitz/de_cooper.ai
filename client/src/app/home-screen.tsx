@@ -81,7 +81,12 @@ export default function HomePage() {
             {/* Top Fold: Nav + Hero centered in full viewport height */}
             <div className="flex min-h-dvh flex-col border-b border-secondary">
                 {/* Top Promo Banner (Clay inspired) */}
-                <div className="w-full bg-[#FEF08A] text-black py-2 px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between border-b border-secondary font-sans text-[10px] tracking-wider uppercase font-semibold">
+                <motion.div
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 80, damping: 15 }}
+                    className="w-full bg-[#FEF08A] text-black py-2 px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between border-b border-secondary font-sans text-[10px] tracking-wider uppercase font-semibold z-50"
+                >
                     <div className="flex items-center gap-2">
                         <span className="font-logo font-black text-xs">COOPER.AI</span>
                         <span className="opacity-50">//</span>
@@ -91,10 +96,15 @@ export default function HomePage() {
                         <span>OCT 23, 2026, PASADENA, CA</span>
                         <span className="text-[#2563EB] font-bold">→ COOPER.AI/PASADENA</span>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Main Floating Nav (Clay inspired) */}
-                <div className="w-full px-6 lg:px-16 mt-4">
+                <motion.div
+                    initial={{ y: -60, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 80, damping: 15, delay: 0.15 }}
+                    className="w-full px-6 lg:px-16 mt-4 z-40"
+                >
                     <nav className="border border-secondary bg-primary/80 backdrop-blur-md rounded-2xl px-6 py-3 shadow-sm flex items-center justify-between transition-all duration-300 hover:shadow-md">
                         {/* Left: Brand logo */}
                         <Link href="/" className="font-logo text-xl font-extrabold text-primary tracking-tight select-none">
@@ -135,7 +145,7 @@ export default function HomePage() {
                             )}
                         </div>
                     </nav>
-                </div>
+                </motion.div>
 
             <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-24 lg:pt-36">
                 <div className="grid max-w-none w-full items-center gap-12 lg:grid-cols-12 text-left px-6 lg:px-16">
