@@ -241,75 +241,145 @@ export default function HomePage() {
             </section>
         </div>
 
-        {/* Quote */}
-        <section className="border-b border-secondary bg-secondary px-6 py-12">
-                <blockquote className="mx-auto max-w-2xl text-center">
-                    <p className="font-display text-xl font-medium italic text-primary">
+        {/* Social Proof / Quote Divider */}
+        <section className="border-b border-secondary bg-secondary px-6 py-16 lg:py-20">
+            <div className="mx-auto max-w-4xl text-center">
+                <div className="inline-flex items-center gap-2 rounded-full border border-secondary bg-primary px-4 py-1.5 text-[10px] font-mono uppercase tracking-widest text-tertiary mb-8">
+                    <span className="size-1.5 rounded-full bg-green-500 animate-pulse" />
+                    AI-powered &middot; Llama 70B &middot; Always judging you
+                </div>
+                <blockquote>
+                    <p className="font-logo text-2xl lg:text-3xl font-bold text-primary leading-snug tracking-tight">
                         &ldquo;I cry because others are stupid, and that makes me sad.&rdquo;
                     </p>
-                    <footer className="mt-3 text-sm text-tertiary">
+                    <footer className="mt-5 text-sm text-tertiary">
                         — Dr. Sheldon Cooper, B.S., M.S., M.A., Ph.D., Sc.D.
                     </footer>
                 </blockquote>
-            </section>
+            </div>
+        </section>
 
-            {/* Features */}
-            <section className="px-6 py-20">
-                <div className="mx-auto max-w-6xl">
-                    <div className="mb-12 text-center">
-                        <h2 className="font-display text-display-sm font-bold text-primary">
-                            Why suffer through this?
+        {/* How It Works */}
+        <section className="px-6 py-20 lg:py-28">
+            <div className="mx-auto max-w-6xl">
+                <div className="mb-14 max-w-2xl">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary mb-3">How it works</p>
+                    <h2 className="font-logo text-3xl lg:text-4xl font-extrabold text-primary tracking-tight">
+                        Three steps to intellectual enlightenment.
+                    </h2>
+                    <p className="mt-4 text-base text-tertiary leading-relaxed">
+                        Or as Dr. Cooper would say: a trivially simple process that even you should be able to follow.
+                    </p>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-3">
+                    {[
+                        {
+                            step: "01",
+                            title: "Pick a subject",
+                            desc: "Choose from mathematics, physics, computer science, or any topic you're embarrassingly unfamiliar with.",
+                        },
+                        {
+                            step: "02",
+                            title: "Ask Dr. Cooper",
+                            desc: "Pose your question. He'll answer with the patience of someone who has already calculated the heat death of the universe.",
+                        },
+                        {
+                            step: "03",
+                            title: "Actually learn",
+                            desc: "Receive step-by-step breakdowns with LaTeX proofs, code examples, and unsolicited commentary on your intelligence.",
+                        },
+                    ].map((item) => (
+                        <div
+                            key={item.step}
+                            className="group relative rounded-2xl border border-secondary bg-primary p-7 transition-all duration-300 hover:border-brand-secondary/40 hover:shadow-lg"
+                        >
+                            <span className="font-mono text-4xl font-black text-brand-secondary/20 group-hover:text-brand-secondary/40 transition-colors">
+                                {item.step}
+                            </span>
+                            <h3 className="mt-3 font-logo text-lg font-bold text-primary tracking-tight">
+                                {item.title}
+                            </h3>
+                            <p className="mt-2 text-sm text-tertiary leading-relaxed">
+                                {item.desc}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        {/* Features Bento Grid */}
+        <section className="border-t border-secondary bg-secondary/30 px-6 py-20 lg:py-28">
+            <div className="mx-auto max-w-6xl">
+                <div className="mb-14 text-center">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary mb-3">Features</p>
+                    <h2 className="font-logo text-3xl lg:text-4xl font-extrabold text-primary tracking-tight">
+                        Why suffer through this?
+                    </h2>
+                    <p className="mt-4 text-base text-tertiary max-w-xl mx-auto">
+                        Because despite the insults, you&apos;ll actually learn something. Probably.
+                    </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {features.map((feature) => {
+                        const Icon = feature.icon;
+                        return (
+                            <div
+                                key={feature.title}
+                                className="group rounded-2xl border border-secondary bg-primary p-6 transition-all duration-300 hover:shadow-lg hover:border-brand-secondary/30"
+                            >
+                                <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-brand-primary/80 group-hover:bg-brand-primary transition-colors">
+                                    <Icon className="size-5 text-white" />
+                                </div>
+                                <h3 className="font-logo text-base font-bold text-primary tracking-tight">
+                                    {feature.title}
+                                </h3>
+                                <p className="mt-2 text-sm text-tertiary leading-relaxed">
+                                    {feature.description}
+                                </p>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="border-t border-secondary px-6 py-20 lg:py-28">
+            <div className="mx-auto max-w-3xl text-center">
+                <div className="rounded-3xl border border-secondary bg-secondary/40 px-8 py-14 lg:px-16 lg:py-20 relative overflow-hidden">
+                    {/* Subtle decorative glow */}
+                    <div className="absolute inset-0 bg-radial from-brand-secondary/8 to-transparent pointer-events-none" />
+
+                    <div className="relative z-10">
+                        <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary mb-4">Free forever</p>
+                        <h2 className="font-logo text-3xl lg:text-4xl font-extrabold text-primary tracking-tight">
+                            Ready to feel intellectually inadequate?
                         </h2>
-                        <p className="mt-3 text-lg text-tertiary">
-                            Because despite the insults, you&apos;ll actually learn something. Probably.
+                        <p className="mt-4 text-base text-tertiary max-w-lg mx-auto leading-relaxed">
+                            Create a free account and start your education. Dr. Cooper is waiting. Impatiently.
+                        </p>
+                        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <Button
+                                href={isAuthenticated ? "/learn" : "/register"}
+                                color="primary"
+                                size="xl"
+                            >
+                                {isAuthenticated ? "Go to Lessons" : "Create Free Account →"}
+                            </Button>
+                            <Button href="/terms" color="secondary" size="xl">
+                                Read the Fine Print
+                            </Button>
+                        </div>
+                        <p className="mt-6 text-[10px] text-quaternary">
+                            No credit card required. No hidden fees. Just pure, unfiltered condescension.
                         </p>
                     </div>
-
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {features.map((feature) => {
-                            const Icon = feature.icon;
-                            return (
-                                <div
-                                    key={feature.title}
-                                    className="rounded-xl border border-secondary bg-primary p-6 shadow-xs transition-all duration-200 hover:shadow-md"
-                                >
-                                    <div className="mb-4 flex size-10 items-center justify-center rounded-lg bg-brand-primary">
-                                        <Icon className="size-5 text-fg-brand-primary" />
-                                    </div>
-                                    <h3 className="font-display text-md font-semibold text-primary">
-                                        {feature.title}
-                                    </h3>
-                                    <p className="mt-2 text-sm text-tertiary">
-                                        {feature.description}
-                                    </p>
-                                </div>
-                            );
-                        })}
-                    </div>
                 </div>
-            </section>
-
-            {/* CTA */}
-            <section className="border-t border-secondary bg-secondary px-6 py-20">
-                <div className="mx-auto max-w-2xl text-center">
-                    <h2 className="font-display text-display-sm font-bold text-primary">
-                        Ready to feel intellectually inadequate?
-                    </h2>
-                    <p className="mt-3 text-lg text-tertiary">
-                        Create a free account and start your education. Dr. Cooper is waiting.
-                        Impatiently.
-                    </p>
-                    <div className="mt-8">
-                        <Button
-                            href={isAuthenticated ? "/learn" : "/register"}
-                            color="primary"
-                            size="xl"
-                        >
-                            {isAuthenticated ? "Go to Lessons" : "Create Free Account"}
-                        </Button>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </section>
 
             {/* Footer — Legal Disclaimer & Satire Notice */}
             <footer className="border-t border-secondary bg-secondary/40 px-6 py-12">
@@ -333,9 +403,9 @@ export default function HomePage() {
                             </div>
                             <div className="flex flex-col gap-2">
                                 <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">Legal</span>
+                                <Link href="/terms" className="hover:text-primary transition-colors">Terms &amp; Conditions</Link>
                                 <span className="text-tertiary">Parody &amp; Satire</span>
                                 <span className="text-tertiary">Non-Commercial Use</span>
-                                <span className="text-tertiary">Fan Project</span>
                             </div>
                         </div>
                     </div>
