@@ -142,7 +142,7 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="hidden lg:col-span-5 lg:block relative mr-0 ml-auto lg:pr-8 text-right translate-y-12">
+                    <div className="hidden lg:col-span-5 lg:block relative mr-0 ml-auto lg:pr-8 text-right translate-y-12 lg:-translate-x-16">
                         {/* Decorative background aura/glow */}
                         <div className="absolute inset-0 -m-8 rounded-full bg-radial from-brand-secondary/15 to-transparent blur-3xl opacity-60" />
 
