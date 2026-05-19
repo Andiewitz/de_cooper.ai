@@ -78,16 +78,16 @@ export default function HomePage() {
                         Powered by Llama 70B via OpenRouter
                     </div>
 
-                    <h1 className="font-display text-display-lg font-bold tracking-tight text-primary leading-tight">
-                        Learn from the smartest
+                    <h1 className="font-logo text-display-lg font-bold tracking-tight text-primary leading-tight">
+                        Be the most obnoxious
                         <br />
                         <span className="text-fg-brand-primary">person in the room.</span>
                     </h1>
 
                     <p className="mx-auto mt-6 max-w-xl text-lg text-tertiary">
-                        An AI teaching platform with the personality of Dr. Sheldon Cooper.
-                        Animated explanations, visual math, and a tutor who&apos;s genuinely
-                        smarter than you. You&apos;re welcome.
+                        An uncompromisingly rigorous academic sandbox. No watered-down concepts,
+                        no participation awards—just beautiful, elegant mathematical proofs
+                        and a mentor who is mathematically certain he is smarter than you.
                     </p>
 
                     <div className="mt-8 flex items-center justify-center gap-4">
