@@ -75,6 +75,7 @@ const features = [
 export default function HomePage() {
     const { isAuthenticated } = useAuth();
     const [isTermsOpen, setIsTermsOpen] = useState(false);
+    const [spinRotation, setSpinRotation] = useState(0);
 
     return (
         <div className="bg-primary">
@@ -224,14 +225,21 @@ export default function HomePage() {
                             {/* Inner circle backdrop */}
                             <div className="absolute inset-2.5 rounded-full bg-primary border border-secondary overflow-hidden" />
                             
-                            {/* Sheldon popping out of the circle border */}
+                             {/* Sheldon popping out of the circle border */}
                             <motion.img
                                 src="/sheldon.png"
                                 alt="Dr. Sheldon Cooper"
-                                initial={{ opacity: 0, y: 80, scale: 1.05 }}
-                                animate={{ opacity: 1, y: 0, scale: 1.18 }}
-                                transition={{ type: "spring", stiffness: 60, damping: 16, delay: 2.9 }}
+                                initial={{ opacity: 0, y: 80, scale: 1.05, rotate: 0 }}
+                                animate={{ opacity: 1, y: 0, scale: 1.18, rotate: spinRotation }}
+                                transition={{
+                                    default: { type: "spring", stiffness: 60, damping: 16 },
+                                    opacity: { delay: 2.9 },
+                                    y: { delay: 2.9 },
+                                    scale: { delay: 2.9 },
+                                    rotate: { type: "spring", stiffness: 120, damping: 12 }
+                                }}
                                 whileHover={{ scale: 1.24 }}
+                                onClick={() => setSpinRotation((prev) => prev + 360)}
                                 className="absolute bottom-0 h-[122%] w-auto object-contain object-bottom z-30 cursor-pointer"
                             />
                         </motion.div>
