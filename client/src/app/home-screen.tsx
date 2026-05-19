@@ -142,41 +142,36 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="hidden lg:col-span-5 lg:block">
-                        <div className="relative rounded-2xl border border-secondary bg-secondary p-8 shadow-md">
-                            {/* Window buttons */}
-                            <div className="absolute top-4 right-4 flex gap-1.5">
-                                <span className="size-3 rounded-full bg-neutral-300" />
-                                <span className="size-3 rounded-full bg-neutral-300" />
-                                <span className="size-3 rounded-full bg-neutral-300" />
-                            </div>
-                            
-                            <div className="font-mono text-xs text-brand-secondary mb-4 uppercase tracking-wider font-semibold">
-                                // LECTURE 07: Quantum Mechanics
-                            </div>
-                            
-                            <div className="space-y-4">
-                                <div className="rounded-lg border border-secondary bg-primary p-4 shadow-xs">
-                                    <span className="block text-xs font-semibold text-tertiary mb-1">Schrödinger Equation</span>
-                                    <code className="font-mono text-sm text-primary block overflow-x-auto whitespace-nowrap">
-                                        iħ ∂/∂t Ψ(x,t) = Ĥ Ψ(x,t)
-                                    </code>
-                                </div>
-                                
-                                <div className="rounded-lg border border-secondary bg-primary p-4 shadow-xs">
-                                    <span className="block text-xs font-semibold text-tertiary mb-1">Wavefunction Solution</span>
-                                    <code className="font-mono text-sm text-primary block overflow-x-auto whitespace-nowrap">
-                                        Ψ(x) = A e^(ikx) + B e^(-ikx)
-                                    </code>
-                                </div>
+                    <div className="hidden lg:col-span-5 lg:block relative pl-8">
+                        {/* Decorative background aura/glow */}
+                        <div className="absolute inset-0 -m-8 rounded-full bg-radial from-brand-secondary/15 to-transparent blur-3xl opacity-60" />
 
-                                <div className="rounded-lg border border-secondary bg-primary p-4 shadow-xs">
-                                    <span className="block text-xs font-semibold text-tertiary mb-1">Sheldon's Assessment</span>
-                                    <p className="font-display text-sm italic text-primary">
-                                        &ldquo;It&apos;s simple quantum mechanics. I&apos;d explain it to you, but you don&apos;t possess the required prefrontal cortex density.&rdquo;
-                                    </p>
-                                </div>
+                        {/* Orbiting technical academic coordinates */}
+                        <div className="absolute inset-0 flex items-center justify-center animate-spin-slow pointer-events-none opacity-40">
+                            <svg className="w-[115%] h-[115%] text-brand-secondary" fill="none" viewBox="0 0 200 200">
+                                <circle cx="100" cy="100" r="76" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3 3" />
+                                <circle cx="100" cy="100" r="92" stroke="currentColor" strokeWidth="0.25" />
+                                <path d="M 20 100 L 180 100 M 100 20 L 100 180" stroke="currentColor" strokeWidth="0.25" strokeDasharray="2 2" />
+                            </svg>
+                        </div>
+
+                        {/* Main Sheldon circular container */}
+                        <div className="relative mx-auto size-[380px] xl:size-[420px] rounded-full border-4 border-secondary bg-secondary p-2.5 shadow-2xl overflow-hidden aspect-square flex items-center justify-center z-10 animate-slide-fade-left-to-right" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
+                            <div className="relative w-full h-full rounded-full overflow-hidden bg-primary border border-secondary flex items-center justify-center">
+                                <img
+                                    src="/sheldon.png"
+                                    alt="Dr. Sheldon Cooper"
+                                    className="w-full h-full object-cover object-center scale-[1.05] transition-transform duration-700 hover:scale-110"
+                                />
                             </div>
+                        </div>
+
+                        {/* Floating pedantic quote badge */}
+                        <div className="absolute -bottom-2 left-6 rounded-xl border border-secondary bg-primary p-3.5 shadow-lg max-w-[220px] z-20 opacity-0 animate-slide-fade-left-to-right" style={{ animationDelay: "2.4s", animationFillMode: "forwards" }}>
+                            <p className="font-display text-xs italic text-primary leading-snug">
+                                &ldquo;I&apos;m not insane. My mother had me tested.&rdquo;
+                            </p>
+                            <span className="block text-[9px] font-mono text-tertiary mt-2 uppercase tracking-wider">// Dr. Cooper</span>
                         </div>
                     </div>
                 </div>
