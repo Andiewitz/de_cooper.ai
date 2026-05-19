@@ -1,9 +1,41 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BookOpen01, Atom01, Calculator, Code01, Star01, Zap } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { useAuth } from "@/providers/auth-provider";
+
+function Typewriter({ text, speed = 15, delay = 800 }: { text: string; speed?: number; delay?: number }) {
+    const [displayedText, setDisplayedText] = useState("");
+    const [start, setStart] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setStart(true);
+        }, delay);
+        return () => clearTimeout(timer);
+    }, [delay]);
+
+    useEffect(() => {
+        if (!start) return;
+        let i = 0;
+        const interval = setInterval(() => {
+            setDisplayedText((prev) => prev + text.charAt(i));
+            i++;
+            if (i >= text.length) {
+                clearInterval(interval);
+            }
+        }, speed);
+        return () => clearInterval(interval);
+    }, [start, text, speed]);
+
+    return (
+        <span className={displayedText.length < text.length ? "animate-cursor-blink" : ""}>
+            {displayedText}
+        </span>
+    );
+}
 
 const features = [
     {
@@ -74,19 +106,17 @@ export default function HomePage() {
             <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
                 <div className="ml-0 mr-auto grid max-w-7xl w-full items-center gap-12 lg:grid-cols-12 text-left pl-4 lg:pl-16">
                     <div className="lg:col-span-7">
-                        <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88]">
+                        <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88] animate-slide-fade-in">
                             Be the most obnoxious
                             <br />
                             <span className="text-fg-brand-primary">person in the room.</span>
                         </h1>
 
-                        <p className="mt-4 max-w-xl text-lg text-tertiary">
-                            An uncompromisingly rigorous academic sandbox. No watered-down concepts,
-                            no participation awards—just beautiful, elegant mathematical proofs
-                            and a mentor who is mathematically certain he is smarter than you.
+                        <p className="mt-4 max-w-xl text-lg text-tertiary min-h-[84px]">
+                            <Typewriter text="An uncompromisingly rigorous academic sandbox. No watered-down concepts, no participation awards—just beautiful, elegant mathematical proofs and a mentor who is mathematically certain he is smarter than you." />
                         </p>
 
-                        <div className="mt-5 flex items-center gap-4">
+                        <div className="mt-5 flex items-center gap-4 opacity-0 animate-slide-fade-in" style={{ animationDelay: "1.6s", animationFillMode: "forwards" }}>
                             <Button
                                 href={isAuthenticated ? "/learn" : "/register"}
                                 color="primary"

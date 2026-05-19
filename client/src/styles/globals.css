@@ -90,3 +90,33 @@ html.lenis body {
     pointer-events: none;
 }
 
+/* Premium Animations */
+@keyframes slideFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cursorBlink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.animate-slide-fade-in {
+    animation: slideFadeIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-cursor-blink::after {
+    content: '|';
+    animation: cursorBlink 0.9s step-end infinite;
+    color: var(--color-fg-brand-primary);
+    margin-left: 2px;
+}
+
+
