@@ -71,36 +71,76 @@ export default function HomePage() {
             </nav>
 
             {/* Hero */}
-            <section className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center md:py-0">
-                <div className="mx-auto max-w-3xl">
-                    <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary px-4 py-1.5 text-sm font-medium text-secondary">
-                        <span className="size-2 rounded-full bg-green-500" />
-                        Powered by Llama 70B via OpenRouter
+            <section className="flex flex-1 flex-col justify-center px-6 py-12 md:py-0">
+                <div className="mx-auto grid max-w-6xl w-full items-center gap-12 lg:grid-cols-12 text-left">
+                    <div className="lg:col-span-7">
+                        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary px-4 py-1.5 text-sm font-medium text-secondary">
+                            <span className="size-2 rounded-full bg-green-500" />
+                            Powered by Llama 70B via OpenRouter
+                        </div>
+
+                        <h1 className="font-logo text-5xl lg:text-7xl font-extrabold tracking-tight text-primary leading-[1.05]">
+                            Be the most obnoxious
+                            <br />
+                            <span className="text-fg-brand-primary">person in the room.</span>
+                        </h1>
+
+                        <p className="mt-6 max-w-xl text-lg text-tertiary">
+                            An uncompromisingly rigorous academic sandbox. No watered-down concepts,
+                            no participation awards—just beautiful, elegant mathematical proofs
+                            and a mentor who is mathematically certain he is smarter than you.
+                        </p>
+
+                        <div className="mt-8 flex items-center gap-4">
+                            <Button
+                                href={isAuthenticated ? "/learn" : "/register"}
+                                color="primary"
+                                size="xl"
+                            >
+                                {isAuthenticated ? "Continue Learning" : "Start Learning"}
+                            </Button>
+                            <Button href="/login" color="secondary" size="xl">
+                                Sign In
+                            </Button>
+                        </div>
                     </div>
 
-                    <h1 className="font-logo text-display-lg font-bold tracking-tight text-primary leading-tight">
-                        Be the most obnoxious
-                        <br />
-                        <span className="text-fg-brand-primary">person in the room.</span>
-                    </h1>
+                    <div className="hidden lg:col-span-5 lg:block">
+                        <div className="relative rounded-2xl border border-secondary bg-secondary p-8 shadow-md">
+                            {/* Window buttons */}
+                            <div className="absolute top-4 right-4 flex gap-1.5">
+                                <span className="size-3 rounded-full bg-neutral-300" />
+                                <span className="size-3 rounded-full bg-neutral-300" />
+                                <span className="size-3 rounded-full bg-neutral-300" />
+                            </div>
+                            
+                            <div className="font-mono text-xs text-brand-secondary mb-4 uppercase tracking-wider font-semibold">
+                                // LECTURE 07: Quantum Mechanics
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div className="rounded-lg border border-secondary bg-primary p-4 shadow-xs">
+                                    <span className="block text-xs font-semibold text-tertiary mb-1">Schrödinger Equation</span>
+                                    <code className="font-mono text-sm text-primary block overflow-x-auto whitespace-nowrap">
+                                        iħ ∂/∂t Ψ(x,t) = Ĥ Ψ(x,t)
+                                    </code>
+                                </div>
+                                
+                                <div className="rounded-lg border border-secondary bg-primary p-4 shadow-xs">
+                                    <span className="block text-xs font-semibold text-tertiary mb-1">Wavefunction Solution</span>
+                                    <code className="font-mono text-sm text-primary block overflow-x-auto whitespace-nowrap">
+                                        Ψ(x) = A e^(ikx) + B e^(-ikx)
+                                    </code>
+                                </div>
 
-                    <p className="mx-auto mt-6 max-w-xl text-lg text-tertiary">
-                        An uncompromisingly rigorous academic sandbox. No watered-down concepts,
-                        no participation awards—just beautiful, elegant mathematical proofs
-                        and a mentor who is mathematically certain he is smarter than you.
-                    </p>
-
-                    <div className="mt-8 flex items-center justify-center gap-4">
-                        <Button
-                            href={isAuthenticated ? "/learn" : "/register"}
-                            color="primary"
-                            size="xl"
-                        >
-                            {isAuthenticated ? "Continue Learning" : "Start Learning"}
-                        </Button>
-                        <Button href="/login" color="secondary" size="xl">
-                            Sign In
-                        </Button>
+                                <div className="rounded-lg border border-secondary bg-primary p-4 shadow-xs">
+                                    <span className="block text-xs font-semibold text-tertiary mb-1">Sheldon's Assessment</span>
+                                    <p className="font-display text-sm italic text-primary">
+                                        &ldquo;It&apos;s simple quantum mechanics. I&apos;d explain it to you, but you don&apos;t possess the required prefrontal cortex density.&rdquo;
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
