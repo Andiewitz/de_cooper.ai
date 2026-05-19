@@ -103,7 +103,7 @@ export default function HomePage() {
             </nav>
 
             <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
-                <div className="ml-0 mr-auto grid max-w-7xl w-full items-center gap-12 lg:grid-cols-12 text-left pl-4 lg:pl-16">
+                <div className="grid max-w-none w-full items-center gap-12 lg:grid-cols-12 text-left px-6 lg:px-16">
                     <div className="lg:col-span-7">
                         <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88] flex flex-col gap-1">
                             <span
@@ -142,7 +142,7 @@ export default function HomePage() {
                         </div>
                     </div>
 
-                    <div className="hidden lg:col-span-5 lg:block relative pl-8">
+                    <div className="hidden lg:col-span-5 lg:block relative mr-0 ml-auto lg:pr-8 text-right">
                         {/* Decorative background aura/glow */}
                         <div className="absolute inset-0 -m-8 rounded-full bg-radial from-brand-secondary/15 to-transparent blur-3xl opacity-60" />
 
@@ -155,19 +155,21 @@ export default function HomePage() {
                             </svg>
                         </div>
 
-                        {/* Main Sheldon circular container */}
-                        <div className="relative mx-auto size-[380px] xl:size-[420px] rounded-full border-4 border-secondary bg-secondary p-2.5 shadow-2xl overflow-hidden aspect-square flex items-center justify-center z-10 animate-slide-fade-left-to-right" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
-                            <div className="relative w-full h-full rounded-full overflow-hidden bg-primary border border-secondary flex items-center justify-center">
-                                <img
-                                    src="/sheldon.png"
-                                    alt="Dr. Sheldon Cooper"
-                                    className="w-full h-full object-cover object-center scale-[1.05] transition-transform duration-700 hover:scale-110"
-                                />
-                            </div>
+                        {/* Main Sheldon 3D circular pop-out container */}
+                        <div className="relative mr-0 ml-auto size-[380px] xl:size-[440px] rounded-full border-4 border-secondary bg-secondary shadow-2xl flex items-end justify-center z-10 animate-slide-fade-left-to-right" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
+                            {/* Inner circle backdrop */}
+                            <div className="absolute inset-2.5 rounded-full bg-primary border border-secondary overflow-hidden" />
+                            
+                            {/* Sheldon popping out of the circle border */}
+                            <img
+                                src="/sheldon.png"
+                                alt="Dr. Sheldon Cooper"
+                                className="absolute bottom-0 h-[122%] w-auto object-contain object-bottom scale-[1.18] transition-all duration-700 hover:scale-[1.24] z-30"
+                            />
                         </div>
 
                         {/* Floating pedantic quote badge */}
-                        <div className="absolute -bottom-2 left-6 rounded-xl border border-secondary bg-primary p-3.5 shadow-lg max-w-[220px] z-20 opacity-0 animate-slide-fade-left-to-right" style={{ animationDelay: "2.4s", animationFillMode: "forwards" }}>
+                        <div className="absolute -bottom-2 right-4 rounded-xl border border-secondary bg-primary p-3.5 shadow-lg max-w-[220px] z-40 opacity-0 animate-slide-fade-left-to-right text-left" style={{ animationDelay: "2.4s", animationFillMode: "forwards" }}>
                             <p className="font-display text-xs italic text-primary leading-snug">
                                 &ldquo;I&apos;m not insane. My mother had me tested.&rdquo;
                             </p>
