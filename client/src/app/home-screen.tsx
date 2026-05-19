@@ -71,7 +71,7 @@ export default function HomePage() {
             </nav>
 
             {/* Hero */}
-            <section className="flex flex-1 flex-col justify-center px-6 py-12 md:py-0">
+            <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
                 <div className="mx-auto grid max-w-6xl w-full items-center gap-12 lg:grid-cols-12 text-left">
                     <div className="lg:col-span-7">
                         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary px-4 py-1.5 text-sm font-medium text-secondary">
