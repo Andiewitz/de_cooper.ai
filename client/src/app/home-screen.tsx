@@ -6,6 +6,7 @@ import { BookOpen01, Atom01, Calculator, Code01, Star01, Zap } from "@untitledui
 import { Button } from "@/components/base/buttons/button";
 import { useAuth } from "@/providers/auth-provider";
 import { motion } from "framer-motion";
+import { TermsModal } from "@/components/terms-modal";
 
 function Typewriter({ text, speed = 15, delay = 800 }: { text: string; speed?: number; delay?: number }) {
     const [displayedText, setDisplayedText] = useState("");
@@ -73,6 +74,7 @@ const features = [
 
 export default function HomePage() {
     const { isAuthenticated } = useAuth();
+    const [isTermsOpen, setIsTermsOpen] = useState(false);
 
     return (
         <div className="bg-primary">
@@ -369,7 +371,7 @@ export default function HomePage() {
                             >
                                 {isAuthenticated ? "Go to Lessons" : "Create Free Account →"}
                             </Button>
-                            <Button href="/terms" color="secondary" size="xl">
+                            <Button onClick={() => setIsTermsOpen(true)} color="secondary" size="xl">
                                 Read the Fine Print
                             </Button>
                         </div>
@@ -403,7 +405,7 @@ export default function HomePage() {
                             </div>
                             <div className="flex flex-col gap-2">
                                 <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">Legal</span>
-                                <Link href="/terms" className="hover:text-primary transition-colors">Terms &amp; Conditions</Link>
+                                <Link href="/terms" onClick={(e) => { e.preventDefault(); setIsTermsOpen(true); }} className="hover:text-primary transition-colors">Terms &amp; Conditions</Link>
                                 <span className="text-tertiary">Parody &amp; Satire</span>
                                 <span className="text-tertiary">Non-Commercial Use</span>
                             </div>
@@ -440,6 +442,8 @@ export default function HomePage() {
                     </div>
                 </div>
             </footer>
+
+            <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
         </div>
     );
 }
