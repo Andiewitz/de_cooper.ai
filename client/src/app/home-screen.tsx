@@ -102,7 +102,7 @@ export default function HomePage() {
                 </div>
             </nav>
 
-            <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
+            <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-24 lg:pt-36">
                 <div className="grid max-w-none w-full items-center gap-12 lg:grid-cols-12 text-left px-6 lg:px-16">
                     <div className="lg:col-span-7">
                         <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88] flex flex-col gap-1">
