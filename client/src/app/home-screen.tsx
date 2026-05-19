@@ -21,7 +21,7 @@ function Typewriter({ text, speed = 15, delay = 800 }: { text: string; speed?: n
         if (!start) return;
         let i = 0;
         const interval = setInterval(() => {
-            setDisplayedText((prev) => prev + text.charAt(i));
+            setDisplayedText(text.substring(0, i + 1));
             i++;
             if (i >= text.length) {
                 clearInterval(interval);
