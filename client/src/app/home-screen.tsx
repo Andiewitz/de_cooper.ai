@@ -311,15 +311,63 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="border-t border-secondary px-6 py-8">
-                <div className="mx-auto flex max-w-6xl items-center justify-between">
-                    <span className="font-logo text-sm font-bold text-tertiary tracking-tight">
-                        de_cooper.ai
-                    </span>
-                    <p className="text-xs text-quaternary">
-                        Not affiliated with CBS, Warner Bros., or Dr. Sheldon Cooper (who is fictional, unlike my intellect).
-                    </p>
+            {/* Footer — Legal Disclaimer & Satire Notice */}
+            <footer className="border-t border-secondary bg-secondary/40 px-6 py-12">
+                <div className="mx-auto max-w-5xl">
+                    {/* Top row: Brand + Nav links */}
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-10">
+                        <div className="max-w-sm">
+                            <span className="font-logo text-lg font-extrabold text-primary tracking-tight">
+                                de_cooper.ai
+                            </span>
+                            <p className="mt-2 text-xs text-tertiary leading-relaxed">
+                                A satirical, non-commercial educational experiment. Built for fun, learning, and the relentless pursuit of academic pedantry.
+                            </p>
+                        </div>
+                        <div className="flex gap-10 text-xs text-secondary">
+                            <div className="flex flex-col gap-2">
+                                <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">Platform</span>
+                                <Link href="/learn" className="hover:text-primary transition-colors">Sandbox</Link>
+                                <Link href="/register" className="hover:text-primary transition-colors">Create Account</Link>
+                                <Link href="/login" className="hover:text-primary transition-colors">Sign In</Link>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">Legal</span>
+                                <span className="text-tertiary">Parody &amp; Satire</span>
+                                <span className="text-tertiary">Non-Commercial Use</span>
+                                <span className="text-tertiary">Fan Project</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-secondary mb-6" />
+
+                    {/* Satire & Legal Disclaimer */}
+                    <div className="rounded-xl border border-secondary bg-primary p-5 mb-6">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mb-2">⚖️ Parody &amp; Satire Disclaimer</p>
+                        <p className="text-[11px] text-tertiary leading-relaxed">
+                            This website is a <strong className="text-secondary">non-commercial, satirical fan project</strong> created purely for educational and comedic purposes.
+                            It is <strong className="text-secondary">not affiliated with, endorsed by, or associated with</strong> CBS Studios, Warner Bros. Television,
+                            Chuck Lorre Productions, Bill Prady, or any cast members of <em>The Big Bang Theory</em>.
+                        </p>
+                        <p className="text-[11px] text-tertiary leading-relaxed mt-2">
+                            The character &ldquo;Dr. Sheldon Cooper&rdquo; is a fictional character from the television series <em>The Big Bang Theory</em>,
+                            created by Chuck Lorre and Bill Prady. All related names, characters, and trademarks are the property of their respective owners.
+                            Any use of the character&apos;s name, likeness, or personality traits on this site is intended solely as <strong className="text-secondary">parody and transformative commentary</strong> under
+                            fair use principles.
+                        </p>
+                        <p className="text-[11px] text-tertiary leading-relaxed mt-2">
+                            This project generates <strong className="text-secondary">no revenue</strong> and is not offered for sale. No copyrighted material from the show is reproduced.
+                            If you are a rights holder and have concerns, please contact us and we will promptly address them.
+                        </p>
+                    </div>
+
+                    {/* Bottom bar */}
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] text-quaternary">
+                        <p>&copy; {new Date().getFullYear()} de_cooper.ai &mdash; A satirical fan project. Not for profit. Not affiliated with any studio or network.</p>
+                        <p className="font-mono opacity-60">// bazinga.</p>
+                    </div>
                 </div>
             </footer>
         </div>
