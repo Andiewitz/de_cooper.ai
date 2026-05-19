@@ -72,13 +72,8 @@ export default function HomePage() {
 
             {/* Hero */}
             <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
-                <div className="mx-auto grid max-w-7xl w-full items-center gap-12 lg:grid-cols-12 text-left px-4 lg:px-8">
+                <div className="ml-0 mr-auto grid max-w-7xl w-full items-center gap-12 lg:grid-cols-12 text-left pl-4 lg:pl-16">
                     <div className="lg:col-span-7">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary px-4 py-1.5 text-sm font-medium text-secondary">
-                            <span className="size-2 rounded-full bg-green-500" />
-                            Powered by Llama 70B via OpenRouter
-                        </div>
-
                         <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88]">
                             Be the most obnoxious
                             <br />
