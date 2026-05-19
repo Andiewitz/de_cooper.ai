@@ -321,7 +321,7 @@ export default function HomePage() {
             </div>
         </section>
 
-        {/* Features Bento Grid */}
+        {/* Features Bento Grid (Clay-inspired) */}
         <section className="border-t border-secondary bg-secondary/30 px-6 py-20 lg:py-28">
             <div className="mx-auto max-w-6xl">
                 <div className="mb-14 text-center">
@@ -334,26 +334,215 @@ export default function HomePage() {
                     </p>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {features.map((feature) => {
-                        const Icon = feature.icon;
-                        return (
-                            <div
-                                key={feature.title}
-                                className="group rounded-2xl border border-secondary bg-primary p-6 transition-all duration-300 hover:shadow-lg hover:border-brand-secondary/30"
-                            >
-                                <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-brand-primary/80 group-hover:bg-brand-primary transition-colors">
-                                    <Icon className="size-5 text-white" />
-                                </div>
-                                <h3 className="font-logo text-base font-bold text-primary tracking-tight">
-                                    {feature.title}
-                                </h3>
-                                <p className="mt-2 text-sm text-tertiary leading-relaxed">
-                                    {feature.description}
-                                </p>
+                <div className="grid gap-6 md:grid-cols-2">
+                    {/* Card 1: Green Card (Verification & Exports) */}
+                    <motion.div
+                        whileHover={{ y: -6 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className="bg-[#043327] text-white rounded-3xl p-8 flex flex-col justify-between overflow-hidden relative border border-[#0d4e3e] shadow-md min-h-[580px] lg:min-h-[620px]"
+                    >
+                        {/* Mock UI Container */}
+                        <div className="bg-[#03231a]/80 border border-white/10 rounded-2xl p-5 space-y-3 relative overflow-hidden h-72">
+                            <div className="flex items-center justify-between text-[9px] font-mono text-white/40 border-b border-white/5 pb-2">
+                                <span>VERIFICATION PIPELINE</span>
+                                <span>STATUS: ACTIVE</span>
                             </div>
-                        );
-                    })}
+                            
+                            <div className="space-y-2 font-mono text-[11px] text-white/70">
+                                <div className="flex items-center justify-between py-1.5 border-b border-white/5">
+                                    <span>Topological K-Theory Proof</span>
+                                    <span className="text-red-400 font-semibold">● Logic Error</span>
+                                </div>
+                                <div className="flex items-center justify-between py-1.5 border-b border-white/5">
+                                    <span>Yang-Mills Boundary Proof</span>
+                                    <span className="text-emerald-400 font-semibold">● Verified</span>
+                                </div>
+                                <div className="flex items-center justify-between py-1.5">
+                                    <span>Schrödinger Wave Derivation</span>
+                                    <span className="text-yellow-400 font-semibold">● Compiling...</span>
+                                </div>
+                            </div>
+
+                            {/* Floating Dropdown Selector */}
+                            <div className="absolute top-12 right-6 w-56 bg-white rounded-xl shadow-2xl border border-secondary p-2.5 text-black space-y-1 z-10">
+                                <div className="text-[8px] font-mono text-neutral-400 font-bold uppercase tracking-wider px-2 py-0.5">Export Proof To:</div>
+                                <div className="flex items-center justify-between text-[11px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
+                                    <span className="flex items-center gap-2">📄 Compile via Coq</span>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] font-bold px-2 py-1.5 bg-brand-primary/10 text-brand-primary rounded-lg cursor-pointer">
+                                    <span className="flex items-center gap-2">📐 Compile to LaTeX</span>
+                                    <span className="text-[10px]">&rarr;</span>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
+                                    <span className="flex items-center gap-2">🐍 Generate Python Solver</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Info */}
+                        <div className="mt-8 space-y-3">
+                            <span className="inline-block bg-[#0a4d3c] text-[#34d399] px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-mono font-bold">
+                                Destinations
+                            </span>
+                            <h3 className="font-logo text-2xl font-bold tracking-tight text-white leading-tight">
+                                Constantly verify and compile proofs to LaTeX, Coq, or Python
+                            </h3>
+                            <p className="text-xs text-white/70 leading-relaxed font-sans">
+                                Push your academic work straight to Coq proof assistants, mathematical solvers, or clean PDF compilations. Dr. Cooper&apos;s compiler handles the rigorous double-checks so you can focus on pure logic.
+                            </p>
+                        </div>
+                    </motion.div>
+
+                    {/* Card 2: Light Cream Testimonial & Metric Card */}
+                    <motion.div
+                        whileHover={{ y: -6 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className="bg-primary border border-secondary rounded-3xl p-8 flex flex-col justify-between shadow-sm min-h-[580px] lg:min-h-[620px]"
+                    >
+                        {/* Top Quote */}
+                        <div className="space-y-4">
+                            <p className="text-sm font-medium text-primary italic leading-relaxed">
+                                &ldquo;de_cooper.ai has helped Caltech significantly improve our academic standards. We&apos;ve been able to consolidate our entire department&apos;s requirements into core essentials, like topology, physics, and Sheldon&apos;s couch rules.&rdquo;
+                            </p>
+                            <div>
+                                <h4 className="text-xs font-bold text-primary">Leonard Hofstadter, Ph.D.</h4>
+                                <p className="text-[10px] text-tertiary">Head of Experimental Physics at Caltech</p>
+                            </div>
+                        </div>
+
+                        {/* Middle Metrics list */}
+                        <div className="my-6 space-y-3">
+                            <div className="flex items-start gap-3">
+                                <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
+                                    12h/week
+                                </span>
+                                <p className="text-xs text-tertiary mt-0.5">Average time saved from hand-waving explanations by using exact mathematical proofs.</p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
+                                    100+
+                                </span>
+                                <p className="text-xs text-tertiary mt-0.5">Total sarcastic remarks received before completing a single homework set.</p>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
+                                    0%
+                                </span>
+                                <p className="text-xs text-tertiary mt-0.5">Chance of receiving any partial credit or participation trophies.</p>
+                            </div>
+                        </div>
+
+                        {/* Bottom Separator Line & Brand */}
+                        <div className="border-t border-secondary pt-4 flex items-center justify-between">
+                            <span className="font-logo text-xs font-black tracking-widest text-primary uppercase select-none opacity-60">
+                                C A L T E C H
+                            </span>
+                            <Link href="/learn" className="text-xs font-bold text-primary hover:text-brand-primary transition-colors flex items-center gap-1">
+                                View Curriculum &rarr;
+                            </Link>
+                        </div>
+                    </motion.div>
+
+                    {/* Card 3: Deep Purple Card (Persona Normalization / Rigor Transformation) */}
+                    <motion.div
+                        whileHover={{ y: -6 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className="bg-[#2e1065] text-white rounded-3xl p-8 flex flex-col justify-between overflow-hidden relative border border-[#4c1d95] shadow-md min-h-[580px] lg:min-h-[620px]"
+                    >
+                        {/* Mock UI Container */}
+                        <div className="bg-[#1e0a3b]/80 border border-white/10 rounded-2xl p-5 space-y-4 relative overflow-hidden h-72">
+                            {/* Input block */}
+                            <div className="space-y-1.5">
+                                <div className="text-[9px] font-mono text-white/40">STUDENT INPUT:</div>
+                                <div className="bg-[#2e1065] border border-white/15 rounded-xl px-3 py-2 text-[11px] font-mono text-white/90">
+                                    &ldquo;gravity pulls things down pretty fast&rdquo;
+                                </div>
+                            </div>
+
+                            {/* Transformation popup overlay */}
+                            <div className="absolute top-10 right-4 w-52 bg-white rounded-xl shadow-2xl border border-secondary p-2 text-black space-y-1 z-10">
+                                <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
+                                    <span>📝 Normalize variables</span>
+                                </div>
+                                <div className="flex items-center justify-between text-[10px] font-bold px-2 py-1.5 bg-purple-50 text-purple-900 rounded-lg cursor-pointer">
+                                    <span className="flex items-center gap-1.5">📐 Convert to Theorem</span>
+                                    <span>&rarr;</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
+                                    <span>🛑 Deduplicate hand-waving</span>
+                                </div>
+                            </div>
+
+                            {/* Result block */}
+                            <div className="space-y-1.5">
+                                <div className="text-[9px] font-mono text-white/40">RIGOROUS NORMALIZATION:</div>
+                                <div className="bg-emerald-950/80 border border-emerald-500/20 text-emerald-300 rounded-xl px-3 py-2 text-[11px] font-mono">
+                                    g &asymp; 9.81 m/s&sup2; exerts gravitational force F = G(m&sup1;m&sup2;)/r&sup2;
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Info */}
+                        <div className="mt-8 space-y-3">
+                            <span className="inline-block bg-[#3b0764] text-[#d8b4fe] px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-mono font-bold">
+                                Rigor Translation
+                            </span>
+                            <h3 className="font-logo text-2xl font-bold tracking-tight text-white leading-tight">
+                                Clean and format your scientific assumptions in seconds
+                            </h3>
+                            <p className="text-xs text-white/70 leading-relaxed font-sans">
+                                Use our parser to transform any hand-waving explanation into strict, axiom-backed statements. Eliminate ambiguity, ensure mathematical precision, and strip out unnecessary adjectives.
+                            </p>
+                        </div>
+                    </motion.div>
+
+                    {/* Card 4: Deep Blue Card (Conditional Logic Steps) */}
+                    <motion.div
+                        whileHover={{ y: -6 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className="bg-[#1e3a8a] text-white rounded-3xl p-8 flex flex-col justify-between overflow-hidden relative border border-[#1d4ed8] shadow-md min-h-[580px] lg:min-h-[620px]"
+                    >
+                        {/* Mock UI Container */}
+                        <div className="bg-[#172554]/80 border border-white/10 rounded-2xl p-5 space-y-3 relative overflow-hidden h-72">
+                            <div className="flex items-center justify-between text-[9px] font-mono text-white/40 border-b border-white/5 pb-2">
+                                <span>RESPONSE MATRIX</span>
+                                <span>RULE #42</span>
+                            </div>
+
+                            {/* Rules */}
+                            <div className="bg-[#1e3a8a] border border-white/10 rounded-xl p-3 space-y-2 text-[11px] font-mono">
+                                <div className="flex items-center gap-1.5 text-white/60">
+                                    <span>Evaluate student proof if:</span>
+                                    <span className="bg-white/10 px-1.5 py-0.5 rounded text-white font-bold">Workspace</span>
+                                    <span>is active</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-white/60">
+                                    <span>and</span>
+                                    <span className="bg-white/10 px-1.5 py-0.5 rounded text-white font-bold">Proof Logic</span>
+                                    <span>contains hand-waving</span>
+                                </div>
+                            </div>
+
+                            {/* Rule Action */}
+                            <div className="bg-rose-950/60 border border-rose-500/20 text-rose-300 rounded-xl p-3 text-[11px] font-mono space-y-1">
+                                <div className="text-[9px] text-rose-400 font-bold uppercase tracking-wider">AI-Generated Outcome:</div>
+                                <div>!sarcasm_modifier &amp;&amp; trigger_cooper_laughter(&ldquo;ha-ha&rdquo;)</div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Info */}
+                        <div className="mt-8 space-y-3">
+                            <span className="inline-block bg-[#172554] text-[#93c5fd] px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-mono font-bold">
+                                Academic Conditionals
+                            </span>
+                            <h3 className="font-logo text-2xl font-bold tracking-tight text-white leading-tight">
+                                Run response pipelines conditionally &mdash; no engineering needed
+                            </h3>
+                            <p className="text-xs text-white/70 leading-relaxed font-sans">
+                                Design custom learning maps that adapt to your inputs automatically. Direct correct proof paths straight to advanced topics, and trigger targeted remediation pipelines for logical fallacies.
+                            </p>
+                        </div>
+                    </motion.div>
                 </div>
             </div>
         </section>
