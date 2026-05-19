@@ -321,47 +321,6 @@ export default function HomePage() {
             </div>
         </section>
 
-        {/* Central Library Split Section (Clay-inspired) */}
-        <section className="border-t border-secondary px-6 py-20 lg:py-28 bg-primary">
-            <div className="mx-auto max-w-6xl grid gap-12 lg:grid-cols-12 items-center">
-                {/* Left: Text & CTA */}
-                <div className="lg:col-span-7 space-y-6">
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary">Central Library</p>
-                    <h2 className="font-logo text-3xl lg:text-5xl font-extrabold text-primary tracking-tight leading-[1.1]">
-                        Access Dr. Cooper&apos;s entire mental library in one central platform
-                    </h2>
-                    <p className="text-base text-tertiary leading-relaxed max-w-xl">
-                        Stop waiting semesters to listen to hand-waving, unrigorous lectures. de_cooper.ai gives you immediate access to advanced physics, mathematical proofs, and automated validation solvers in a single environment. No grade curves, no participation trophies, no excuses.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                        <Button href="/learn" color="primary" size="xl">
-                            Launch the Sandbox &rarr;
-                        </Button>
-                        <Button onClick={() => setIsTermsOpen(true)} color="secondary" size="xl">
-                            Read the Rules &rarr;
-                        </Button>
-                    </div>
-                </div>
-
-                {/* Right: 3D Illustration Container */}
-                <div className="lg:col-span-5">
-                    <div className="bg-[#F9F6F0] rounded-3xl p-8 border border-secondary shadow-sm flex items-center justify-center relative aspect-square overflow-hidden group select-none">
-                        {/* Subtle grid pattern background to enhance the aesthetic */}
-                        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-                        
-                        <motion.img 
-                            src="/toolbox.png" 
-                            alt="Academic Toolbox" 
-                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out z-10"
-                            initial={{ y: 20, opacity: 0 }}
-                            whileInView={{ y: 0, opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                        />
-                    </div>
-                </div>
-            </div>
-        </section>
 
         {/* Features Bento Grid (Clay-inspired) */}
         <section className="border-t border-secondary bg-secondary/30 px-6 py-20 lg:py-28">
@@ -588,37 +547,47 @@ export default function HomePage() {
                 </div>
             </div>
         </section>
+        {/* Final CTA (Clay-inspired split layout) */}
+        <section className="border-t border-secondary px-6 py-20 lg:py-28 bg-primary">
+            <div className="mx-auto max-w-6xl grid gap-12 lg:grid-cols-12 items-center">
+                {/* Left: Text & CTA */}
+                <div className="lg:col-span-7 space-y-6">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary">Free forever</p>
+                    <h2 className="font-logo text-3xl lg:text-5xl font-extrabold text-primary tracking-tight leading-[1.1]">
+                        Ready to feel intellectually inadequate?
+                    </h2>
+                    <p className="text-base text-tertiary leading-relaxed max-w-xl">
+                        Create a free account and start your education. Dr. Cooper is waiting. Impatiently. No credit card required. No hidden fees. Just pure, unfiltered condescension.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                        <Button
+                            href={isAuthenticated ? "/learn" : "/register"}
+                            color="primary"
+                            size="xl"
+                        >
+                            {isAuthenticated ? "Go to Lessons" : "Create Free Account →"}
+                        </Button>
+                        <Button onClick={() => setIsTermsOpen(true)} color="secondary" size="xl">
+                            Read the Fine Print
+                        </Button>
+                    </div>
+                </div>
 
-        {/* Final CTA */}
-        <section className="border-t border-secondary px-6 py-20 lg:py-28">
-            <div className="mx-auto max-w-3xl text-center">
-                <div className="rounded-3xl border border-secondary bg-secondary/40 px-8 py-14 lg:px-16 lg:py-20 relative overflow-hidden">
-                    {/* Subtle decorative glow */}
-                    <div className="absolute inset-0 bg-radial from-brand-secondary/8 to-transparent pointer-events-none" />
-
-                    <div className="relative z-10">
-                        <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary mb-4">Free forever</p>
-                        <h2 className="font-logo text-3xl lg:text-4xl font-extrabold text-primary tracking-tight">
-                            Ready to feel intellectually inadequate?
-                        </h2>
-                        <p className="mt-4 text-base text-tertiary max-w-lg mx-auto leading-relaxed">
-                            Create a free account and start your education. Dr. Cooper is waiting. Impatiently.
-                        </p>
-                        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-                            <Button
-                                href={isAuthenticated ? "/learn" : "/register"}
-                                color="primary"
-                                size="xl"
-                            >
-                                {isAuthenticated ? "Go to Lessons" : "Create Free Account →"}
-                            </Button>
-                            <Button onClick={() => setIsTermsOpen(true)} color="secondary" size="xl">
-                                Read the Fine Print
-                            </Button>
-                        </div>
-                        <p className="mt-6 text-[10px] text-quaternary">
-                            No credit card required. No hidden fees. Just pure, unfiltered condescension.
-                        </p>
+                {/* Right: 3D Illustration Container */}
+                <div className="lg:col-span-5">
+                    <div className="bg-[#F9F6F0] rounded-3xl p-8 border border-secondary shadow-sm flex items-center justify-center relative aspect-square overflow-hidden group select-none">
+                        {/* Subtle grid pattern background to enhance the aesthetic */}
+                        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+                        
+                        <motion.img 
+                            src="/toolbox.png" 
+                            alt="Academic Toolbox" 
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out z-10"
+                            initial={{ y: 20, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                        />
                     </div>
                 </div>
             </div>
