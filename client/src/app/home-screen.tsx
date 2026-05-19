@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BookOpen01, Atom01, Calculator, Code01, Star01, Zap } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { useAuth } from "@/providers/auth-provider";
+import { motion } from "framer-motion";
 
 function Typewriter({ text, speed = 15, delay = 800 }: { text: string; speed?: number; delay?: number }) {
     const [displayedText, setDisplayedText] = useState("");
@@ -106,29 +107,38 @@ export default function HomePage() {
                 <div className="grid max-w-none w-full items-center gap-12 lg:grid-cols-12 text-left px-6 lg:px-16">
                     <div className="lg:col-span-7">
                         <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88] flex flex-col gap-1">
-                            <span
-                                className="opacity-0 animate-slide-fade-left-to-right block"
-                                style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
+                            <motion.span
+                                initial={{ opacity: 0, x: -36 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.1 }}
+                                className="block"
                             >
                                 Be the most obnoxious
-                            </span>
-                            <span
-                                className="opacity-0 animate-slide-fade-left-to-right block text-fg-brand-primary"
-                                style={{ animationDelay: "0.45s", animationFillMode: "forwards" }}
+                            </motion.span>
+                            <motion.span
+                                initial={{ opacity: 0, x: -36 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.45 }}
+                                className="block text-fg-brand-primary"
                             >
                                 person in the room.
-                            </span>
+                            </motion.span>
                         </h1>
 
                         <p className="mt-4 max-w-xl text-lg text-tertiary min-h-[84px]">
                             <Typewriter
                                 text="An uncompromisingly rigorous academic sandbox. No watered-down concepts, no participation awards—just beautiful, elegant mathematical proofs and a mentor who is mathematically certain he is smarter than you."
-                                delay={1800}
+                                delay={1200}
                                 speed={12}
                             />
                         </p>
 
-                        <div className="mt-5 flex items-center gap-4 opacity-0 animate-slide-fade-left-to-right" style={{ animationDelay: "3.2s", animationFillMode: "forwards" }}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ type: "spring", stiffness: 70, damping: 16, delay: 2.2 }}
+                            className="mt-5 flex items-center gap-4"
+                        >
                             <Button
                                 href={isAuthenticated ? "/learn" : "/register"}
                                 color="primary"
@@ -139,7 +149,7 @@ export default function HomePage() {
                             <Button href="/login" color="secondary" size="xl">
                                 Sign In
                             </Button>
-                        </div>
+                        </motion.div>
                     </div>
 
                     <div className="hidden lg:col-span-5 lg:block relative mr-0 ml-auto lg:pr-8 text-right translate-y-12 lg:-translate-x-16">
@@ -147,34 +157,53 @@ export default function HomePage() {
                         <div className="absolute inset-0 -m-8 rounded-full bg-radial from-brand-secondary/15 to-transparent blur-3xl opacity-60" />
 
                         {/* Orbiting technical academic coordinates */}
-                        <div className="absolute inset-0 flex items-center justify-center animate-spin-slow pointer-events-none opacity-40">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 0.4, scale: 1 }}
+                            transition={{ duration: 1.2, delay: 2.4 }}
+                            className="absolute inset-0 flex items-center justify-center animate-spin-slow pointer-events-none"
+                        >
                             <svg className="w-[115%] h-[115%] text-brand-secondary" fill="none" viewBox="0 0 200 200">
                                 <circle cx="100" cy="100" r="76" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3 3" />
                                 <circle cx="100" cy="100" r="92" stroke="currentColor" strokeWidth="0.25" />
                                 <path d="M 20 100 L 180 100 M 100 20 L 100 180" stroke="currentColor" strokeWidth="0.25" strokeDasharray="2 2" />
                             </svg>
-                        </div>
+                        </motion.div>
 
                         {/* Main Sheldon 3D circular pop-out container */}
-                        <div className="relative mr-0 ml-auto size-[380px] xl:size-[440px] rounded-full border-4 border-secondary bg-secondary shadow-2xl flex items-end justify-center z-10 animate-slide-fade-left-to-right" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.7, x: 30 }}
+                            animate={{ opacity: 1, scale: 1, x: 0 }}
+                            transition={{ type: "spring", stiffness: 50, damping: 14, delay: 2.6 }}
+                            className="relative mr-0 ml-auto size-[380px] xl:size-[440px] rounded-full border-4 border-secondary bg-secondary shadow-2xl flex items-end justify-center z-10"
+                        >
                             {/* Inner circle backdrop */}
                             <div className="absolute inset-2.5 rounded-full bg-primary border border-secondary overflow-hidden" />
                             
                             {/* Sheldon popping out of the circle border */}
-                            <img
+                            <motion.img
                                 src="/sheldon.png"
                                 alt="Dr. Sheldon Cooper"
-                                className="absolute bottom-0 h-[122%] w-auto object-contain object-bottom scale-[1.18] transition-all duration-700 hover:scale-[1.24] z-30"
+                                initial={{ opacity: 0, y: 80, scale: 1.05 }}
+                                animate={{ opacity: 1, y: 0, scale: 1.18 }}
+                                transition={{ type: "spring", stiffness: 60, damping: 16, delay: 2.9 }}
+                                whileHover={{ scale: 1.24 }}
+                                className="absolute bottom-0 h-[122%] w-auto object-contain object-bottom z-30 cursor-pointer"
                             />
-                        </div>
+                        </motion.div>
 
                         {/* Floating pedantic quote badge */}
-                        <div className="absolute -bottom-2 right-4 rounded-xl border border-secondary bg-primary p-3.5 shadow-lg max-w-[220px] z-40 opacity-0 animate-slide-fade-left-to-right text-left" style={{ animationDelay: "2.4s", animationFillMode: "forwards" }}>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.5, y: 15 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ type: "spring", stiffness: 90, damping: 11, delay: 3.5 }}
+                            className="absolute -bottom-2 right-4 rounded-xl border border-secondary bg-primary p-3.5 shadow-lg max-w-[220px] z-40 text-left"
+                        >
                             <p className="font-display text-xs italic text-primary leading-snug">
                                 &ldquo;I&apos;m not insane. My mother had me tested.&rdquo;
                             </p>
                             <span className="block text-[9px] font-mono text-tertiary mt-2 uppercase tracking-wider">// Dr. Cooper</span>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
