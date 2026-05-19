@@ -102,21 +102,35 @@ export default function HomePage() {
                 </div>
             </nav>
 
-            {/* Hero */}
             <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
                 <div className="ml-0 mr-auto grid max-w-7xl w-full items-center gap-12 lg:grid-cols-12 text-left pl-4 lg:pl-16">
                     <div className="lg:col-span-7">
-                        <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88] animate-slide-fade-in">
+                        <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88] opacity-0 animate-slide-fade-left-to-right">
                             Be the most obnoxious
                             <br />
                             <span className="text-fg-brand-primary">person in the room.</span>
                         </h1>
 
-                        <p className="mt-4 max-w-xl text-lg text-tertiary min-h-[84px]">
-                            <Typewriter text="An uncompromisingly rigorous academic sandbox. No watered-down concepts, no participation awards—just beautiful, elegant mathematical proofs and a mentor who is mathematically certain he is smarter than you." />
+                        <p className="mt-5 max-w-xl text-lg text-tertiary flex flex-col gap-1.5 min-h-[96px]">
+                            {[
+                                "An uncompromisingly rigorous academic sandbox.",
+                                "No watered-down concepts, no participation awards—",
+                                "just beautiful, elegant mathematical proofs and a mentor who is mathematically certain he is smarter than you."
+                            ].map((line, index) => (
+                                <span
+                                    key={index}
+                                    className="opacity-0 animate-slide-fade-left-to-right block"
+                                    style={{
+                                        animationDelay: `${0.8 + index * 0.35}s`,
+                                        animationFillMode: "forwards"
+                                    }}
+                                >
+                                    {line}
+                                </span>
+                            ))}
                         </p>
 
-                        <div className="mt-5 flex items-center gap-4 opacity-0 animate-slide-fade-in" style={{ animationDelay: "1.6s", animationFillMode: "forwards" }}>
+                        <div className="mt-6 flex items-center gap-4 opacity-0 animate-slide-fade-left-to-right" style={{ animationDelay: "2.0s", animationFillMode: "forwards" }}>
                             <Button
                                 href={isAuthenticated ? "/learn" : "/register"}
                                 color="primary"

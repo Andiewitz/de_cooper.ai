@@ -119,4 +119,20 @@ html.lenis body {
     margin-left: 2px;
 }
 
+@keyframes slideFadeLeftToRight {
+    from {
+        opacity: 0;
+        transform: translateX(-36px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-slide-fade-left-to-right {
+    animation: slideFadeLeftToRight 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
 
