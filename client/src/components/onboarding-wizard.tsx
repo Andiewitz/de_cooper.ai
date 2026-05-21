@@ -67,7 +67,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
       >
         <h2 className="text-2xl font-bold text-primary mb-4">Welcome, {form.display_name || "Friend"}</h2>
         <p className="text-tertiary mb-4 italic">{getSheldonComment(step, form)}</p>
-        <AnimatePresence exitBeforeEnter>
+        <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
               key="step1"
