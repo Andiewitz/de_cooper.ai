@@ -6,8 +6,10 @@ import { BookOpen01, Atom01, Calculator, Code01, Globe01, Lightbulb02 } from "@u
 import { Button } from "@/components/base/buttons/button";
 import { useAuth } from "@/providers/auth-provider";
 import OnboardingWizard from "@/components/onboarding-wizard";
+import HeroBanner from "@/components/HeroBanner";
+import TopicCard from "@/components/TopicCard";
 
-const topics = [
+export const topics = [
     {
         id: "physics",
         title: "Physics",
@@ -94,37 +96,33 @@ export default function LearnPage() {
                 </div>
             </header>
 
-            {/* Main */}
-            <main className="mx-auto max-w-6xl px-6 py-12">
-                <div className="mb-10 text-center">
-                    <h2 className="font-display text-display-sm font-bold text-primary">
-                        What do you want to learn?
-                    </h2>
-                    <p className="mt-2 text-lg text-tertiary">
-                        Choose a topic. I&apos;ll try to explain it simply enough for you.
-                    </p>
-                </div>
+            {/* Hero Banner */}
+            <main className="mx-auto max-w-6xl px-6 py-8">
+                <HeroBanner name={user?.display_name || user?.username} />
+
+                {/* Learning Progress Card */}
+                <section className="mb-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-6">
+                    <h2 className="text-2xl font-bold text-white">Your Learning Journey</h2>
+                    <p className="mt-2 text-white/80">Progress will appear here as you complete lessons.</p>
+                </section>
 
                 {/* Topic Grid */}
+                <div className="mb-10 text-center">
+                    <h2 className="font-display text-display-sm font-bold text-primary">What do you want to learn?</h2>
+                    <p className="mt-2 text-lg text-tertiary">Choose a topic. I’ll try to explain it simply enough for you.</p>
+                </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {topics.map((topic) => {
                         const Icon = topic.icon;
                         return (
-                            <button
+                            <TopicCard
                                 key={topic.id}
+                                id={topic.id}
+                                title={topic.title}
+                                description={topic.description}
+                                Icon={Icon}
                                 onClick={() => router.push(`/learn/${topic.id}`)}
-                                className="group cursor-pointer rounded-xl border border-secondary bg-primary p-6 text-left shadow-xs transition-all duration-200 hover:border-brand hover:shadow-md"
-                            >
-                                <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-brand-primary">
-                                    <Icon className="size-5 text-fg-brand-primary" />
-                                </div>
-                                <h3 className="font-display text-lg font-semibold text-primary group-hover:text-brand-secondary">
-                                    {topic.title}
-                                </h3>
-                                <p className="mt-1 text-sm text-tertiary">
-                                    {topic.description}
-                                </p>
-                            </button>
+                            />
                         );
                     })}
                 </div>

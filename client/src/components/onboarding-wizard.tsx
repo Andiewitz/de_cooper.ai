@@ -161,3 +161,4 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+export default OnboardingWizard;
