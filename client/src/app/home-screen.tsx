@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BookOpen01, Atom01, Calculator, Code01, Star01, Zap } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { useAuth } from "@/providers/auth-provider";
 import { motion } from "framer-motion";
 import { TermsModal } from "@/components/terms-modal";
+import { AuthModal } from "@/components/auth-modal";
 
 function Typewriter({ text, speed = 15, delay = 800 }: { text: string; speed?: number; delay?: number }) {
     const [displayedText, setDisplayedText] = useState("");
@@ -72,10 +74,12 @@ const features = [
     },
 ];
 
-export default function HomePage() {
+export default function HomePage({ initialAuthMode = null }: { initialAuthMode?: "login" | "register" | null }) {
     const { isAuthenticated } = useAuth();
+    const router = useRouter();
     const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [spinRotation, setSpinRotation] = useState(0);
+    const [authMode, setAuthMode] = useState<"login" | "register" | null>(initialAuthMode);
 
     return (
         <div className="bg-primary">
@@ -136,10 +140,10 @@ export default function HomePage() {
                                 </Button>
                             ) : (
                                 <>
-                                    <Button href="/login" color="tertiary" size="sm">
+                                    <Button onClick={() => setAuthMode("login")} color="tertiary" size="sm">
                                         Sign In
                                     </Button>
-                                    <Button href="/register" color="primary" size="sm">
+                                    <Button onClick={() => setAuthMode("register")} color="primary" size="sm">
                                         Get Started &rarr;
                                     </Button>
                                 </>
@@ -184,16 +188,20 @@ export default function HomePage() {
                             transition={{ type: "spring", stiffness: 70, damping: 16, delay: 2.2 }}
                             className="mt-5 flex items-center gap-4"
                         >
-                            <Button
-                                href={isAuthenticated ? "/learn" : "/register"}
-                                color="primary"
-                                size="xl"
-                            >
-                                {isAuthenticated ? "Continue Learning" : "Start Learning"}
-                            </Button>
-                            <Button href="/login" color="secondary" size="xl">
-                                Sign In
-                            </Button>
+                            {isAuthenticated ? (
+                                <Button href="/learn" color="primary" size="xl">
+                                    Continue Learning
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button onClick={() => setAuthMode("register")} color="primary" size="xl">
+                                        Start Learning
+                                    </Button>
+                                    <Button onClick={() => setAuthMode("login")} color="secondary" size="xl">
+                                        Sign In
+                                    </Button>
+                                </>
+                            )}
                         </motion.div>
                     </div>
 
@@ -614,13 +622,15 @@ export default function HomePage() {
                         Create a free account and start your education. Dr. Cooper is waiting. Impatiently. No credit card required. No hidden fees. Just pure, unfiltered condescension.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                        <Button
-                            href={isAuthenticated ? "/learn" : "/register"}
-                            color="primary"
-                            size="xl"
-                        >
-                            {isAuthenticated ? "Go to Lessons" : "Create Free Account →"}
-                        </Button>
+                        {isAuthenticated ? (
+                            <Button href="/learn" color="primary" size="xl">
+                                Go to Lessons
+                            </Button>
+                        ) : (
+                            <Button onClick={() => setAuthMode("register")} color="primary" size="xl">
+                                Create Free Account &rarr;
+                            </Button>
+                        )}
                         <Button onClick={() => setIsTermsOpen(true)} color="secondary" size="xl">
                             Read the Fine Print
                         </Button>
@@ -664,8 +674,8 @@ export default function HomePage() {
                             <div className="flex flex-col gap-2">
                                 <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">Platform</span>
                                 <Link href="/learn" className="hover:text-primary transition-colors">Sandbox</Link>
-                                <Link href="/register" className="hover:text-primary transition-colors">Create Account</Link>
-                                <Link href="/login" className="hover:text-primary transition-colors">Sign In</Link>
+                                <Link href="/register" onClick={(e) => { e.preventDefault(); setAuthMode("register"); }} className="hover:text-primary transition-colors">Create Account</Link>
+                                <Link href="/login" onClick={(e) => { e.preventDefault(); setAuthMode("login"); }} className="hover:text-primary transition-colors">Sign In</Link>
                             </div>
                             <div className="flex flex-col gap-2">
                                 <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">Legal</span>
@@ -708,6 +718,7 @@ export default function HomePage() {
             </footer>
 
             <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
+            <AuthModal isOpen={authMode !== null} initialMode={authMode || "login"} onClose={() => { setAuthMode(null); if (initialAuthMode) { router.push("/", { scroll: false }); } }} />
         </div>
     );
 }
