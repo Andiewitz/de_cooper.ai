@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { BookOpen01, Atom01, Calculator, Code01, Globe01, Lightbulb02 } from "@untitledui/icons";
 import { Button } from "@/components/base/buttons/button";
 import { useAuth } from "@/providers/auth-provider";
+import OnboardingWizard from "@/components/onboarding-wizard";
 
 const topics = [
     {
@@ -64,6 +65,14 @@ export default function LearnPage() {
     }
 
     if (!isAuthenticated) return null;
+
+    // If user has not completed onboarding, show wizard
+    if (user && !user.onboarding_completed) {
+        return <OnboardingWizard onClose={() => {
+            // Optionally refetch user data after onboarding completes
+            // This could be handled by context update elsewhere
+        }} />;
+    }
 
     return (
         <div className="min-h-dvh bg-primary">

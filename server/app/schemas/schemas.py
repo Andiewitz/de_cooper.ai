@@ -32,9 +32,21 @@ class UserResponse(BaseModel):
     username: str
     display_name: str | None
     avatar_url: str | None = None
+    age: int | None = None
+    occupation: str | None = None
+    onboarding_reason: str | None = None
+    onboarding_completed: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class UserOnboardingUpdate(BaseModel):
+    display_name: str = Field(..., min_length=1, max_length=255)
+    age: int = Field(..., ge=1, le=120)
+    occupation: str = Field(..., min_length=1, max_length=255)
+    onboarding_reason: str = Field(..., min_length=1)
+
 
 
 class GoogleLoginRequest(BaseModel):

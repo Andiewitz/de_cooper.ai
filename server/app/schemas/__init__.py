@@ -10,6 +10,7 @@ from app.schemas.schemas import (
     LessonResponse,
     MessageCreate,
     MessageResponse,
+    UserOnboardingUpdate,
 )
 
 __all__ = [
@@ -23,4 +24,5 @@ __all__ = [
     "LessonResponse",
     "MessageCreate",
     "MessageResponse",
+    "UserOnboardingUpdate",
 ]

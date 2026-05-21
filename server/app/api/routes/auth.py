@@ -12,7 +12,7 @@ from app.core.security import (
 )
 from app.core.config import get_settings
 from app.models import User
-from app.schemas import UserRegister, UserLogin, Token, UserResponse, GoogleLoginRequest
+from app.schemas import UserRegister, UserLogin, Token, UserResponse, GoogleLoginRequest, UserOnboardingUpdate
 
 settings = get_settings()
 
@@ -174,3 +174,23 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
     # 4. Generate access token
     access_token = create_access_token(data={"sub": str(user.id)})
     return Token(access_token=access_token)
+
+
+@router.post("/onboarding", response_model=UserResponse)
+async def update_onboarding(
+    data: UserOnboardingUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Complete onboarding baseline calibration. Even Wolowitz eventually completed... actually he never got a PhD. But you can finish this calibration.
+    """
+    current_user.display_name = data.display_name
+    current_user.age = data.age
+    current_user.occupation = data.occupation
+    current_user.onboarding_reason = data.onboarding_reason
+    current_user.onboarding_completed = True
+    
+    await db.commit()
+    await db.refresh(current_user)
+    return current_user

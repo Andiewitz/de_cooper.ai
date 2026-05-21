@@ -27,6 +27,13 @@ class User(Base):
     google_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
     avatar_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    
+    # Onboarding Baseline
+    age: Mapped[int | None] = mapped_column(nullable=True)
+    occupation: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    onboarding_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    onboarding_completed: Mapped[bool] = mapped_column(default=False, server_default="false")
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

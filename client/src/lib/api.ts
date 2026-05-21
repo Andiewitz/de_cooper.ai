@@ -65,7 +65,19 @@ export interface UserResponse {
     email: string;
     username: string;
     display_name: string | null;
+    avatar_url?: string | null;
+    age?: number | null;
+    occupation?: string | null;
+    onboarding_reason?: string | null;
+    onboarding_completed: boolean;
     created_at: string;
+}
+
+export interface OnboardingData {
+    display_name: string;
+    age: number;
+    occupation: string;
+    onboarding_reason: string;
 }
 
 export const authApi = {
@@ -89,6 +101,13 @@ export const authApi = {
 
     getMe: (token: string) =>
         fetchApi<UserResponse>("/auth/me", { token }),
+
+    submitOnboarding: (data: OnboardingData, token: string) =>
+        fetchApi<UserResponse>("/auth/onboarding", {
+            method: "POST",
+            body: JSON.stringify(data),
+            token,
+        }),
 };
 
 // --- Lesson API ---

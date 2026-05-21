@@ -10,11 +10,38 @@ from app.api.routes import auth, health, lessons
 settings = get_settings()
 
 
+from sqlalchemy import inspect, text
+
+# Safe dynamic columns addition for SQLite and PostgreSQL databases
+async def run_migrations(conn):
+    # Retrieve metadata info dynamically
+    def get_columns(connection):
+        inspector = inspect(connection)
+        return [c["name"] for c in inspector.get_columns("users")]
+        
+    existing_cols = await conn.run_sync(get_columns)
+    
+    # Define columns to verify
+    required_cols = {
+        "age": "INTEGER",
+        "occupation": "VARCHAR(255)",
+        "onboarding_reason": "TEXT",
+        "onboarding_completed": "BOOLEAN DEFAULT FALSE"
+    }
+    
+    # Alter table if column is missing
+    for col_name, col_type in required_cols.items():
+        if col_name not in existing_cols:
+            alter_query = f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"
+            await conn.execute(text(alter_query))
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: create tables (dev only — use Alembic in production)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await run_migrations(conn)
     yield
     # Shutdown: dispose engine
     await engine.dispose()

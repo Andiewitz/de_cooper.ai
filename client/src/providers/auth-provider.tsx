@@ -12,6 +12,7 @@ interface AuthContextType {
     register: (data: RegisterData) => Promise<void>;
     googleLogin: (credential: string) => Promise<void>;
     logout: () => void;
+    updateUser: (updatedUser: UserResponse) => void;
     error: string | null;
     clearError: () => void;
 }
@@ -97,6 +98,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     }, []);
 
+    const updateUser = useCallback((updatedUser: UserResponse) => {
+        setUser(updatedUser);
+    }, []);
+
     return (
         <AuthContext.Provider
             value={{
@@ -108,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 register,
                 googleLogin,
                 logout,
+                updateUser,
                 error,
                 clearError,
             }}
