@@ -15,6 +15,10 @@ COPY client/ ./
 # Set environment variable for relative API calls
 ENV NEXT_PUBLIC_API_URL=/api
 
+# Capture Railway environment variable as a Docker build argument and set it for Next.js build-time compile
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
 # Build and export the static files
 RUN npm run build
 
