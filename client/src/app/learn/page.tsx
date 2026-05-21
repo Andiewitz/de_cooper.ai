@@ -78,7 +78,7 @@ export default function LearnPage() {
     const displayName = user?.display_name || user?.username;
 
     return (
-        <LearnDashboardLayout title="Dashboard" subtitle="Track progress and pick your next lesson">
+        <LearnDashboardLayout title="Home" subtitle="Track progress and pick your next lesson">
             <div className="mx-auto max-w-6xl space-y-8">
                 <HeroBanner
                     name={displayName}
