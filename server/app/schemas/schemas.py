@@ -31,9 +31,14 @@ class UserResponse(BaseModel):
     email: str
     username: str
     display_name: str | None
+    avatar_url: str | None = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class GoogleLoginRequest(BaseModel):
+    credential: str
 
 
 # --- Lesson Schemas ---

@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = ""
+
     # CORS
     CORS_ORIGINS: Any = ["http://localhost:3000"]
 
@@ -27,7 +30,9 @@ class Settings(BaseSettings):
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
-    def assemble_db_url(cls, v: str) -> str:
+    def assemble_db_url(cls, v: str | None) -> str:
+        if not v or not v.strip():
+            return "sqlite+aiosqlite:///./decooper.db"
         if v.startswith("postgresql://"):
             return v.replace("postgresql://", "postgresql+asyncpg://", 1)
         if v.startswith("postgres://"):
