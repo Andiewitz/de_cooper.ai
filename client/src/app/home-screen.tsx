@@ -84,13 +84,13 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
     return (
         <div className="bg-primary">
             {/* Fixed Header */}
-            <header className="fixed top-0 left-0 right-0 z-50 flex flex-col">
+            <header className="fixed top-0 left-0 right-0 z-40 flex flex-col">
                 {/* Top Promo Banner (Clay inspired) */}
                 <motion.div
                     initial={{ y: -50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ type: "spring", stiffness: 80, damping: 15 }}
-                    className="w-full bg-[#FEF08A] text-black py-2 px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between border-b border-secondary font-sans text-[10px] tracking-wider uppercase font-semibold z-50"
+                    className="w-full bg-[#FEF08A] text-black py-2 px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between border-b border-secondary font-sans text-[10px] tracking-wider uppercase font-semibold"
                 >
                     <div className="flex items-center gap-2">
                         <span className="font-logo font-black text-xs">COOPER.AI</span>

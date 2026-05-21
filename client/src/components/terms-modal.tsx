@@ -42,7 +42,7 @@ export function TermsModal({ isOpen, onClose }: TermsModalProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+                        className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
                         onClick={onClose}
                     />
 
@@ -52,7 +52,7 @@ export function TermsModal({ isOpen, onClose }: TermsModalProps) {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.97 }}
                         transition={{ type: "spring", stiffness: 300, damping: 28 }}
-                        className="fixed inset-x-4 top-[5%] bottom-[5%] z-50 mx-auto max-w-3xl rounded-2xl border border-secondary bg-primary shadow-2xl flex flex-col overflow-hidden"
+                        className="fixed inset-x-4 top-[5%] bottom-[5%] z-[101] mx-auto max-w-3xl rounded-2xl border border-secondary bg-primary shadow-2xl flex flex-col overflow-hidden"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between border-b border-secondary px-6 py-4 shrink-0">
