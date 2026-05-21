@@ -95,11 +95,11 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                     <div className="flex items-center gap-2">
                         <span className="font-logo font-black text-xs">COOPER.AI</span>
                         <span className="opacity-50">//</span>
-                        <span>THE RIGOROUS MATHEMATICAL COLLOQUIUM BY DR. COOPER</span>
+                        <span>THE UNCOMPROMISING AI TUTOR & STUDY CALENDAR</span>
                     </div>
                     <div className="mt-0.5 md:mt-0 flex items-center gap-2">
-                        <span>OCT 23, 2026, PASADENA, CA</span>
-                        <span className="text-[#2563EB] font-bold">→ COOPER.AI/PASADENA</span>
+                        <span>UPGRADE YOUR FLASHCARDS</span>
+                        <span className="text-[#2563EB] font-bold">→ COOPER.AI/LEARN</span>
                     </div>
                 </motion.div>
 
@@ -162,7 +162,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                                 transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.1 }}
                                 className="block"
                             >
-                                Be the most obnoxious
+                                Your schedule.
                             </motion.span>
                             <motion.span
                                 initial={{ opacity: 0, x: -36 }}
@@ -170,13 +170,13 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                                 transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.45 }}
                                 className="block text-fg-brand-primary"
                             >
-                                person in the room.
+                                Your relentless AI tutor.
                             </motion.span>
                         </h1>
 
                         <p className="mt-4 max-w-xl text-lg text-tertiary min-h-[84px]">
                             <Typewriter
-                                text="An uncompromisingly rigorous academic sandbox. No watered-down concepts, no participation awards—just beautiful, elegant mathematical proofs and a mentor who is mathematically certain he is smarter than you."
+                                text="An uncompromising study calendar and flashcard ecosystem. No watered-down concepts, no participation awards—just spaced repetition and an AI tutor who is mathematically certain he is smarter than you."
                                 delay={1200}
                                 speed={12}
                             />
@@ -281,10 +281,10 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                 </div>
                 <blockquote>
                     <p className="font-logo text-2xl lg:text-3xl font-bold text-primary leading-snug tracking-tight">
-                        &ldquo;I cry because others are stupid, and that makes me sad.&rdquo;
+                        &ldquo;I weep for your neural pathways. Let&apos;s review these flashcards.&rdquo;
                     </p>
                     <footer className="mt-5 text-sm text-tertiary">
-                        — Dr. Sheldon Cooper, B.S., M.S., M.A., Ph.D., Sc.D.
+                        — Dr. Cooper
                     </footer>
                 </blockquote>
             </div>
@@ -327,20 +327,20 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         {[
                             {
                                 step: "01",
-                                title: "Pick a subject",
-                                desc: "Choose from mathematics, physics, computer science, or any topic you're embarrassingly unfamiliar with.",
+                                title: "Schedule your learning",
+                                desc: "Build a rigorous academic calendar. Dr. Cooper will ensure you stick to it, whether you like it or not.",
                                 Icon: Atom01,
                             },
                             {
                                 step: "02",
-                                title: "Ask Dr. Cooper",
-                                desc: "Pose your question. He'll answer with the patience of someone who has already calculated the heat death of the universe.",
+                                title: "Generate Flashcards",
+                                desc: "Upload your notes and watch Dr. Cooper transform your rambling text into precise, spaced-repetition flashcards.",
                                 Icon: BookOpen01,
                             },
                             {
                                 step: "03",
-                                title: "Actually learn",
-                                desc: "Receive step-by-step breakdowns with LaTeX proofs, code examples, and unsolicited commentary on your intelligence.",
+                                title: "Spaced Repetition",
+                                desc: "Review your cards on an optimized schedule, accompanied by unsolicited commentary on your intelligence.",
                                 Icon: Zap,
                             },
                         ].map((item, i) => (
@@ -407,37 +407,37 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         {/* Mock UI Container */}
                         <div className="bg-[#03231a]/80 border border-white/10 rounded-2xl p-5 space-y-3 relative overflow-hidden h-72">
                             <div className="flex items-center justify-between text-[9px] font-mono text-white/40 border-b border-white/5 pb-2">
-                                <span>VERIFICATION PIPELINE</span>
+                                <span>FLASHCARD GENERATOR</span>
                                 <span>STATUS: ACTIVE</span>
                             </div>
                             
                             <div className="space-y-2 font-mono text-[11px] text-white/70">
                                 <div className="flex items-center justify-between py-1.5 border-b border-white/5">
-                                    <span>Topological K-Theory Proof</span>
-                                    <span className="text-red-400 font-semibold">● Logic Error</span>
+                                    <span>Lecture 04: Neural Networks</span>
+                                    <span className="text-emerald-400 font-semibold">● 24 Cards Built</span>
                                 </div>
                                 <div className="flex items-center justify-between py-1.5 border-b border-white/5">
-                                    <span>Yang-Mills Boundary Proof</span>
-                                    <span className="text-emerald-400 font-semibold">● Verified</span>
+                                    <span>Chapter 7: Thermodynamics</span>
+                                    <span className="text-emerald-400 font-semibold">● 18 Cards Built</span>
                                 </div>
                                 <div className="flex items-center justify-between py-1.5">
-                                    <span>Schrödinger Wave Derivation</span>
-                                    <span className="text-yellow-400 font-semibold">● Compiling...</span>
+                                    <span>My Incoherent Notes</span>
+                                    <span className="text-yellow-400 font-semibold">● Processing...</span>
                                 </div>
                             </div>
 
                             {/* Floating Dropdown Selector */}
                             <div className="absolute top-12 right-6 w-56 bg-white rounded-xl shadow-2xl border border-secondary p-2.5 text-black space-y-1 z-10">
-                                <div className="text-[8px] font-mono text-neutral-400 font-bold uppercase tracking-wider px-2 py-0.5">Export Proof To:</div>
+                                <div className="text-[8px] font-mono text-neutral-400 font-bold uppercase tracking-wider px-2 py-0.5">Card Generation:</div>
                                 <div className="flex items-center justify-between text-[11px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
-                                    <span className="flex items-center gap-2">📄 Compile via Coq</span>
+                                    <span className="flex items-center gap-2">📄 Upload PDF Notes</span>
                                 </div>
                                 <div className="flex items-center justify-between text-[11px] font-bold px-2 py-1.5 bg-brand-primary/10 text-brand-primary rounded-lg cursor-pointer">
-                                    <span className="flex items-center gap-2">📐 Compile to LaTeX</span>
+                                    <span className="flex items-center gap-2">✨ AI Concept Extraction</span>
                                     <span className="text-[10px]">&rarr;</span>
                                 </div>
                                 <div className="flex items-center justify-between text-[11px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
-                                    <span className="flex items-center gap-2">🐍 Generate Python Solver</span>
+                                    <span className="flex items-center gap-2">📅 Schedule Review</span>
                                 </div>
                             </div>
                         </div>
@@ -445,13 +445,13 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         {/* Bottom Info */}
                         <div className="mt-8 space-y-3">
                             <span className="inline-block bg-[#0a4d3c] text-[#34d399] px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-mono font-bold">
-                                Destinations
+                                Smart Extraction
                             </span>
                             <h3 className="font-logo text-2xl font-bold tracking-tight text-white leading-tight">
-                                Constantly verify and compile proofs to LaTeX, Coq, or Python
+                                Transform messy notes into precise flashcards
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed font-sans">
-                                Push your academic work straight to Coq proof assistants, mathematical solvers, or clean PDF compilations. Dr. Cooper&apos;s compiler handles the rigorous double-checks so you can focus on pure logic.
+                                Upload your study materials and Dr. Cooper will immediately identify your misunderstandings and generate a rigorous spaced-repetition deck to fix them.
                             </p>
                         </div>
                     </motion.div>
@@ -465,11 +465,11 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         {/* Top Quote */}
                         <div className="space-y-4">
                             <p className="text-sm font-medium text-primary italic leading-relaxed">
-                                &ldquo;de_cooper.ai has helped Caltech significantly improve our academic standards. We&apos;ve been able to consolidate our entire department&apos;s requirements into core essentials, like topology, physics, and Sheldon&apos;s couch rules.&rdquo;
+                                &ldquo;I thought I knew the material until Dr. Cooper scheduled my flashcards. Now I realize my previous study habits were the academic equivalent of playing with blocks.&rdquo;
                             </p>
                             <div>
-                                <h4 className="text-xs font-bold text-primary">Leonard Hofstadter, Ph.D.</h4>
-                                <p className="text-[10px] text-tertiary">Head of Experimental Physics at Caltech</p>
+                                <h4 className="text-xs font-bold text-primary">A Humbled Student</h4>
+                                <p className="text-[10px] text-tertiary">Learning to actually retain information</p>
                             </div>
                         </div>
 
@@ -477,15 +477,15 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         <div className="my-6 space-y-3">
                             <div className="flex items-start gap-3">
                                 <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
-                                    12h/week
+                                    99%
                                 </span>
-                                <p className="text-xs text-tertiary mt-0.5">Average time saved from hand-waving explanations by using exact mathematical proofs.</p>
+                                <p className="text-xs text-tertiary mt-0.5">Retention rate after following the AI-generated spaced repetition calendar.</p>
                             </div>
                             <div className="flex items-start gap-3">
                                 <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
                                     100+
                                 </span>
-                                <p className="text-xs text-tertiary mt-0.5">Total sarcastic remarks received before completing a single homework set.</p>
+                                <p className="text-xs text-tertiary mt-0.5">Total sarcastic remarks received when you forget a card you just reviewed.</p>
                             </div>
                             <div className="flex items-start gap-3">
                                 <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
@@ -516,31 +516,31 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         <div className="bg-[#1e0a3b]/80 border border-white/10 rounded-2xl p-5 space-y-4 relative overflow-hidden h-72">
                             {/* Input block */}
                             <div className="space-y-1.5">
-                                <div className="text-[9px] font-mono text-white/40">STUDENT INPUT:</div>
+                                <div className="text-[9px] font-mono text-white/40">STUDENT SCHEDULE:</div>
                                 <div className="bg-[#2e1065] border border-white/15 rounded-xl px-3 py-2 text-[11px] font-mono text-white/90">
-                                    &ldquo;gravity pulls things down pretty fast&rdquo;
+                                    &ldquo;I&apos;ll study on the weekend when I have time&rdquo;
                                 </div>
                             </div>
 
                             {/* Transformation popup overlay */}
                             <div className="absolute top-10 right-4 w-52 bg-white rounded-xl shadow-2xl border border-secondary p-2 text-black space-y-1 z-10">
                                 <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
-                                    <span>📝 Normalize variables</span>
+                                    <span>⚠️ Inefficient pattern detected</span>
                                 </div>
                                 <div className="flex items-center justify-between text-[10px] font-bold px-2 py-1.5 bg-purple-50 text-purple-900 rounded-lg cursor-pointer">
-                                    <span className="flex items-center gap-1.5">📐 Convert to Theorem</span>
+                                    <span className="flex items-center gap-1.5">📅 Optimize Calendar</span>
                                     <span>&rarr;</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-[10px] font-semibold px-2 py-1.5 hover:bg-neutral-100 rounded-lg cursor-pointer">
-                                    <span>🛑 Deduplicate hand-waving</span>
+                                    <span>🛑 Reject procrastination</span>
                                 </div>
                             </div>
 
                             {/* Result block */}
                             <div className="space-y-1.5">
-                                <div className="text-[9px] font-mono text-white/40">RIGOROUS NORMALIZATION:</div>
+                                <div className="text-[9px] font-mono text-white/40">DR. COOPER&apos;S REVISION:</div>
                                 <div className="bg-emerald-950/80 border border-emerald-500/20 text-emerald-300 rounded-xl px-3 py-2 text-[11px] font-mono">
-                                    g &asymp; 9.81 m/s&sup2; exerts gravitational force F = G(m&sup1;m&sup2;)/r&sup2;
+                                    Reviewing 20 cards daily at 08:00 to maximize synaptic retention.
                                 </div>
                             </div>
                         </div>
@@ -548,13 +548,13 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         {/* Bottom Info */}
                         <div className="mt-8 space-y-3">
                             <span className="inline-block bg-[#3b0764] text-[#d8b4fe] px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-mono font-bold">
-                                Rigor Translation
+                                Study Calendar
                             </span>
                             <h3 className="font-logo text-2xl font-bold tracking-tight text-white leading-tight">
-                                Clean and format your scientific assumptions in seconds
+                                A schedule designed for actual memory retention
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed font-sans">
-                                Use our parser to transform any hand-waving explanation into strict, axiom-backed statements. Eliminate ambiguity, ensure mathematical precision, and strip out unnecessary adjectives.
+                                Stop procrastinating. Dr. Cooper will seamlessly block out your calendar with perfectly spaced review sessions, ensuring you never forget the difference between mitosis and meiosis again.
                             </p>
                         </div>
                     </motion.div>
@@ -575,34 +575,34 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                             {/* Rules */}
                             <div className="bg-[#1e3a8a] border border-white/10 rounded-xl p-3 space-y-2 text-[11px] font-mono">
                                 <div className="flex items-center gap-1.5 text-white/60">
-                                    <span>Evaluate student proof if:</span>
-                                    <span className="bg-white/10 px-1.5 py-0.5 rounded text-white font-bold">Workspace</span>
-                                    <span>is active</span>
+                                    <span>Adjust card frequency if:</span>
+                                    <span className="bg-white/10 px-1.5 py-0.5 rounded text-white font-bold">Recall Score</span>
+                                    <span>&lt; 85%</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-white/60">
                                     <span>and</span>
-                                    <span className="bg-white/10 px-1.5 py-0.5 rounded text-white font-bold">Proof Logic</span>
-                                    <span>contains hand-waving</span>
+                                    <span className="bg-white/10 px-1.5 py-0.5 rounded text-white font-bold">Time Lapsed</span>
+                                    <span>&gt; 48 hours</span>
                                 </div>
                             </div>
 
                             {/* Rule Action */}
                             <div className="bg-rose-950/60 border border-rose-500/20 text-rose-300 rounded-xl p-3 text-[11px] font-mono space-y-1">
                                 <div className="text-[9px] text-rose-400 font-bold uppercase tracking-wider">AI-Generated Outcome:</div>
-                                <div>!sarcasm_modifier &amp;&amp; trigger_cooper_laughter(&ldquo;ha-ha&rdquo;)</div>
+                                <div>schedule_immediate_review() &amp;&amp; add_sarcastic_comment()</div>
                             </div>
                         </div>
 
                         {/* Bottom Info */}
                         <div className="mt-8 space-y-3">
                             <span className="inline-block bg-[#172554] text-[#93c5fd] px-2 py-0.5 rounded text-[9px] uppercase tracking-wider font-mono font-bold">
-                                Academic Conditionals
+                                Adaptive Spaced Repetition
                             </span>
                             <h3 className="font-logo text-2xl font-bold tracking-tight text-white leading-tight">
-                                Run response pipelines conditionally &mdash; no engineering needed
+                                Dynamic scheduling that adapts to your failures
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed font-sans">
-                                Design custom learning maps that adapt to your inputs automatically. Direct correct proof paths straight to advanced topics, and trigger targeted remediation pipelines for logical fallacies.
+                                The AI tracks your forgetting curve in real-time. Struggle with a concept? It resurfaces immediately. Master it? It gets pushed out. It&apos;s like having a tutor who never sleeps and never forgets your mistakes.
                             </p>
                         </div>
                     </motion.div>
@@ -619,7 +619,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         Ready to feel intellectually inadequate?
                     </h2>
                     <p className="text-base text-tertiary leading-relaxed max-w-xl">
-                        Create a free account and start your education. Dr. Cooper is waiting. Impatiently. No credit card required. No hidden fees. Just pure, unfiltered condescension.
+                        Create a free account and sync your calendar. Dr. Cooper is waiting to generate your flashcards. Impatiently. No credit card required. No hidden fees. Just pure, unfiltered condescension.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 pt-2">
                         {isAuthenticated ? (
@@ -711,7 +711,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
 
                     {/* Bottom bar */}
                     <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] text-quaternary">
-                        <p>&copy; {new Date().getFullYear()} de_cooper.ai &mdash; A satirical fan project. Not for profit. Not affiliated with any studio or network.</p>
+                        <p>&copy; {new Date().getFullYear()} de_cooper.ai &mdash; A functional satire app with edtech. Not for profit. Not affiliated with CBS.</p>
                         <p className="font-mono opacity-60">// bazinga.</p>
                     </div>
                 </div>
