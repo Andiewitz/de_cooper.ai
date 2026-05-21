@@ -239,7 +239,10 @@ export default function HomePage() {
                                     rotate: { type: "spring", stiffness: 120, damping: 12 }
                                 }}
                                 whileHover={{ scale: 1.24 }}
-                                onClick={() => setSpinRotation((prev) => prev + 360)}
+                                onClick={() => {
+                                    console.log("Sheldon clicked! Previous rotation:", spinRotation);
+                                    setSpinRotation((prev) => prev + 360);
+                                }}
                                 className="absolute bottom-0 h-[122%] w-auto object-contain object-bottom z-30 cursor-pointer"
                             />
                         </motion.div>
@@ -280,51 +283,94 @@ export default function HomePage() {
         </section>
 
         {/* How It Works */}
-        <section className="px-6 py-20 lg:py-28">
+        <section className="px-6 py-24 lg:py-32 overflow-hidden">
             <div className="mx-auto max-w-6xl">
-                <div className="mb-14 max-w-2xl">
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary mb-3">How it works</p>
-                    <h2 className="font-logo text-3xl lg:text-4xl font-extrabold text-primary tracking-tight">
-                        Three steps to intellectual enlightenment.
+                {/* Section header */}
+                <motion.div
+                    className="mb-16 lg:mb-20 max-w-2xl"
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                >
+                    <div className="inline-flex items-center gap-2 rounded-full border border-secondary bg-secondary/60 px-3.5 py-1 text-[10px] font-mono uppercase tracking-[0.2em] text-brand-secondary mb-5">
+                        <span className="size-1 rounded-full bg-brand-secondary" />
+                        How it works
+                    </div>
+                    <h2 className="font-logo text-3xl lg:text-5xl font-extrabold text-primary tracking-tight leading-[1.1]">
+                        Three steps to intellectual{" "}
+                        <span className="text-fg-brand-primary">enlightenment.</span>
                     </h2>
-                    <p className="mt-4 text-base text-tertiary leading-relaxed">
+                    <p className="mt-4 text-base text-tertiary leading-relaxed max-w-lg">
                         Or as Dr. Cooper would say: a trivially simple process that even you should be able to follow.
                     </p>
-                </div>
+                </motion.div>
 
-                <div className="grid gap-6 lg:grid-cols-3">
-                    {[
-                        {
-                            step: "01",
-                            title: "Pick a subject",
-                            desc: "Choose from mathematics, physics, computer science, or any topic you're embarrassingly unfamiliar with.",
-                        },
-                        {
-                            step: "02",
-                            title: "Ask Dr. Cooper",
-                            desc: "Pose your question. He'll answer with the patience of someone who has already calculated the heat death of the universe.",
-                        },
-                        {
-                            step: "03",
-                            title: "Actually learn",
-                            desc: "Receive step-by-step breakdowns with LaTeX proofs, code examples, and unsolicited commentary on your intelligence.",
-                        },
-                    ].map((item) => (
-                        <div
-                            key={item.step}
-                            className="group relative rounded-2xl border border-secondary bg-primary p-7 transition-all duration-300 hover:border-brand-secondary/40 hover:shadow-lg"
-                        >
-                            <span className="font-mono text-4xl font-black text-brand-secondary/20 group-hover:text-brand-secondary/40 transition-colors">
-                                {item.step}
-                            </span>
-                            <h3 className="mt-3 font-logo text-lg font-bold text-primary tracking-tight">
-                                {item.title}
-                            </h3>
-                            <p className="mt-2 text-sm text-tertiary leading-relaxed">
-                                {item.desc}
-                            </p>
-                        </div>
-                    ))}
+                {/* Steps */}
+                <div className="relative">
+                    {/* Connecting dotted line (desktop only) */}
+                    <div className="hidden lg:block absolute top-[52px] left-[calc(33.33%_-_12px)] right-[calc(33.33%_-_12px)] z-0">
+                        <svg width="100%" height="2" className="overflow-visible">
+                            <line x1="0" y1="1" x2="100%" y2="1" stroke="var(--color-border-secondary)" strokeWidth="2" strokeDasharray="6 6" />
+                        </svg>
+                    </div>
+
+                    <div className="grid gap-8 lg:grid-cols-3">
+                        {[
+                            {
+                                step: "01",
+                                title: "Pick a subject",
+                                desc: "Choose from mathematics, physics, computer science, or any topic you're embarrassingly unfamiliar with.",
+                                Icon: Atom01,
+                            },
+                            {
+                                step: "02",
+                                title: "Ask Dr. Cooper",
+                                desc: "Pose your question. He'll answer with the patience of someone who has already calculated the heat death of the universe.",
+                                Icon: BookOpen01,
+                            },
+                            {
+                                step: "03",
+                                title: "Actually learn",
+                                desc: "Receive step-by-step breakdowns with LaTeX proofs, code examples, and unsolicited commentary on your intelligence.",
+                                Icon: Zap,
+                            },
+                        ].map((item, i) => (
+                            <motion.div
+                                key={item.step}
+                                initial={{ opacity: 0, y: 32 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-60px" }}
+                                transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                                className="group relative"
+                            >
+                                {/* Icon circle sitting on the card top edge */}
+                                <div className="relative z-10 ml-8 mb-[-26px] w-[52px] h-[52px] rounded-2xl bg-brand-primary border-[3px] border-primary shadow-md flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-4deg]">
+                                    <item.Icon className="size-5 text-white" strokeWidth={2} />
+                                </div>
+
+                                {/* Card body */}
+                                <div className="relative rounded-2xl border border-secondary bg-primary p-8 pt-10 h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-brand/30">
+                                    {/* Large watermark step number */}
+                                    <span className="absolute top-4 right-6 font-mono text-[72px] font-black leading-none text-secondary/60 select-none pointer-events-none transition-colors duration-300 group-hover:text-brand-secondary/15">
+                                        {item.step}
+                                    </span>
+
+                                    <div className="relative z-10">
+                                        <h3 className="font-logo text-xl font-bold text-primary tracking-tight">
+                                            {item.title}
+                                        </h3>
+                                        <p className="mt-3 text-sm text-tertiary leading-relaxed">
+                                            {item.desc}
+                                        </p>
+                                    </div>
+
+                                    {/* Bottom accent bar on hover */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-brand-secondary/0 via-brand-secondary/50 to-brand-secondary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>
