@@ -83,8 +83,8 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
 
     return (
         <div className="bg-primary">
-            {/* Top Fold: Nav + Hero centered in full viewport height */}
-            <div className="flex min-h-dvh flex-col border-b border-secondary">
+            {/* Fixed Header */}
+            <header className="fixed top-0 left-0 right-0 z-50 flex flex-col">
                 {/* Top Promo Banner (Clay inspired) */}
                 <motion.div
                     initial={{ y: -50, opacity: 0 }}
@@ -151,8 +151,11 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         </div>
                     </nav>
                 </motion.div>
+            </header>
 
-            <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-24 lg:pt-36">
+            {/* Top Fold: Nav + Hero centered in full viewport height */}
+            <div className="flex min-h-dvh flex-col border-b border-secondary pt-[120px]">
+                <section className="flex flex-1 flex-col justify-start px-6 py-12 pt-16 lg:pt-24">
                 <div className="grid max-w-none w-full items-center gap-12 lg:grid-cols-12 text-left px-6 lg:px-16">
                     <div className="lg:col-span-7">
                         <h1 className="font-logo text-6xl lg:text-8xl font-extrabold tracking-tight text-primary leading-[0.88] flex flex-col gap-1">
