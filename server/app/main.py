@@ -42,10 +42,31 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(lessons.router, prefix="/api")
 
 
-@app.get("/")
-async def root():
-    return {
-        "app": "de_cooper.ai",
-        "tagline": "I cry because others are stupid, and that makes me sad.",
-        "docs": "/docs",
-    }
+# Static files serving
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
+
+# Determine client static out directory (monorepo structure)
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "client", "out"))
+
+@app.exception_handler(404)
+async def custom_404_handler(request, exc):
+    # Check if request is for API
+    if request.url.path.startswith("/api"):
+        return JSONResponse(status_code=404, content={"detail": "Not Found"})
+    
+    # Otherwise, fall back to index.html or 404.html in the static directory
+    fallback_path = os.path.join(static_dir, "404.html")
+    if not os.path.exists(fallback_path):
+        fallback_path = os.path.join(static_dir, "index.html")
+        
+    if os.path.exists(fallback_path):
+        return FileResponse(fallback_path)
+    
+    return JSONResponse(status_code=404, content={"detail": "Not Found"})
+
+# Only mount static files if the directory exists (allows local API-only testing)
+if os.path.exists(static_dir):
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+
