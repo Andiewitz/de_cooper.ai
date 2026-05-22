@@ -188,25 +188,28 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                 key={msg.id}
                                 className={`flex ${msg.role === "student" ? "justify-end" : "justify-start"}`}
                             >
-                                <div
-                                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                                        msg.role === "student"
-                                            ? "bg-brand-solid text-white"
-                                            : "border border-secondary bg-secondary"
-                                    }`}
-                                >
-                                    {msg.role === "sheldon" && (
-                                        <span className="mb-1 block text-xs font-semibold text-brand-secondary">
+                                {msg.role === "sheldon" ? (
+                                    <div className="max-w-[80%] border-l-2 border-brand-secondary/60 pl-4 py-0.5">
+                                        <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-brand-secondary">
                                             Dr. Cooper
                                         </span>
-                                    )}
-                                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                        {msg.content}
-                                        {msg.isStreaming && (
-                                            <span className="ml-1 inline-block size-2 animate-pulse rounded-full bg-current" />
-                                        )}
+                                        <div className="whitespace-pre-wrap text-sm leading-relaxed text-primary">
+                                            {msg.content}
+                                            {msg.isStreaming && (
+                                                <span className="ml-1 inline-block size-2 animate-pulse rounded-full bg-brand-secondary" />
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-brand-solid text-white">
+                                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                                            {msg.content}
+                                            {msg.isStreaming && (
+                                                <span className="ml-1 inline-block size-2 animate-pulse rounded-full bg-current" />
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

@@ -80,7 +80,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
     };
 
     return (
-        <div className="flex min-h-dvh bg-secondary">
+        <div className="flex min-h-dvh bg-primary">
             {/* Brand panel */}
             <div className="relative hidden w-[42%] flex-col justify-between overflow-hidden bg-brand-section p-10 lg:flex">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(254,240,138,0.15),transparent_50%)]" />
@@ -144,7 +144,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                         <ProgressBar value={progress} className="mt-3" progressClassName="bg-brand-solid" />
                     </div>
 
-                    <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-xs sm:p-8">
+                    <div className="w-full">
                         <div className="mb-6 flex items-start gap-4">
                             <FeaturedIcon
                                 icon={step === 1 ? User01 : step === 3 ? Briefcase01 : MessageChatCircle}

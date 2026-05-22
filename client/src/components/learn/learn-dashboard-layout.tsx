@@ -248,10 +248,12 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                 <div className={cx("border-t border-secondary p-3", isCollapsed && "flex flex-col items-center gap-2")}>
                     {isCollapsed ? (
                         <Tooltip title={displayName} placement="right">
-                            <Avatar size="sm" initials={initials} alt={displayName} />
+                            <div className="py-2">
+                                <Avatar size="sm" initials={initials} alt={displayName} />
+                            </div>
                         </Tooltip>
                     ) : (
-                        <div className="mb-3 flex items-center gap-3 rounded-lg bg-secondary px-3 py-2.5">
+                        <div className="mb-3 flex items-center gap-3 px-1 py-2">
                             <Avatar size="sm" initials={initials} alt={displayName} />
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-semibold text-primary">{displayName}</p>
@@ -294,7 +296,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
     };
 
     return (
-        <div className="min-h-dvh bg-secondary" style={{ "--sidebar-width": `${sidebarWidth}px` } as React.CSSProperties}>
+        <div className="min-h-dvh bg-primary" style={{ "--sidebar-width": `${sidebarWidth}px` } as React.CSSProperties}>
             {mobileNavOpen && (
                 <button
                     type="button"
