@@ -8,6 +8,8 @@ import {
     ChevronLeft,
     ChevronRight,
     Atom01,
+    Calculator,
+    Code01,
     Lightbulb02,
     Globe01,
     BookOpen01,
@@ -44,6 +46,15 @@ const topicLabels: Record<string, string> = {
     chemistry: "Chemistry",
     astronomy: "Astronomy",
     general: "General STEM",
+};
+
+const topicConfig: Record<string, { Icon: React.ComponentType<{ className?: string }>; gradient: string }> = {
+    physics: { Icon: Atom01, gradient: "bg-linear-to-tr from-purple-500 to-indigo-500" },
+    mathematics: { Icon: Calculator, gradient: "bg-linear-to-tr from-blue-500 to-cyan-500" },
+    "computer-science": { Icon: Code01, gradient: "bg-linear-to-tr from-emerald-500 to-teal-500" },
+    chemistry: { Icon: Lightbulb02, gradient: "bg-linear-to-tr from-amber-500 to-orange-500" },
+    astronomy: { Icon: Globe01, gradient: "bg-linear-to-tr from-pink-500 to-rose-500" },
+    general: { Icon: BookOpen01, gradient: "bg-linear-to-tr from-slate-500 to-neutral-500" },
 };
 
 /* ────────────────────────── Helpers ──────────────────────── */
@@ -86,34 +97,7 @@ function ThinkingDots() {
     );
 }
 
-/* ────────────────────────── Quick Actions ────────────────── */
 
-const quickActions = [
-    {
-        label: "Draw it out",
-        prompt: "Explain the current concepts with a detailed visual mermaid diagram.",
-        gradient: "bg-linear-to-tr from-purple-500 to-indigo-500",
-        Icon: Atom01,
-    },
-    {
-        label: "Visual analogy",
-        prompt: "Give a concrete visual analogy for these concepts, with a diagram.",
-        gradient: "bg-linear-to-tr from-amber-500 to-orange-500",
-        Icon: Lightbulb02,
-    },
-    {
-        label: "Real-world use",
-        prompt: "Show a real-world application of this topic with a diagram.",
-        gradient: "bg-linear-to-tr from-emerald-500 to-teal-500",
-        Icon: Globe01,
-    },
-    {
-        label: "Quiz me",
-        prompt: "Generate a challenging quiz question about these notes with a diagram.",
-        gradient: "bg-linear-to-tr from-pink-500 to-rose-500",
-        Icon: BookOpen01,
-    },
-];
 
 /* ────────────────────────── Main Component ───────────────── */
 
@@ -280,7 +264,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     return (
         <div className="flex h-dvh flex-col bg-primary overflow-hidden">
             {/* ═══════════════ Header ═══════════════ */}
-            <header className="shrink-0 flex items-center justify-between px-6 py-4 sm:px-10 lg:px-12 border-b border-secondary/60">
+            <header className="shrink-0 flex items-center justify-between px-6 py-4 sm:px-10 lg:px-12">
                 <button
                     type="button"
                     aria-label="Back to workspace"
@@ -293,20 +277,23 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                     </span>
                 </button>
 
-                <div className="flex items-center gap-2">
-                    <span className="inline-block size-2 rounded-full bg-brand-solid animate-pulse" />
-                    <p className="text-xs font-bold uppercase tracking-widest text-primary">
-                        {topicLabels[topicId] || topicId}
-                    </p>
+                <div className="flex items-center gap-4">
+                    {hasSlides && (
+                        <span className="text-[10px] font-mono text-quaternary tabular-nums">
+                            {currentSlide + 1} / {exchanges.length}
+                        </span>
+                    )}
+                    <div className="flex items-center gap-2.5">
+                        {topicConfig[topicId] && (
+                            <div className={`flex size-8 items-center justify-center rounded-lg ${topicConfig[topicId].gradient} text-white shadow-xs`}>
+                                {(() => { const TIcon = topicConfig[topicId].Icon; return <TIcon className="size-4" aria-hidden />; })()}
+                            </div>
+                        )}
+                        <p className="text-xs font-bold uppercase tracking-widest text-primary">
+                            {topicLabels[topicId] || topicId}
+                        </p>
+                    </div>
                 </div>
-
-                {hasSlides ? (
-                    <span className="text-[10px] font-mono text-quaternary tabular-nums w-16 text-right">
-                        {currentSlide + 1} / {exchanges.length}
-                    </span>
-                ) : (
-                    <div className="w-16" aria-hidden />
-                )}
             </header>
 
             {/* ═══════════════ Slide Viewer ═══════════════ */}
@@ -360,25 +347,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                         </button>
                     )}
 
-                    {/* ── Empty state ── */}
-                    {!hasSlides && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="flex flex-col items-center text-center px-6 relative z-10"
-                        >
-                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-4">
-                                de_cooper.ai / {topicLabels[topicId]}
-                            </p>
-                            <h1 className="font-display text-display-md sm:text-display-lg font-bold text-primary tracking-tight leading-tight">
-                                {topicLabels[topicId] || "STEM"} Workspace
-                            </h1>
-                            <p className="mt-5 text-md text-tertiary max-w-md leading-relaxed">
-                                Type a question below or use an action to begin exploring visual concepts.
-                            </p>
-                        </motion.div>
-                    )}
+
 
                     {/* ── Active slide ── */}
                     {active && (
@@ -524,9 +493,8 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
             </div>
 
             {/* ═══════════════ Input Bar ═══════════════ */}
-            <div className="shrink-0 border-t border-secondary/60 bg-primary px-4 sm:px-8 py-5">
-                <div className="max-w-2xl mx-auto space-y-4">
-                    {/* Input row */}
+            <div className="shrink-0 bg-primary px-4 sm:px-8 py-5">
+                <div className="max-w-2xl mx-auto">
                     <div className="flex items-center gap-3 rounded-2xl border-2 border-secondary bg-primary p-2 shadow-xs focus-within:border-brand focus-within:shadow-md transition-all">
                         <input
                             ref={inputRef}
@@ -549,28 +517,6 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                             <ArrowRight className="size-4" aria-hidden />
                             <span className="hidden sm:inline">Explore</span>
                         </button>
-                    </div>
-
-                    {/* Quick action badges */}
-                    <div className="flex items-center gap-3 overflow-x-auto pb-0.5">
-                        {quickActions.map((action) => (
-                            <button
-                                key={action.label}
-                                type="button"
-                                disabled={isStreaming || !lessonId}
-                                onClick={() => sendMessage(action.prompt)}
-                                className="group shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-secondary/80 bg-primary hover:border-brand/40 hover:shadow-sm transition disabled:opacity-30 cursor-pointer"
-                            >
-                                <div
-                                    className={`flex size-7 items-center justify-center rounded-lg ${action.gradient} text-white shrink-0 shadow-xs group-hover:scale-110 transition`}
-                                >
-                                    <action.Icon className="size-3.5" aria-hidden />
-                                </div>
-                                <span className="text-xs font-bold text-secondary group-hover:text-brand-secondary transition">
-                                    {action.label}
-                                </span>
-                            </button>
-                        ))}
                     </div>
                 </div>
             </div>
