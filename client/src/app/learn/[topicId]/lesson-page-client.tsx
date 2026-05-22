@@ -4,14 +4,14 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
     ArrowLeft,
+    ArrowRight,
     ChevronLeft,
     ChevronRight,
-    Send,
-    Activity,
-    Sparkles,
-    BookOpen,
-    HelpCircle,
-} from "lucide-react";
+    Atom01,
+    Lightbulb02,
+    Globe01,
+    BookOpen01,
+} from "@untitledui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/auth-provider";
 import { lessonsApi } from "@/lib/api";
@@ -48,23 +48,22 @@ const topicLabels: Record<string, string> = {
 
 /* ────────────────────────── Helpers ──────────────────────── */
 
-/** Extract the first complete ```mermaid … ``` block from raw text */
+/** Extract the first complete ```mermaid … ``` block from raw answer text */
 function extractDiagram(text: string): string | null {
     const m = /```mermaid([\s\S]*?)```/.exec(text);
     return m ? m[1].trim() : null;
 }
 
-/** True when a ```mermaid block has been opened but not yet closed */
+/** True when a ```mermaid block has been opened but not yet closed (still streaming) */
 function isDiagramStreaming(text: string): boolean {
     const idx = text.lastIndexOf("```mermaid");
     if (idx === -1) return false;
     return !text.slice(idx + 10).includes("```");
 }
 
-/** Strip all complete AND incomplete mermaid fences from text */
+/** Strip all complete AND incomplete mermaid fences from displayed text */
 function stripMermaid(text: string): string {
     let result = text.replace(/```mermaid[\s\S]*?```/g, "");
-    // Also strip an incomplete opening block at the tail (still streaming)
     result = result.replace(/```mermaid[\s\S]*$/, "");
     return result.trim();
 }
@@ -77,7 +76,7 @@ function ThinkingDots() {
             {[0, 1, 2].map((i) => (
                 <span
                     key={i}
-                    className="size-2.5 rounded-full bg-brand-secondary"
+                    className="size-2.5 rounded-full bg-brand-solid"
                     style={{
                         animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
                     }}
@@ -86,6 +85,35 @@ function ThinkingDots() {
         </span>
     );
 }
+
+/* ────────────────────────── Quick Actions ────────────────── */
+
+const quickActions = [
+    {
+        label: "Draw it out",
+        prompt: "Explain the current concepts with a detailed visual mermaid diagram.",
+        gradient: "bg-linear-to-tr from-purple-500 to-indigo-500",
+        Icon: Atom01,
+    },
+    {
+        label: "Visual analogy",
+        prompt: "Give a concrete visual analogy for these concepts, with a diagram.",
+        gradient: "bg-linear-to-tr from-amber-500 to-orange-500",
+        Icon: Lightbulb02,
+    },
+    {
+        label: "Real-world use",
+        prompt: "Show a real-world application of this topic with a diagram.",
+        gradient: "bg-linear-to-tr from-emerald-500 to-teal-500",
+        Icon: Globe01,
+    },
+    {
+        label: "Quiz me",
+        prompt: "Generate a challenging quiz question about these notes with a diagram.",
+        gradient: "bg-linear-to-tr from-pink-500 to-rose-500",
+        Icon: BookOpen01,
+    },
+];
 
 /* ────────────────────────── Main Component ───────────────── */
 
@@ -123,7 +151,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         })();
     }, [token, topicId, lessonId]);
 
-    /* ── Typewriter loop (fast: 3 chars / 6 ms) ── */
+    /* ── Typewriter loop (3 chars / 6 ms — snappy) ── */
     useEffect(() => {
         const interval = setInterval(() => {
             setExchanges((prev) => {
@@ -153,7 +181,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         }
     }, [exchanges.length]);
 
-    /* ── Keyboard arrow navigation (when input not focused) ── */
+    /* ── Keyboard arrow navigation ── */
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if (document.activeElement === inputRef.current) return;
@@ -231,7 +259,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         );
     }
 
-    /* ── Derive slide data ── */
+    /* ── Derived slide data ── */
     const hasSlides = exchanges.length > 0;
     const active = hasSlides ? exchanges[currentSlide] : null;
     const diagram = active ? extractDiagram(active.answer) : null;
@@ -249,79 +277,56 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         exit: (dir: number) => ({ x: dir > 0 ? -320 : 320, opacity: 0 }),
     };
 
-    /* ── Quick actions ── */
-    const quickActions = [
-        {
-            icon: Activity,
-            label: "Explain with diagram",
-            prompt:
-                "Explain the current concepts with a clear visual diagram.",
-        },
-        {
-            icon: Sparkles,
-            label: "Visual analogy",
-            prompt:
-                "Give a concrete visual analogy for these concepts, with a diagram.",
-        },
-        {
-            icon: BookOpen,
-            label: "Real-world use",
-            prompt:
-                "Show a real-world application of this topic with a diagram.",
-        },
-        {
-            icon: HelpCircle,
-            label: "Quiz me",
-            prompt:
-                "Generate a quiz question about these notes with a supporting diagram.",
-        },
-    ];
-
     return (
         <div className="flex h-dvh flex-col bg-primary overflow-hidden">
             {/* ═══════════════ Header ═══════════════ */}
-            <header className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-secondary/40">
+            <header className="shrink-0 flex items-center justify-between px-6 py-4 sm:px-10 lg:px-12 border-b border-secondary/60">
                 <button
                     type="button"
+                    aria-label="Back to workspace"
                     onClick={() => router.push("/learn")}
-                    className="flex items-center gap-2 text-quaternary hover:text-secondary transition-colors cursor-pointer"
+                    className="flex items-center gap-2 text-quaternary hover:text-secondary transition-colors duration-150 cursor-pointer"
                 >
-                    <ArrowLeft className="size-4" />
+                    <ArrowLeft className="size-4" aria-hidden />
                     <span className="text-[10px] font-bold uppercase tracking-widest">
-                        Back
+                        Workspace
                     </span>
                 </button>
 
                 <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-brand-secondary animate-pulse" />
-                    <span className="text-xs font-bold uppercase tracking-widest text-primary">
+                    <span className="inline-block size-2 rounded-full bg-brand-solid animate-pulse" />
+                    <p className="text-xs font-bold uppercase tracking-widest text-primary">
                         {topicLabels[topicId] || topicId}
-                    </span>
+                    </p>
                 </div>
 
-                {/* Slide counter */}
-                {hasSlides && (
-                    <span className="text-[10px] font-mono text-quaternary tabular-nums">
+                {hasSlides ? (
+                    <span className="text-[10px] font-mono text-quaternary tabular-nums w-16 text-right">
                         {currentSlide + 1} / {exchanges.length}
                     </span>
+                ) : (
+                    <div className="w-16" aria-hidden />
                 )}
-                {!hasSlides && <div className="w-12" />}
             </header>
 
             {/* ═══════════════ Slide Viewer ═══════════════ */}
             <div className="flex-1 min-h-0 flex flex-col relative">
+                {/* Ambient glow — matches dashboard aesthetic */}
+                <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-brand-secondary/40 opacity-30 blur-3xl" />
+                <div className="pointer-events-none absolute bottom-20 -left-16 size-48 rounded-full bg-[#FEF08A]/10 opacity-30 blur-3xl" />
+
                 {/* Dot indicators */}
                 {hasSlides && exchanges.length > 1 && (
-                    <div className="flex items-center justify-center gap-1.5 pt-4 pb-2 shrink-0">
+                    <div className="flex items-center justify-center gap-1.5 pt-4 pb-2 shrink-0 relative z-10">
                         {exchanges.map((_, i) => (
                             <button
                                 key={i}
                                 type="button"
                                 onClick={() => goToSlide(i)}
-                                className={`rounded-full transition-all duration-250 cursor-pointer ${
+                                className={`rounded-full transition-all duration-200 cursor-pointer ${
                                     i === currentSlide
-                                        ? "w-6 h-2 bg-brand-secondary"
-                                        : "size-2 bg-secondary/50 hover:bg-secondary"
+                                        ? "w-6 h-2 bg-brand-solid"
+                                        : "size-2 bg-secondary/60 hover:bg-secondary"
                                 }`}
                                 aria-label={`Concept ${i + 1}`}
                             />
@@ -336,7 +341,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                         <button
                             type="button"
                             onClick={() => goToSlide(currentSlide - 1)}
-                            className="absolute left-4 z-20 size-10 rounded-full bg-secondary/50 hover:bg-secondary flex items-center justify-center text-tertiary hover:text-primary transition cursor-pointer backdrop-blur-sm"
+                            className="absolute left-4 z-20 size-11 rounded-full bg-primary border border-secondary/80 shadow-xs flex items-center justify-center text-tertiary hover:text-brand-secondary hover:border-brand/40 transition cursor-pointer"
                             aria-label="Previous concept"
                         >
                             <ChevronLeft className="size-5" />
@@ -348,7 +353,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                         <button
                             type="button"
                             onClick={() => goToSlide(currentSlide + 1)}
-                            className="absolute right-4 z-20 size-10 rounded-full bg-secondary/50 hover:bg-secondary flex items-center justify-center text-tertiary hover:text-primary transition cursor-pointer backdrop-blur-sm"
+                            className="absolute right-4 z-20 size-11 rounded-full bg-primary border border-secondary/80 shadow-xs flex items-center justify-center text-tertiary hover:text-brand-secondary hover:border-brand/40 transition cursor-pointer"
                             aria-label="Next concept"
                         >
                             <ChevronRight className="size-5" />
@@ -358,19 +363,19 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                     {/* ── Empty state ── */}
                     {!hasSlides && (
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="flex flex-col items-center text-center px-6"
+                            className="flex flex-col items-center text-center px-6 relative z-10"
                         >
-                            <div className="size-20 rounded-2xl bg-gradient-to-br from-brand-secondary/20 to-brand-secondary/5 flex items-center justify-center mb-6 shadow-sm">
-                                <Activity className="size-9 text-brand-secondary" />
-                            </div>
-                            <h1 className="font-display text-display-sm font-bold text-primary tracking-tight">
-                                {topicLabels[topicId] || "STEM"}
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-4">
+                                de_cooper.ai / {topicLabels[topicId]}
+                            </p>
+                            <h1 className="font-display text-display-md sm:text-display-lg font-bold text-primary tracking-tight leading-tight">
+                                {topicLabels[topicId] || "STEM"} Workspace
                             </h1>
-                            <p className="mt-3 text-sm text-tertiary max-w-sm leading-relaxed">
-                                Ask a question below and watch visual concepts build in real time.
+                            <p className="mt-5 text-md text-tertiary max-w-md leading-relaxed">
+                                Type a question below or use an action to begin exploring visual concepts.
                             </p>
                         </motion.div>
                     )}
@@ -390,31 +395,45 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     stiffness: 300,
                                     damping: 30,
                                 }}
-                                className="absolute inset-0 flex flex-col items-center justify-center px-14 sm:px-20 lg:px-28 py-4 overflow-y-auto"
+                                className="absolute inset-0 flex flex-col items-center justify-center px-16 sm:px-20 lg:px-28 py-6 overflow-y-auto relative z-10"
                             >
                                 {/* Waiting state */}
                                 {isWaiting && (
-                                    <div className="flex flex-col items-center gap-3">
+                                    <div className="flex flex-col items-center gap-4">
                                         <ThinkingDots />
-                                        <span className="text-xs text-quaternary font-medium">
+                                        <span className="text-xs text-quaternary font-semibold">
                                             Constructing visual...
                                         </span>
                                     </div>
                                 )}
 
+                                {/* Concept label + display title */}
+                                {!isWaiting && (
+                                    <>
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-secondary mb-3 shrink-0">
+                                            Concept Focus
+                                        </p>
+                                        <h2 className="font-display text-display-xs sm:text-display-sm font-bold text-primary tracking-tight text-center leading-tight max-w-3xl mb-6 shrink-0">
+                                            {active.question}
+                                        </h2>
+                                    </>
+                                )}
+
                                 {/* Diagram: constructing placeholder */}
                                 {!isWaiting && !diagram && diagramPending && (
-                                    <div className="w-full max-w-2xl aspect-[16/9] rounded-2xl bg-[#F9F7F2] border border-secondary/40 flex flex-col items-center justify-center mb-6 bg-[linear-gradient(to_right,#F4F2EB_1px,transparent_1px),linear-gradient(to_bottom,#F4F2EB_1px,transparent_1px)] bg-[size:24px_24px]">
-                                        <span className="size-4 rounded-full bg-brand-secondary/50 animate-ping mb-3" />
-                                        <span className="text-xs font-semibold text-secondary">
-                                            Constructing diagram...
-                                        </span>
+                                    <div className="w-full max-w-3xl aspect-[16/9] rounded-2xl bg-brand-primary border border-brand/20 flex flex-col items-center justify-center mb-6 shadow-xs">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="size-2.5 rounded-full bg-brand-solid animate-pulse" />
+                                            <span className="text-xs font-bold text-brand-secondary">
+                                                Constructing diagram...
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
 
                                 {/* Diagram: rendered */}
                                 {!isWaiting && diagram && (
-                                    <div className="w-full max-w-3xl rounded-2xl bg-[#F9F7F2] border border-secondary/40 p-5 mb-6 overflow-hidden bg-[linear-gradient(to_right,#F4F2EB_1px,transparent_1px),linear-gradient(to_bottom,#F4F2EB_1px,transparent_1px)] bg-[size:24px_24px] flex items-center justify-center min-h-[180px]">
+                                    <div className="w-full max-w-3xl rounded-2xl bg-brand-primary border border-brand/20 p-6 shadow-xs overflow-hidden mb-6 min-h-[180px] flex items-center justify-center">
                                         <MermaidRenderer
                                             chart={diagram}
                                             inline={false}
@@ -422,21 +441,21 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     </div>
                                 )}
 
-                                {/* Text explanation (brief) */}
+                                {/* Text caption */}
                                 {!isWaiting && displayedText && (
-                                    <div className="w-full max-w-2xl text-center">
+                                    <div className="w-full max-w-2xl text-center shrink-0">
                                         <div className="prose max-w-none">
                                             <ReactMarkdown
                                                 remarkPlugins={[remarkMath]}
                                                 rehypePlugins={[rehypeKatex]}
                                                 components={{
                                                     p: ({ children }) => (
-                                                        <p className="text-base sm:text-lg text-secondary leading-relaxed mb-2 last:mb-0">
+                                                        <p className="text-md sm:text-lg text-secondary leading-relaxed mb-3 last:mb-0">
                                                             {children}
                                                         </p>
                                                     ),
                                                     strong: ({ children }) => (
-                                                        <strong className="font-bold text-primary">
+                                                        <strong className="font-extrabold text-brand-secondary tracking-tight">
                                                             {children}
                                                         </strong>
                                                     ),
@@ -446,12 +465,12 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                                         </em>
                                                     ),
                                                     h2: ({ children }) => (
-                                                        <h3 className="text-lg font-bold text-primary mt-3 mb-1">
+                                                        <h3 className="text-display-xs font-bold text-primary mt-4 mb-2 tracking-tight">
                                                             {children}
                                                         </h3>
                                                     ),
                                                     h3: ({ children }) => (
-                                                        <h4 className="text-base font-bold text-primary mt-2 mb-1">
+                                                        <h4 className="text-xl font-bold text-primary mt-3 mb-2 tracking-tight">
                                                             {children}
                                                         </h4>
                                                     ),
@@ -481,7 +500,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                                             return null;
                                                         return (
                                                             <code
-                                                                className="bg-secondary/40 px-1.5 py-0.5 rounded text-sm font-mono text-primary border border-secondary/50"
+                                                                className="bg-brand-primary px-1.5 py-0.5 rounded text-sm font-mono text-brand-secondary border border-brand/20 font-bold"
                                                                 {...props}
                                                             >
                                                                 {children}
@@ -493,7 +512,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                                 {displayedText}
                                             </ReactMarkdown>
                                             {(isTyping || active.isStreaming) && (
-                                                <span className="ml-0.5 inline-block w-[2px] h-[0.85em] bg-brand-secondary align-middle animate-[caret-blink_1s_infinite]" />
+                                                <span className="ml-0.5 inline-block w-[2px] h-[0.85em] bg-brand-solid align-middle animate-[caret-blink_1s_infinite]" />
                                             )}
                                         </div>
                                     </div>
@@ -505,10 +524,10 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
             </div>
 
             {/* ═══════════════ Input Bar ═══════════════ */}
-            <div className="shrink-0 border-t border-secondary/40 bg-[#F9F7F2] px-4 sm:px-8 py-4">
-                <div className="max-w-2xl mx-auto space-y-3">
+            <div className="shrink-0 border-t border-secondary/60 bg-primary px-4 sm:px-8 py-5">
+                <div className="max-w-2xl mx-auto space-y-4">
                     {/* Input row */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 rounded-2xl border-2 border-secondary bg-primary p-2 shadow-xs focus-within:border-brand focus-within:shadow-md transition-all">
                         <input
                             ref={inputRef}
                             id="lesson-input"
@@ -516,34 +535,40 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder={`Ask about ${topicLabels[topicId]?.toLowerCase() || "anything"}...`}
+                            placeholder={`What do you want to explore in ${topicLabels[topicId]?.toLowerCase() || "STEM"}?`}
                             disabled={isStreaming || !lessonId}
-                            className="flex-1 h-12 px-5 rounded-xl bg-white border-2 border-secondary/50 text-sm text-primary outline-none placeholder:text-placeholder focus:border-brand-secondary focus:shadow-[0_0_0_3px_rgba(79,70,229,0.1)] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex-1 h-11 px-4 bg-transparent text-md text-primary outline-none placeholder:text-placeholder disabled:opacity-40 disabled:cursor-not-allowed"
                         />
                         <button
                             type="button"
                             id="lesson-send-btn"
                             onClick={() => sendMessage()}
                             disabled={!input.trim() || isStreaming || !lessonId}
-                            className="h-12 px-6 rounded-xl bg-brand-secondary text-white font-semibold text-sm flex items-center gap-2 hover:opacity-90 active:scale-[0.97] transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-sm"
+                            className="h-11 px-5 rounded-xl bg-brand-solid text-white font-bold text-sm flex items-center gap-2 hover:bg-brand-solid_hover shadow-xs active:scale-[0.97] transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                         >
-                            <Send className="size-4" />
-                            <span className="hidden sm:inline">Send</span>
+                            <ArrowRight className="size-4" aria-hidden />
+                            <span className="hidden sm:inline">Explore</span>
                         </button>
                     </div>
 
-                    {/* Quick action pills */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
+                    {/* Quick action badges */}
+                    <div className="flex items-center gap-3 overflow-x-auto pb-0.5">
                         {quickActions.map((action) => (
                             <button
                                 key={action.label}
                                 type="button"
                                 disabled={isStreaming || !lessonId}
                                 onClick={() => sendMessage(action.prompt)}
-                                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-secondary/40 bg-white text-[11px] font-medium text-tertiary hover:text-brand-secondary hover:border-brand-secondary/40 transition disabled:opacity-30 cursor-pointer"
+                                className="group shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-secondary/80 bg-primary hover:border-brand/40 hover:shadow-sm transition disabled:opacity-30 cursor-pointer"
                             >
-                                <action.icon className="size-3" />
-                                {action.label}
+                                <div
+                                    className={`flex size-7 items-center justify-center rounded-lg ${action.gradient} text-white shrink-0 shadow-xs group-hover:scale-110 transition`}
+                                >
+                                    <action.Icon className="size-3.5" aria-hidden />
+                                </div>
+                                <span className="text-xs font-bold text-secondary group-hover:text-brand-secondary transition">
+                                    {action.label}
+                                </span>
                             </button>
                         ))}
                     </div>

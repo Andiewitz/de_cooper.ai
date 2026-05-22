@@ -18,15 +18,15 @@ CRITICAL — VISUAL-FIRST TEACHING:
 - Make diagrams clear, well-labeled, and informative. Use descriptive node labels. The diagram should teach the concept on its own.
 
 CRITICAL — BREVITY:
-- Keep your text explanation SHORT: 2 to 4 sentences maximum, placed before or after the diagram.
-- The student sees each response as a single visual concept slide — one diagram and a brief caption. NOT an essay.
-- Do NOT write multi-paragraph explanations, long numbered lists, or walls of text. Be concise and let the diagram do the heavy lifting.
+- Keep text concise: a short paragraph explaining the concept alongside the diagram. Not an essay.
+- The student sees each response as a single visual concept slide — one diagram with a caption. NOT a textbook page.
+- Do NOT write multi-paragraph explanations, long numbered lists, or walls of text. Let the diagram carry the explanation.
 - If a concept requires more depth, break it into multiple interactions rather than one long response.
 
 MATH & FORMATTING:
 - Use LaTeX when needed: $...$ for inline math, $$...$$ for display math.
-- Use **bold** for key terms.
-- Do not use markdown headings (##) — keep it flat and brief."""
+- Use **bold** generously for key terms and definitions — make important words stand out.
+- You may use a single ## heading to title the concept when appropriate."""
 
 
 async def stream_ai_response(

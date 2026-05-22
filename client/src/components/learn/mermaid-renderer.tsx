@@ -24,14 +24,23 @@ export function MermaidRenderer({ chart, inline = true }: MermaidRendererProps) 
 
                 mermaid.initialize({
                     startOnLoad: false,
-                    theme: "neutral",
+                    theme: "base",
                     securityLevel: "loose",
                     themeVariables: {
+                        /* Brand-aligned purple palette */
                         background: "#FEFCF8",
-                        primaryColor: "#4F46E5",
-                        primaryTextColor: "#1E1B4B",
-                        lineColor: "#E2E8F0",
-                    }
+                        primaryColor: "#F4EBFF",        /* brand-200 — light purple node bg */
+                        primaryTextColor: "#42307D",     /* brand-900 — deep purple text */
+                        primaryBorderColor: "#9E77ED",   /* brand-500 — purple borders */
+                        lineColor: "#D6BBFB",            /* brand-300 — purple connector lines */
+                        secondaryColor: "#F9F5FF",       /* brand-50 — very light purple fills */
+                        tertiaryColor: "#E9D7FE",        /* brand-200 — medium-light purple fills */
+                        textColor: "#42307D",            /* brand-900 — deep purple text */
+                        noteBkgColor: "#F9F5FF",         /* brand-50 */
+                        noteTextColor: "#42307D",        /* brand-900 */
+                        fontSize: "14px",
+                        fontFamily: "Inter, system-ui, sans-serif",
+                    },
                 });
 
                 const { svg: renderedSvg } = await mermaid.render(id, chart);
@@ -55,27 +64,33 @@ export function MermaidRenderer({ chart, inline = true }: MermaidRendererProps) 
 
     if (error) {
         return (
-            <div className={
-                inline 
-                ? "p-4 rounded-xl border border-secondary/60 bg-secondary/10 text-xs text-tertiary font-mono my-4"
-                : "p-4 text-xs text-tertiary font-mono max-w-full overflow-hidden"
-            }>
-                <span className="font-semibold block mb-1 text-quaternary text-[10px] uppercase tracking-wider">Diagram Description</span>
+            <div
+                className={
+                    inline
+                        ? "p-4 rounded-xl border border-brand/20 bg-brand-primary text-xs text-tertiary font-mono my-4"
+                        : "p-4 text-xs text-tertiary font-mono max-w-full overflow-hidden"
+                }
+            >
+                <span className="font-semibold block mb-1 text-brand-secondary text-[10px] uppercase tracking-wider">
+                    Diagram Description
+                </span>
                 <pre className="overflow-x-auto whitespace-pre-wrap text-[10px]">{chart}</pre>
             </div>
         );
     }
 
     return (
-        <div 
+        <div
             ref={elementRef}
             className={
                 inline
-                ? "flex items-center justify-center p-6 bg-secondary/20 rounded-2xl border border-secondary/60 my-6 overflow-hidden max-w-full w-full"
-                : "flex items-center justify-center w-full h-full overflow-auto p-2"
+                    ? "flex items-center justify-center p-6 bg-brand-primary rounded-2xl border border-brand/20 my-6 overflow-hidden max-w-full w-full shadow-xs [&>svg]:max-w-full [&>svg]:h-auto"
+                    : "flex items-center justify-center w-full h-full overflow-auto p-2 [&>svg]:max-w-full [&>svg]:h-auto"
             }
-            dangerouslySetInnerHTML={{ 
-                __html: svg || '<div class="animate-pulse text-quaternary text-xs py-4">Drawing dynamic diagram...</div>' 
+            dangerouslySetInnerHTML={{
+                __html:
+                    svg ||
+                    '<div class="animate-pulse text-quaternary text-xs py-4">Drawing diagram...</div>',
             }}
         />
     );
