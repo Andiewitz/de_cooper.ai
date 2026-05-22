@@ -4,6 +4,7 @@ import type { ComponentType, ReactNode, SVGProps } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+    Atom01,
     Beaker01,
     Calendar,
     ChevronLeft,
@@ -65,6 +66,12 @@ const NAV_ITEMS: NavItem[] = [
         href: "/learn/leaderboards",
         icon: Trophy01,
         isActive: (pathname) => pathname.startsWith("/learn/leaderboards"),
+    },
+    {
+        label: "Competitive for Nerds",
+        href: "/learn/competitive",
+        icon: Atom01,
+        isActive: (pathname) => pathname.startsWith("/learn/competitive"),
     },
     {
         label: "Docs for devs",
