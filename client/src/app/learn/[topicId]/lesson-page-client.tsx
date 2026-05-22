@@ -2,15 +2,15 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Send01 } from "@untitledui/icons";
-import { Button } from "@/components/base/buttons/button";
+import { ArrowLeft } from "@untitledui/icons";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/auth-provider";
-import { lessonsApi, type MessageResponse } from "@/lib/api";
+import { lessonsApi } from "@/lib/api";
 
-interface ChatMessage {
+interface Exchange {
     id: string;
-    role: "student" | "sheldon";
-    content: string;
+    question: string;
+    answer: string;
     isStreaming?: boolean;
 }
 
@@ -23,6 +23,15 @@ const topicLabels: Record<string, string> = {
     general: "Ask Anything",
 };
 
+const emptyStatePrompts: Record<string, string> = {
+    physics: "What would you like to understand about physics?",
+    mathematics: "What mathematical concept shall we dissect?",
+    "computer-science": "What would you like to know about computer science?",
+    chemistry: "What chemical mystery shall we unravel?",
+    astronomy: "What cosmic question is on your mind?",
+    general: "Ask Dr. Cooper anything. He'll answer. Grudgingly.",
+};
+
 interface LessonPageClientProps {
     topicId: string;
 }
@@ -31,10 +40,10 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const router = useRouter();
     const { token, isLoading, isAuthenticated } = useAuth();
     const [lessonId, setLessonId] = useState<string | null>(null);
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [exchanges, setExchanges] = useState<Exchange[]>([]);
     const [input, setInput] = useState("");
     const [isStreaming, setIsStreaming] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const bottomRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Auth guard
@@ -47,7 +56,6 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     // Create lesson on mount
     useEffect(() => {
         if (!token || lessonId) return;
-
         const createLesson = async () => {
             try {
                 const topicLabel = topicLabels[topicId] || topicId;
@@ -63,30 +71,31 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         createLesson();
     }, [token, topicId, lessonId]);
 
-    // Auto-scroll
+    // Scroll to bottom after each answer
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [exchanges]);
 
     // Auto-resize textarea
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInput(e.target.value);
         if (textareaRef.current) {
             textareaRef.current.style.height = "auto";
-            textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + "px";
+            textareaRef.current.style.height =
+                Math.min(textareaRef.current.scrollHeight, 160) + "px";
         }
     };
 
     const sendMessage = useCallback(async () => {
         if (!input.trim() || !lessonId || !token || isStreaming) return;
 
-        const userMessage: ChatMessage = {
-            id: crypto.randomUUID(),
-            role: "student",
-            content: input.trim(),
-        };
+        const question = input.trim();
+        const exchangeId = crypto.randomUUID();
 
-        setMessages((prev) => [...prev, userMessage]);
+        setExchanges((prev) => [
+            ...prev,
+            { id: exchangeId, question, answer: "", isStreaming: true },
+        ]);
         setInput("");
         setIsStreaming(true);
 
@@ -94,39 +103,32 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
             textareaRef.current.style.height = "auto";
         }
 
-        // Add placeholder for Sheldon's response
-        const sheldonId = crypto.randomUUID();
-        setMessages((prev) => [
-            ...prev,
-            { id: sheldonId, role: "sheldon", content: "", isStreaming: true },
-        ]);
-
         try {
-            for await (const chunk of lessonsApi.streamChat(lessonId, userMessage.content, token)) {
-                setMessages((prev) =>
-                    prev.map((msg) =>
-                        msg.id === sheldonId
-                            ? { ...msg, content: msg.content + chunk }
-                            : msg
+            for await (const chunk of lessonsApi.streamChat(lessonId, question, token)) {
+                setExchanges((prev) =>
+                    prev.map((ex) =>
+                        ex.id === exchangeId
+                            ? { ...ex, answer: ex.answer + chunk }
+                            : ex
                     )
                 );
             }
-        } catch (err) {
-            console.error("Chat error:", err);
-            setMessages((prev) =>
-                prev.map((msg) =>
-                    msg.id === sheldonId
+        } catch {
+            setExchanges((prev) =>
+                prev.map((ex) =>
+                    ex.id === exchangeId
                         ? {
-                              ...msg,
-                              content: "*sighs* Something went wrong with my neural pathways. Even my failures are more sophisticated than your successes. Try again.",
+                              ...ex,
+                              answer:
+                                  "*sighs* Something went wrong with my neural pathways. Even my failures are more sophisticated than your successes. Try again.",
                           }
-                        : msg
+                        : ex
                 )
             );
         } finally {
-            setMessages((prev) =>
-                prev.map((msg) =>
-                    msg.id === sheldonId ? { ...msg, isStreaming: false } : msg
+            setExchanges((prev) =>
+                prev.map((ex) =>
+                    ex.id === exchangeId ? { ...ex, isStreaming: false } : ex
                 )
             );
             setIsStreaming(false);
@@ -148,98 +150,152 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         );
     }
 
+    const currentExchange = exchanges[exchanges.length - 1];
+    const pastExchanges = exchanges.slice(0, -1);
+    const hasExchanges = exchanges.length > 0;
+
     return (
         <div className="flex h-dvh flex-col bg-primary">
-            {/* Header */}
-            <header className="shrink-0 border-b border-secondary px-4 py-3">
-                <div className="mx-auto flex max-w-4xl items-center gap-3">
-                    <Button
-                        color="tertiary"
-                        size="sm"
-                        iconLeading={ArrowLeft}
-                        onClick={() => router.push("/learn")}
-                    />
-                    <div>
-                        <h1 className="font-display text-md font-semibold text-primary">
-                            {topicLabels[topicId] || topicId}
-                        </h1>
-                        <p className="text-xs text-tertiary">with Dr. Sheldon Cooper</p>
-                    </div>
-                </div>
+            {/* Minimal header */}
+            <header className="shrink-0 flex items-center justify-between px-6 py-4 sm:px-10 lg:px-16">
+                <button
+                    type="button"
+                    aria-label="Back to workspace"
+                    onClick={() => router.push("/learn")}
+                    className="flex items-center gap-2 text-quaternary hover:text-secondary transition-colors duration-150 cursor-pointer"
+                >
+                    <ArrowLeft className="size-4" aria-hidden />
+                    <span className="text-xs font-semibold uppercase tracking-widest">
+                        Back
+                    </span>
+                </button>
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-secondary">
+                    {topicLabels[topicId] || topicId}
+                </p>
+                <div className="w-14" aria-hidden /> {/* balance spacer */}
             </header>
 
-            {/* Messages */}
+            {/* Content */}
             <div className="min-h-0 flex-1 overflow-y-auto">
-                <div className="mx-auto max-w-4xl px-4 py-6">
-                    {messages.length === 0 && (
-                        <div className="py-20 text-center">
-                            <p className="font-display text-display-xs font-semibold text-primary">
-                                Ask Dr. Cooper anything about {topicLabels[topicId]?.toLowerCase() || "anything"}
+                <div className="mx-auto max-w-3xl px-6 py-6 sm:px-10 lg:px-0">
+
+                    {/* Empty state */}
+                    {!hasExchanges && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="flex flex-col items-start pt-16 pb-10"
+                        >
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-quaternary mb-6">
+                                Dr. Sheldon Cooper — {topicLabels[topicId]}
                             </p>
-                            <p className="mt-2 text-sm text-tertiary">
-                                He&apos;ll explain it brilliantly. And make you feel bad about yourself. It&apos;s his gift.
+                            <h2 className="font-display text-display-sm font-bold text-primary leading-tight sm:text-display-md">
+                                {emptyStatePrompts[topicId] || "What would you like to learn?"}
+                            </h2>
+                            <p className="mt-5 text-sm text-quaternary max-w-sm leading-relaxed">
+                                Type below. He&apos;ll answer with characteristic thoroughness and barely concealed condescension.
                             </p>
+                        </motion.div>
+                    )}
+
+                    {/* Past exchanges — compact & minimal */}
+                    {pastExchanges.length > 0 && (
+                        <div className="space-y-10 pb-10">
+                            {pastExchanges.map((ex) => (
+                                <div key={ex.id} className="border-t border-secondary/60 pt-8">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-quaternary mb-3">
+                                        You asked
+                                    </p>
+                                    <p className="text-sm font-medium text-secondary mb-6 leading-relaxed">
+                                        {ex.question}
+                                    </p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-brand-secondary/70 mb-3">
+                                        Dr. Cooper
+                                    </p>
+                                    <p className="text-md text-tertiary leading-relaxed whitespace-pre-wrap">
+                                        {ex.answer}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     )}
 
-                    <div className="space-y-6">
-                        {messages.map((msg) => (
-                            <div
-                                key={msg.id}
-                                className={`flex ${msg.role === "student" ? "justify-end" : "justify-start"}`}
+                    {/* Current exchange — BIG editorial response */}
+                    <AnimatePresence>
+                        {currentExchange && (
+                            <motion.div
+                                key={currentExchange.id}
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.4 }}
+                                className={pastExchanges.length > 0 ? "border-t border-secondary/60 pt-8" : "pt-4"}
                             >
-                                {msg.role === "sheldon" ? (
-                                    <div className="max-w-[80%] border-l-2 border-brand-secondary/60 pl-4 py-0.5">
-                                        <span className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-brand-secondary">
-                                            Dr. Cooper
+                                {/* Question label */}
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-quaternary mb-3">
+                                    You asked
+                                </p>
+                                <p className="text-sm font-semibold text-secondary mb-8 leading-relaxed">
+                                    {currentExchange.question}
+                                </p>
+
+                                {/* Dr. Cooper label */}
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-secondary mb-5">
+                                    Dr. Cooper
+                                </p>
+
+                                {/* Giant answer text */}
+                                <div className="font-display text-display-xs font-semibold text-primary leading-snug sm:text-display-sm whitespace-pre-wrap">
+                                    {currentExchange.answer || (
+                                        <span className="text-quaternary animate-pulse">
+                                            Formulating a response...
                                         </span>
-                                        <div className="whitespace-pre-wrap text-sm leading-relaxed text-primary">
-                                            {msg.content}
-                                            {msg.isStreaming && (
-                                                <span className="ml-1 inline-block size-2 animate-pulse rounded-full bg-brand-secondary" />
-                                            )}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-brand-solid text-white">
-                                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                            {msg.content}
-                                            {msg.isStreaming && (
-                                                <span className="ml-1 inline-block size-2 animate-pulse rounded-full bg-current" />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                    <div ref={messagesEndRef} />
+                                    )}
+                                    {currentExchange.isStreaming && currentExchange.answer && (
+                                        <span className="ml-1 inline-block w-0.5 h-[0.9em] bg-brand-secondary animate-[caret-blink_1s_infinite] align-middle" />
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    <div ref={bottomRef} className="h-10" />
                 </div>
             </div>
 
-            {/* Input */}
-            <div className="shrink-0 border-t border-secondary px-4 py-4">
-                <div className="mx-auto flex max-w-4xl items-end gap-3">
-                    <div className="flex min-h-[44px] flex-1 items-end rounded-xl border border-secondary bg-primary px-4 py-3 shadow-xs transition-colors focus-within:border-brand focus-within:ring-2 focus-within:ring-brand">
+            {/* Input — flat, minimal, editorial */}
+            <div className="shrink-0 border-t border-secondary/60 bg-primary">
+                <div className="mx-auto max-w-3xl px-6 py-5 sm:px-10 lg:px-0">
+                    <div className="flex items-end gap-4">
                         <textarea
                             ref={textareaRef}
+                            id="lesson-input"
                             value={input}
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
-                            placeholder="Ask Dr. Cooper a question..."
+                            placeholder={
+                                hasExchanges
+                                    ? "Ask a follow-up question..."
+                                    : "Type your question here..."
+                            }
                             rows={1}
                             disabled={isStreaming || !lessonId}
-                            className="w-full resize-none bg-transparent text-sm text-primary outline-none placeholder:text-placeholder disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex-1 resize-none bg-transparent text-md text-primary outline-none placeholder:text-placeholder disabled:cursor-not-allowed disabled:opacity-40 leading-relaxed py-1"
                         />
+                        <button
+                            type="button"
+                            id="lesson-send-btn"
+                            onClick={sendMessage}
+                            disabled={!input.trim() || isStreaming || !lessonId}
+                            aria-label="Send question"
+                            className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-brand-secondary hover:text-brand-solid transition-colors duration-150 disabled:text-quaternary disabled:cursor-not-allowed pb-1"
+                        >
+                            {isStreaming ? "Thinking..." : "Ask →"}
+                        </button>
                     </div>
-                    <Button
-                        color="primary"
-                        size="md"
-                        iconLeading={Send01}
-                        onClick={sendMessage}
-                        isDisabled={!input.trim() || isStreaming || !lessonId}
-                        isLoading={isStreaming}
-                    />
+                    <p className="mt-1.5 text-[10px] text-quaternary">
+                        Enter to send · Shift+Enter for new line
+                    </p>
                 </div>
             </div>
         </div>
