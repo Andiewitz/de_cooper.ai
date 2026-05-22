@@ -1,14 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen01, Atom01, Calculator, Code01, Globe01, Lightbulb02, Zap } from "@untitledui/icons";
+import { motion } from "framer-motion";
+import {
+    BookOpen01,
+    Atom01,
+    Calculator,
+    Code01,
+    Globe01,
+    Lightbulb02,
+    Zap,
+    Trophy01,
+    ArrowRight,
+} from "@untitledui/icons";
 import { Badge } from "@/components/base/badges/badges";
-import { ProgressBar } from "@/components/base/progress-indicators/progress-indicators";
+import { CircleProgressBar } from "@/components/base/progress-indicators/simple-circle";
+import { Avatar } from "@/components/base/avatar/avatar";
 import { useAuth } from "@/providers/auth-provider";
 import OnboardingWizard from "@/components/onboarding-wizard";
-import HeroBanner from "@/components/HeroBanner";
-import TopicCard from "@/components/TopicCard";
 import { LearnDashboardLayout } from "@/components/learn/learn-dashboard-layout";
 
 export const topics = [
@@ -53,7 +63,6 @@ export const topics = [
 export default function LearnPage() {
     const router = useRouter();
     const { user, isLoading, isAuthenticated } = useAuth();
-    const topicsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -75,100 +84,197 @@ export default function LearnPage() {
         return <OnboardingWizard onClose={() => {}} />;
     }
 
-    const displayName = user?.display_name || user?.username;
+    const displayName = user?.display_name || user?.username || "Learner";
+    const initials = displayName
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
 
     return (
-        <LearnDashboardLayout title="Home" subtitle="Track progress and pick your next lesson">
-            <div className="mx-auto max-w-6xl space-y-8">
-                <HeroBanner
-                    name={displayName}
-                    onStartLearning={() => topicsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                />
+        <LearnDashboardLayout title="Workspace Dashboard" subtitle="Interactive STEM Q&A and AI-Guided Lessons">
+            <div className="mx-auto max-w-6xl">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    {/* Main Workspace (Left) */}
+                    <div className="lg:col-span-8 space-y-8">
+                        
+                        {/* Seamless, Premium Header Greeting */}
+                        <motion.section
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4 }}
+                            className="relative overflow-hidden rounded-2xl border border-secondary bg-primary p-6 sm:p-8"
+                        >
+                            {/* Glowing light-mesh visual accents in the canvas background */}
+                            <div className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-brand-secondary opacity-60 blur-2xl" />
+                            <div className="pointer-events-none absolute bottom-0 left-1/3 h-24 w-2/3 bg-[#FEF08A]/20 blur-3xl" />
 
-                {/* Stats row */}
-                <section className="grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-xl border border-secondary bg-primary p-5">
-                        <p className="text-sm font-medium text-tertiary">Lessons completed</p>
-                        <p className="mt-1 font-display text-display-xs font-bold text-primary">0</p>
-                        <Badge color="gray" size="sm" className="mt-3">
-                            Just getting started
-                        </Badge>
-                    </div>
-                    <div className="rounded-xl border border-secondary bg-primary p-5">
-                        <p className="text-sm font-medium text-tertiary">Study streak</p>
-                        <p className="mt-1 font-display text-display-xs font-bold text-primary">0 days</p>
-                        <p className="mt-3 text-xs text-quaternary">Complete a lesson to begin</p>
-                    </div>
-                    <div className="rounded-xl border border-secondary bg-primary p-5">
-                        <p className="text-sm font-medium text-tertiary">Topics available</p>
-                        <p className="mt-1 font-display text-display-xs font-bold text-brand-secondary">{topics.length}</p>
-                        <p className="mt-3 text-xs text-quaternary">Across STEM & general Q&A</p>
-                    </div>
-                </section>
-
-                {/* Progress + continue */}
-                <section className="grid gap-6 lg:grid-cols-5">
-                    <div className="rounded-xl border border-secondary bg-primary p-6 lg:col-span-3">
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <h2 className="font-display text-lg font-semibold text-primary">Your learning journey</h2>
-                                <p className="mt-1 text-sm text-tertiary">
-                                    Progress updates as you complete lessons and quizzes.
+                            <div className="relative">
+                                <p className="text-xs font-semibold uppercase tracking-wider text-brand-secondary">Dashboard Welcome</p>
+                                <h2 className="mt-1 font-display text-display-xs font-bold text-primary sm:text-display-sm">
+                                    Hey {displayName}, ready to learn?
+                                </h2>
+                                <p className="mt-2 text-md text-tertiary leading-relaxed max-w-xl">
+                                    Dr. Cooper is currently in a state of mild agitation. Select a curriculum module below to begin a lesson and attempt to prove your competence.
                                 </p>
                             </div>
-                            <div className="flex size-10 items-center justify-center rounded-lg bg-brand-secondary">
-                                <Zap className="size-5 text-fg-brand-primary" aria-hidden />
+                        </motion.section>
+
+                        {/* STEM Curriculum Modules (Redesigned Active Module Panel) */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between px-1">
+                                <h3 className="text-xs font-semibold uppercase tracking-wider text-tertiary">
+                                    STEM Curriculum Modules
+                                </h3>
+                                <span className="text-xs text-quaternary font-medium">Select a module to launch</span>
+                            </div>
+
+                            <div className="overflow-hidden rounded-2xl border border-secondary bg-primary divide-y divide-secondary/60 shadow-xs">
+                                {topics.map((topic) => {
+                                    const Icon = topic.icon;
+                                    const gradientClass = {
+                                        physics: "bg-linear-to-tr from-purple-500 to-indigo-500 text-white",
+                                        mathematics: "bg-linear-to-tr from-blue-500 to-cyan-500 text-white",
+                                        "computer-science": "bg-linear-to-tr from-emerald-500 to-teal-500 text-white",
+                                        chemistry: "bg-linear-to-tr from-amber-500 to-orange-500 text-white",
+                                        astronomy: "bg-linear-to-tr from-pink-500 to-rose-500 text-white",
+                                        general: "bg-linear-to-tr from-slate-500 to-neutral-500 text-white"
+                                    }[topic.id] || "bg-brand-secondary text-fg-brand-primary";
+
+                                    return (
+                                        <motion.button
+                                            key={topic.id}
+                                            type="button"
+                                            whileHover={{ backgroundColor: "var(--color-bg-secondary_hover)" }}
+                                            transition={{ duration: 0.1 }}
+                                            onClick={() => router.push(`/learn/${topic.id}`)}
+                                            className="group flex w-full items-center justify-between p-5 text-left transition duration-150 ease-out outline-focus-ring cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-4 flex-1 min-w-0 pr-4">
+                                                <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl shadow-xs ${gradientClass}`}>
+                                                    <Icon className="size-6" aria-hidden />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h4 className="text-md font-semibold text-primary group-hover:text-brand-secondary transition duration-100 flex items-center gap-2">
+                                                        {topic.title}
+                                                    </h4>
+                                                    <p className="mt-1 text-sm text-tertiary line-clamp-2 max-w-xl group-hover:text-secondary transition duration-100">
+                                                        {topic.description}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Action state or launching cue */}
+                                            <div className="flex items-center gap-4 shrink-0">
+                                                <span className="hidden sm:inline-flex rounded-full bg-secondary/80 px-2.5 py-0.5 text-xs font-semibold text-tertiary group-hover:bg-brand-secondary group-hover:text-fg-brand-primary transition duration-150">
+                                                    {topic.id === "general" ? "Open Q&A" : "Ready"}
+                                                </span>
+                                                <div className="flex size-8 items-center justify-center rounded-full bg-secondary/40 text-tertiary group-hover:bg-brand-solid group-hover:text-white transition duration-150">
+                                                    <ArrowRight className="size-4" aria-hidden />
+                                                </div>
+                                            </div>
+                                        </motion.button>
+                                    );
+                                })}
                             </div>
                         </div>
-                        <div className="mt-6">
-                            <div className="mb-2 flex justify-between text-sm">
-                                <span className="font-medium text-secondary">Overall progress</span>
-                                <span className="text-tertiary">0%</span>
+
+                    </div>
+
+                    {/* Progress Sidebar Panel (Right) */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="sticky top-6 rounded-2xl border border-secondary bg-primary p-6 shadow-xs space-y-6">
+                            
+                            {/* User details summary header */}
+                            <div className="flex items-center gap-3 pb-4 border-b border-secondary/60">
+                                <Avatar size="md" initials={initials} alt={displayName} className="ring-2 ring-brand-secondary/40" />
+                                <div className="min-w-0">
+                                    <h3 className="font-semibold text-primary truncate" title={displayName}>{displayName}</h3>
+                                    <Badge color="purple" size="sm" className="mt-0.5">
+                                        STEM Explorer
+                                    </Badge>
+                                </div>
                             </div>
-                            <ProgressBar value={0} progressClassName="bg-brand-solid" />
+
+                            {/* Overall progress visual circle */}
+                            <div className="flex flex-col items-center justify-center py-5 bg-secondary/30 rounded-xl border border-secondary/50">
+                                <CircleProgressBar value={0} />
+                                <div className="mt-3 text-center px-4">
+                                    <span className="text-xs font-semibold uppercase tracking-wider text-tertiary">Overall Progress</span>
+                                    <p className="text-xs text-quaternary mt-1">Complete lessons to advance your rank</p>
+                                </div>
+                            </div>
+
+                            {/* Integrated minimal stats grid (no floating card boxes!) */}
+                            <div className="grid grid-cols-2 gap-4 py-2 border-b border-secondary/60">
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-1.5 text-tertiary">
+                                        <Trophy01 className="size-4 text-amber-500" />
+                                        <span className="text-xs font-medium uppercase tracking-wider">Completed</span>
+                                    </div>
+                                    <p className="mt-1 font-display text-display-xs font-bold text-primary">0</p>
+                                    <span className="text-xs text-quaternary">lessons finished</span>
+                                </div>
+                                
+                                <div className="flex flex-col border-l border-secondary/60 pl-4">
+                                    <div className="flex items-center gap-1.5 text-tertiary">
+                                        <Zap className="size-4 text-orange-500" />
+                                        <span className="text-xs font-medium uppercase tracking-wider">Streak</span>
+                                    </div>
+                                    <p className="mt-1 font-display text-display-xs font-bold text-primary">0 days</p>
+                                    <span className="text-xs text-quaternary">active streak</span>
+                                </div>
+                            </div>
+
+                            {/* Roadmap Timeline path */}
+                            <div className="space-y-4">
+                                <h4 className="text-xs font-semibold uppercase tracking-wider text-tertiary">
+                                    Your Learning Path
+                                </h4>
+                                <div className="relative pl-6 space-y-4">
+                                    <div className="absolute left-2.5 top-1.5 bottom-1.5 w-0.5 border-l border-dashed border-secondary-solid/40" />
+
+                                    {/* Step 1 */}
+                                    <div className="relative flex gap-3 text-sm">
+                                        <div className="absolute -left-6 mt-1 flex size-5 items-center justify-center rounded-full bg-brand-solid text-white text-[10px] font-bold">
+                                            ✓
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-secondary">Complete Onboarding</p>
+                                            <p className="text-xs text-quaternary">Tuned study profile established</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Step 2 */}
+                                    <div className="relative flex gap-3 text-sm">
+                                        <div className="absolute -left-6 mt-1 flex size-5 items-center justify-center rounded-full bg-brand-secondary border border-brand text-fg-brand-primary text-[10px] font-bold">
+                                            2
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-primary">Launch First Lesson</p>
+                                            <p className="text-xs text-tertiary">Select any active module from the list</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Step 3 */}
+                                    <div className="relative flex gap-3 text-sm opacity-50">
+                                        <div className="absolute -left-6 mt-1 flex size-5 items-center justify-center rounded-full bg-secondary border border-secondary text-quaternary text-[10px] font-bold">
+                                            3
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-secondary">Pass First Quiz</p>
+                                            <p className="text-xs text-quaternary">Attempt to survive Dr. Cooper's grading</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
-                        <p className="mt-4 text-sm text-quaternary">No lessons completed yet — choose a topic below to begin.</p>
                     </div>
 
-                    <div className="rounded-xl border border-dashed border-secondary bg-secondary/50 p-6 lg:col-span-2">
-                        <h3 className="text-sm font-semibold text-secondary">Continue learning</h3>
-                        <p className="mt-2 text-sm text-tertiary">Your recent lessons will appear here once you start.</p>
-                        <button
-                            type="button"
-                            onClick={() => topicsRef.current?.scrollIntoView({ behavior: "smooth" })}
-                            className="mt-4 text-sm font-semibold text-brand-secondary hover:text-brand-secondary_hover transition duration-100"
-                        >
-                            Explore topics →
-                        </button>
-                    </div>
-                </section>
-
-                {/* Topic grid */}
-                <section ref={topicsRef}>
-                    <div className="mb-6">
-                        <h2 className="font-display text-display-xs font-bold text-primary sm:text-display-sm">
-                            Choose a topic
-                        </h2>
-                        <p className="mt-2 text-md text-tertiary">
-                            Select a subject to start an AI-guided lesson with Dr. Cooper.
-                        </p>
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {topics.map((topic) => {
-                            const Icon = topic.icon;
-                            return (
-                                <TopicCard
-                                    key={topic.id}
-                                    id={topic.id}
-                                    title={topic.title}
-                                    description={topic.description}
-                                    Icon={Icon}
-                                    onClick={() => router.push(`/learn/${topic.id}`)}
-                                />
-                            );
-                        })}
-                    </div>
-                </section>
+                </div>
             </div>
         </LearnDashboardLayout>
     );
