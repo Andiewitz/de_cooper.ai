@@ -381,7 +381,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                             {latestMermaid ? (
                                 <div className="absolute inset-0 flex items-center justify-center p-4">
                                     <div className="w-full max-h-full overflow-hidden flex items-center justify-center">
-                                        <MermaidRenderer chart={latestMermaid} />
+                                        <MermaidRenderer chart={latestMermaid} inline={false} />
                                     </div>
                                 </div>
                             ) : (
