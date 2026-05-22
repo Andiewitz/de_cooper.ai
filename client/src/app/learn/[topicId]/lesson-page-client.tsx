@@ -4,6 +4,10 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "@untitledui/icons";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { useAuth } from "@/providers/auth-provider";
 import { lessonsApi } from "@/lib/api";
 
@@ -252,9 +256,22 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     <p className="text-sm font-medium text-secondary mb-6 leading-relaxed">
                                         {ex.question}
                                     </p>
-                                    <p className="text-md text-tertiary leading-relaxed whitespace-pre-wrap">
-                                        {ex.displayed}
-                                    </p>
+                                    <div className="text-md text-tertiary leading-relaxed">
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkMath]}
+                                            rehypePlugins={[rehypeKatex]}
+                                            components={{
+                                                p: ({ children }) => <span className="block mb-2 last:mb-0">{children}</span>,
+                                                strong: ({ children }) => <strong className="font-bold text-primary">{children}</strong>,
+                                                em: ({ children }) => <em className="italic text-tertiary">{children}</em>,
+                                                h2: ({ children }) => <h4 className="text-md font-bold text-primary mt-4 mb-1">{children}</h4>,
+                                                h3: ({ children }) => <h5 className="text-sm font-bold text-primary mt-3 mb-1">{children}</h5>,
+                                                code: ({ children }) => <code className="bg-secondary/40 px-1 py-0.5 rounded text-xs font-mono text-primary font-bold">{children}</code>,
+                                            }}
+                                        >
+                                            {ex.displayed}
+                                        </ReactMarkdown>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -278,16 +295,29 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                 </p>
 
                                 {/* Big answer */}
-                                <div className="font-display text-display-xs font-semibold text-primary leading-snug sm:text-display-sm whitespace-pre-wrap">
+                                <div className="font-display text-display-xs font-semibold text-primary leading-snug sm:text-display-sm">
                                     {isWaitingForFirstChunk ? (
                                         <ThinkingDots />
                                     ) : (
-                                        <>
-                                            {currentExchange.displayed}
+                                        <div className="inline-block w-full">
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkMath]}
+                                                rehypePlugins={[rehypeKatex]}
+                                                components={{
+                                                    p: ({ children }) => <span className="block mb-4 last:mb-0">{children}</span>,
+                                                    strong: ({ children }) => <strong className="font-extrabold text-brand-secondary tracking-tight">{children}</strong>,
+                                                    em: ({ children }) => <em className="italic text-secondary font-medium">{children}</em>,
+                                                    h2: ({ children }) => <h3 className="text-display-xs font-bold text-primary mt-6 mb-3 tracking-tight">{children}</h3>,
+                                                    h3: ({ children }) => <h4 className="text-xl font-bold text-primary mt-4 mb-2 tracking-tight">{children}</h4>,
+                                                    code: ({ children }) => <code className="bg-secondary/40 px-1.5 py-0.5 rounded text-sm font-mono text-brand-secondary border border-secondary/50 font-bold">{children}</code>,
+                                                }}
+                                            >
+                                                {currentExchange.displayed}
+                                            </ReactMarkdown>
                                             {(isTypewriting || currentExchange.isStreaming) && (
                                                 <span className="ml-0.5 inline-block w-[2px] h-[0.85em] bg-brand-secondary align-middle animate-[caret-blink_1s_infinite]" />
                                             )}
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             </motion.div>
