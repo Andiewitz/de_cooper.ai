@@ -11,6 +11,7 @@ interface Exchange {
     id: string;
     question: string;
     answer: string;
+    displayed: string;
     isStreaming?: boolean;
 }
 
@@ -29,11 +30,28 @@ const emptyStatePrompts: Record<string, string> = {
     "computer-science": "What would you like to know about computer science?",
     chemistry: "What chemical mystery shall we unravel?",
     astronomy: "What cosmic question is on your mind?",
-    general: "Ask Dr. Cooper anything. He'll answer. Grudgingly.",
+    general: "What do you want to learn today?",
 };
 
 interface LessonPageClientProps {
     topicId: string;
+}
+
+// Animated dots for loading state
+function ThinkingDots() {
+    return (
+        <span className="inline-flex items-center gap-1.5 py-1" aria-label="Thinking">
+            {[0, 1, 2].map((i) => (
+                <span
+                    key={i}
+                    className="size-1.5 rounded-full bg-quaternary"
+                    style={{
+                        animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+                    }}
+                />
+            ))}
+        </span>
+    );
 }
 
 export default function LessonPageClient({ topicId }: LessonPageClientProps) {
@@ -71,7 +89,25 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         createLesson();
     }, [token, topicId, lessonId]);
 
-    // Scroll to bottom after each answer
+    // Typewriter: drain pending chars from answer → displayed, one char at a time
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setExchanges((prev) => {
+                let changed = false;
+                const next = prev.map((ex) => {
+                    if (ex.displayed.length < ex.answer.length) {
+                        changed = true;
+                        return { ...ex, displayed: ex.answer.slice(0, ex.displayed.length + 1) };
+                    }
+                    return ex;
+                });
+                return changed ? next : prev;
+            });
+        }, 12); // ~83 chars/sec — fast enough to feel live
+        return () => clearInterval(interval);
+    }, []);
+
+    // Scroll to bottom
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [exchanges]);
@@ -94,7 +130,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
         setExchanges((prev) => [
             ...prev,
-            { id: exchangeId, question, answer: "", isStreaming: true },
+            { id: exchangeId, question, answer: "", displayed: "", isStreaming: true },
         ]);
         setInput("");
         setIsStreaming(true);
@@ -119,8 +155,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                     ex.id === exchangeId
                         ? {
                               ...ex,
-                              answer:
-                                  "*sighs* Something went wrong with my neural pathways. Even my failures are more sophisticated than your successes. Try again.",
+                              answer: "Something went wrong. Please try again.",
                           }
                         : ex
                 )
@@ -154,6 +189,13 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const pastExchanges = exchanges.slice(0, -1);
     const hasExchanges = exchanges.length > 0;
 
+    // Whether the current exchange is still mid-typewriter (displayed hasn't caught up to answer)
+    const isTypewriting =
+        currentExchange &&
+        currentExchange.displayed.length < currentExchange.answer.length;
+    const isWaitingForFirstChunk =
+        currentExchange?.isStreaming && currentExchange.answer.length === 0;
+
     return (
         <div className="flex h-dvh flex-col bg-primary">
             {/* Minimal header */}
@@ -172,7 +214,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                 <p className="text-xs font-bold uppercase tracking-widest text-brand-secondary">
                     {topicLabels[topicId] || topicId}
                 </p>
-                <div className="w-14" aria-hidden /> {/* balance spacer */}
+                <div className="w-14" aria-hidden />
             </header>
 
             {/* Content */}
@@ -188,18 +230,18 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                             className="flex flex-col items-start pt-16 pb-10"
                         >
                             <p className="text-[10px] font-bold uppercase tracking-widest text-quaternary mb-6">
-                                Dr. Sheldon Cooper — {topicLabels[topicId]}
+                                de_cooper.ai — {topicLabels[topicId]}
                             </p>
                             <h2 className="font-display text-display-sm font-bold text-primary leading-tight sm:text-display-md">
                                 {emptyStatePrompts[topicId] || "What would you like to learn?"}
                             </h2>
                             <p className="mt-5 text-sm text-quaternary max-w-sm leading-relaxed">
-                                Type below. He&apos;ll answer with characteristic thoroughness and barely concealed condescension.
+                                Type below. Clear answers, no hand-holding.
                             </p>
                         </motion.div>
                     )}
 
-                    {/* Past exchanges — compact & minimal */}
+                    {/* Past exchanges — compact */}
                     {pastExchanges.length > 0 && (
                         <div className="space-y-10 pb-10">
                             {pastExchanges.map((ex) => (
@@ -210,18 +252,15 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     <p className="text-sm font-medium text-secondary mb-6 leading-relaxed">
                                         {ex.question}
                                     </p>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-brand-secondary/70 mb-3">
-                                        Dr. Cooper
-                                    </p>
                                     <p className="text-md text-tertiary leading-relaxed whitespace-pre-wrap">
-                                        {ex.answer}
+                                        {ex.displayed}
                                     </p>
                                 </div>
                             ))}
                         </div>
                     )}
 
-                    {/* Current exchange — BIG editorial response */}
+                    {/* Current exchange — editorial big response */}
                     <AnimatePresence>
                         {currentExchange && (
                             <motion.div
@@ -231,7 +270,6 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                 transition={{ duration: 0.4 }}
                                 className={pastExchanges.length > 0 ? "border-t border-secondary/60 pt-8" : "pt-4"}
                             >
-                                {/* Question label */}
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-quaternary mb-3">
                                     You asked
                                 </p>
@@ -239,20 +277,17 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     {currentExchange.question}
                                 </p>
 
-                                {/* Dr. Cooper label */}
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-secondary mb-5">
-                                    Dr. Cooper
-                                </p>
-
-                                {/* Giant answer text */}
+                                {/* Big answer */}
                                 <div className="font-display text-display-xs font-semibold text-primary leading-snug sm:text-display-sm whitespace-pre-wrap">
-                                    {currentExchange.answer || (
-                                        <span className="text-quaternary animate-pulse">
-                                            Formulating a response...
-                                        </span>
-                                    )}
-                                    {currentExchange.isStreaming && currentExchange.answer && (
-                                        <span className="ml-1 inline-block w-0.5 h-[0.9em] bg-brand-secondary animate-[caret-blink_1s_infinite] align-middle" />
+                                    {isWaitingForFirstChunk ? (
+                                        <ThinkingDots />
+                                    ) : (
+                                        <>
+                                            {currentExchange.displayed}
+                                            {(isTypewriting || currentExchange.isStreaming) && (
+                                                <span className="ml-0.5 inline-block w-[2px] h-[0.85em] bg-brand-secondary align-middle animate-[caret-blink_1s_infinite]" />
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             </motion.div>
@@ -263,7 +298,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                 </div>
             </div>
 
-            {/* Input — flat, minimal, editorial */}
+            {/* Input — flat, minimal */}
             <div className="shrink-0 border-t border-secondary/60 bg-primary">
                 <div className="mx-auto max-w-3xl px-6 py-5 sm:px-10 lg:px-0">
                     <div className="flex items-end gap-4">
@@ -275,7 +310,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                             onKeyDown={handleKeyDown}
                             placeholder={
                                 hasExchanges
-                                    ? "Ask a follow-up question..."
+                                    ? "Ask a follow-up..."
                                     : "Type your question here..."
                             }
                             rows={1}
@@ -290,7 +325,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                             aria-label="Send question"
                             className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-brand-secondary hover:text-brand-solid transition-colors duration-150 disabled:text-quaternary disabled:cursor-not-allowed pb-1"
                         >
-                            {isStreaming ? "Thinking..." : "Ask →"}
+                            {isStreaming ? "···" : "Ask →"}
                         </button>
                     </div>
                     <p className="mt-1.5 text-[10px] text-quaternary">
