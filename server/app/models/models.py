@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 from sqlalchemy import String, DateTime, func, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -33,6 +33,11 @@ class User(Base):
     occupation: Mapped[str | None] = mapped_column(String(255), nullable=True)
     onboarding_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     onboarding_completed: Mapped[bool] = mapped_column(default=False, server_default="false")
+    
+    # Streak Tracking
+    last_activity_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    current_streak: Mapped[int] = mapped_column(default=0)
+    longest_streak: Mapped[int] = mapped_column(default=0)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -46,6 +51,40 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
+
+    def update_streak(self) -> "User":
+        """Update streak based on last activity date"""
+        now = datetime.now(timezone.utc)
+        
+        if self.last_activity_date is None:
+            # First activity
+            self.current_streak = 1
+            self.last_activity_date = now
+        else:
+            # Convert to date for comparison (ignoring time)
+            last_activity_date_only = self.last_activity_date.date()
+            now_date_only = now.date()
+            yesterday_date_only = (now - timedelta(days=1)).date()
+            
+            if last_activity_date_only == now_date_only:
+                # Same day activity - no change to streak
+                pass
+            elif last_activity_date_only == yesterday_date_only:
+                # Yesterday activity - increment streak
+                self.current_streak += 1
+                self.last_activity_date = now
+            else:
+                # More than 1 day gap - reset streak
+                self.current_streak = 1
+                self.last_activity_date = now
+        
+        # Update longest streak if current streak is greater
+        # Handle case where longest_streak might be None
+        longest_streak = self.longest_streak if self.longest_streak is not None else 0
+        if self.current_streak > longest_streak:
+            self.longest_streak = self.current_streak
+            
+        return self
 
 
 class Lesson(Base):

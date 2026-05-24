@@ -71,6 +71,9 @@ export interface UserResponse {
     onboarding_reason?: string | null;
     onboarding_completed: boolean;
     created_at: string;
+    last_activity_date: string | null;
+    current_streak: number;
+    longest_streak: number;
 }
 
 export interface OnboardingData {

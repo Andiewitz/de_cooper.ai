@@ -37,6 +37,9 @@ class UserResponse(BaseModel):
     onboarding_reason: str | None = None
     onboarding_completed: bool
     created_at: datetime
+    last_activity_date: datetime | None = None
+    current_streak: int = 0
+    longest_streak: int = 0
 
     model_config = {"from_attributes": True}
 

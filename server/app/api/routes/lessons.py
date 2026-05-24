@@ -1,4 +1,5 @@
 import json
+from datetime import timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
@@ -21,6 +22,9 @@ async def create_lesson(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new lesson. Another student who thinks they can learn. How quaint."""
+    # Update user streak
+    current_user.update_streak()
+    
     lesson = Lesson(
         user_id=current_user.id,
         topic_id=data.topic_id,
@@ -92,6 +96,9 @@ async def chat(
     db: AsyncSession = Depends(get_db),
 ):
     """Send a message and get a streamed response from Dr. Cooper."""
+    
+    # Update user streak
+    current_user.update_streak()
 
     # Verify lesson belongs to user
     result = await db.execute(

@@ -26,7 +26,10 @@ async def run_migrations(conn):
         "age": "INTEGER",
         "occupation": "VARCHAR(255)",
         "onboarding_reason": "TEXT",
-        "onboarding_completed": "BOOLEAN DEFAULT FALSE"
+        "onboarding_completed": "BOOLEAN DEFAULT FALSE",
+        "last_activity_date": "TIMESTAMP WITH TIME ZONE",
+        "current_streak": "INTEGER DEFAULT 0",
+        "longest_streak": "INTEGER DEFAULT 0"
     }
     
     # Alter table if column is missing

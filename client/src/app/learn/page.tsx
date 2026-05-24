@@ -358,14 +358,14 @@ export default function LearnPage() {
                                 <span className="text-xs text-quaternary mt-1">lessons finished</span>
                             </div>
                             
-                            <div className="flex flex-col border-l border-secondary/60 pl-6">
-                                <div className="flex items-center gap-1.5 text-tertiary">
-                                    <Zap className="size-4 text-orange-500" />
-                                    <span className="text-xs font-bold uppercase tracking-wider">Streak</span>
-                                </div>
-                                <p className="mt-1.5 font-display text-display-sm font-bold text-primary leading-none">0 days</p>
-                                <span className="text-xs text-quaternary mt-1">active streak</span>
-                            </div>
+                             <div className="flex flex-col border-l border-secondary/60 pl-6">
+                                 <div className="flex items-center gap-1.5 text-tertiary">
+                                     <Zap className="size-4 text-orange-500" />
+                                     <span className="text-xs font-bold uppercase tracking-wider">Streak</span>
+                                 </div>
+                                 <p className="mt-1.5 font-display text-display-sm font-bold text-primary leading-none">{user?.current_streak ?? 0} days</p>
+                                 <span className="text-xs text-quaternary mt-1">active streak</span>
+                             </div>
                         </div>
 
                         {/* Study Path Timeline */}
