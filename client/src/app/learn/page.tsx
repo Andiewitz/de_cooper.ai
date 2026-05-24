@@ -60,6 +60,127 @@ export const topics = [
     },
 ];
 
+/* ────────────────────────── Loading Skeletons ───────────────── */
+
+function DashboardSkeleton() {
+    return (
+        <div className="mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                
+                {/* Main Workspace (Left - Cardless Layout) */}
+                <div className="lg:col-span-8 space-y-10">
+                    
+                    {/* Welcome Greeting Skeleton */}
+                    <div className="relative">
+                        {/* Shimmering mesh glows */}
+                        <div className="pointer-events-none absolute -right-20 -top-20 size-60 rounded-full bg-brand-secondary/20 opacity-20 blur-3xl" />
+                        <div className="pointer-events-none absolute bottom-0 left-1/4 h-32 w-1/2 bg-[#FEF08A]/5 opacity-15 blur-3xl" />
+
+                        <div className="space-y-4 animate-pulse">
+                            <div className="h-4 w-32 rounded-full bg-secondary" />
+                            <div className="h-10 sm:h-12 w-3/4 rounded-xl bg-secondary" />
+                            <div className="space-y-2.5 mt-4">
+                                <div className="h-4 w-full rounded-full bg-secondary/60" />
+                                <div className="h-4 w-5/6 rounded-full bg-secondary/60" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="h-px bg-secondary/60 w-full animate-pulse" />
+
+                    {/* STEM Curriculum Modules Skeleton */}
+                    <div className="space-y-6 animate-pulse">
+                        <div className="flex items-center justify-between">
+                            <div className="h-4 w-44 rounded-full bg-secondary" />
+                            <div className="h-4 w-32 rounded-full bg-secondary/40" />
+                        </div>
+
+                        <div className="divide-y divide-secondary/60">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div key={i} className="flex w-full items-center justify-between py-6">
+                                    <div className="flex items-center gap-5 flex-1 min-w-0 pr-4">
+                                        <div className="size-14 shrink-0 rounded-2xl bg-secondary" />
+                                        <div className="min-w-0 flex-1 space-y-2.5">
+                                            <div className="h-5 w-36 rounded-lg bg-secondary" />
+                                            <div className="h-4 w-5/6 max-w-xl rounded-full bg-secondary/60" />
+                                        </div>
+                                    </div>
+
+                                    {/* Action details */}
+                                    <div className="flex items-center gap-4 shrink-0">
+                                        <div className="hidden sm:block h-6 w-16 rounded-full bg-secondary/60" />
+                                        <div className="size-9 rounded-full bg-secondary/40" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Progress Sidebar Panel (Right - Seamlessly Integrated) */}
+                <div className="lg:col-span-4 space-y-8 lg:border-l lg:border-secondary/80 lg:pl-8 animate-pulse">
+                    
+                    {/* Profile Header Details Skeleton */}
+                    <div className="flex items-center gap-4 pb-6 border-b border-secondary/80">
+                        <div className="size-14 rounded-full bg-secondary shrink-0" />
+                        <div className="space-y-2 flex-1">
+                            <div className="h-5 w-28 rounded-lg bg-secondary" />
+                            <div className="h-4 w-20 rounded-full bg-secondary/40" />
+                        </div>
+                    </div>
+
+                    {/* Overall Progress Circle Skeleton */}
+                    <div className="space-y-3 pb-6 border-b border-secondary/80">
+                        <div className="h-4 w-28 rounded-full bg-secondary" />
+                        <div className="flex items-center gap-5 py-2">
+                            <div className="size-16 rounded-full border-4 border-secondary/40 shrink-0" />
+                            <div className="space-y-2 flex-1">
+                                <div className="h-4 w-20 rounded-full bg-secondary" />
+                                <div className="h-3.5 w-36 rounded-full bg-secondary/40" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats Grid Skeleton */}
+                    <div className="grid grid-cols-2 gap-6 pb-6 border-b border-secondary/80">
+                        <div className="space-y-2">
+                            <div className="h-4 w-20 rounded-full bg-secondary" />
+                            <div className="h-8 w-10 rounded-lg bg-secondary" />
+                            <div className="h-3 w-16 rounded-full bg-secondary/40" />
+                        </div>
+                        
+                        <div className="border-l border-secondary/60 pl-6 space-y-2">
+                            <div className="h-4 w-16 rounded-full bg-secondary" />
+                            <div className="h-8 w-16 rounded-lg bg-secondary" />
+                            <div className="h-3 w-16 rounded-full bg-secondary/40" />
+                        </div>
+                    </div>
+
+                    {/* Study Path Timeline Skeleton */}
+                    <div className="space-y-4">
+                        <div className="h-4 w-28 rounded-full bg-secondary" />
+                        <div className="relative pl-6 space-y-6">
+                            <div className="absolute left-2.5 top-1.5 bottom-1.5 w-0.5 border-l border-dashed border-secondary/40" />
+
+                            {[1, 2, 3].map((step) => (
+                                <div key={step} className="relative flex gap-3">
+                                    <div className="absolute -left-6 mt-0.5 size-5 rounded-full bg-secondary/60" />
+                                    <div className="space-y-1.5 flex-1">
+                                        <div className="h-4 w-28 rounded-full bg-secondary" />
+                                        <div className="h-3 w-36 rounded-full bg-secondary/40" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    );
+}
+
 export default function LearnPage() {
     const router = useRouter();
     const { user, isLoading, isAuthenticated } = useAuth();
@@ -72,9 +193,9 @@ export default function LearnPage() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-dvh items-center justify-center bg-primary">
-                <div className="animate-pulse text-lg text-tertiary">Loading your workspace...</div>
-            </div>
+            <LearnDashboardLayout title="Workspace Dashboard" subtitle="Interactive STEM Q&A and AI-Guided Lessons">
+                <DashboardSkeleton />
+            </LearnDashboardLayout>
         );
     }
 

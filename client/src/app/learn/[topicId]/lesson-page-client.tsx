@@ -235,13 +235,82 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     };
 
     /* ── Loading guard ── */
-    if (isLoading || !isAuthenticated) {
+    if (isLoading) {
         return (
-            <div className="flex min-h-dvh items-center justify-center bg-primary">
-                <div className="animate-pulse text-lg text-tertiary">Loading...</div>
+            <div className="flex h-dvh flex-col bg-primary overflow-hidden">
+                {/* ═══════════════ Header ═══════════════ */}
+                <header className="shrink-0 flex items-center justify-between px-6 py-4 sm:px-10 lg:px-12">
+                    <div className="flex items-center gap-2 text-quaternary">
+                        <ArrowLeft className="size-4 animate-pulse" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest animate-pulse">
+                            Workspace
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2.5">
+                            {topicConfig[topicId] && (
+                                <div className={`flex size-8 items-center justify-center rounded-lg ${topicConfig[topicId].gradient} text-white shadow-xs animate-pulse`}>
+                                    {(() => { const TIcon = topicConfig[topicId].Icon; return <TIcon className="size-4" aria-hidden />; })()}
+                                </div>
+                            )}
+                            <p className="text-xs font-bold uppercase tracking-widest text-primary animate-pulse">
+                                {topicLabels[topicId] || topicId}
+                            </p>
+                        </div>
+                    </div>
+                </header>
+
+                {/* ═══════════════ Slide Viewer (Skeleton) ═══════════════ */}
+                <div className="flex-1 min-h-0 flex flex-col relative justify-center items-center px-16 sm:px-20 lg:px-28 py-6">
+                    {/* Ambient glow */}
+                    <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-brand-secondary/40 opacity-30 blur-3xl" />
+                    <div className="pointer-events-none absolute bottom-20 -left-16 size-48 rounded-full bg-[#FEF08A]/10 opacity-30 blur-3xl" />
+
+                    <div className="w-full max-w-3xl flex flex-col items-center animate-pulse">
+                        <div className="h-4 w-28 rounded-full bg-secondary mb-3" />
+                        <div className="h-8 w-1/2 rounded-lg bg-secondary mb-8" />
+                        
+                        {/* Shimmering Diagram block */}
+                        <div className="w-full aspect-[16/9] max-h-[380px] rounded-2xl bg-brand-primary border border-brand/20 shadow-xs mb-8 flex items-center justify-center">
+                            <div className="flex items-center gap-2">
+                                <span className="size-2 rounded-full bg-brand-solid animate-pulse" />
+                                <span className="text-xs font-bold text-brand-secondary">Establishing lesson...</span>
+                            </div>
+                        </div>
+
+                        {/* Shimmering captions */}
+                        <div className="w-full max-w-xl space-y-2.5">
+                            <div className="h-4 w-full rounded-full bg-secondary/60" />
+                            <div className="h-4 w-5/6 rounded-full bg-secondary/60 mx-auto" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ═══════════════ Input Bar (Disabled) ═══════════════ */}
+                <div className="shrink-0 bg-primary px-4 sm:px-8 py-5">
+                    <div className="max-w-2xl mx-auto">
+                        <div className="flex items-center gap-3 rounded-2xl border-2 border-secondary bg-primary p-2 opacity-50">
+                            <input
+                                disabled
+                                placeholder="Connecting to Dr. Cooper..."
+                                className="flex-1 bg-transparent px-3 py-2 text-sm outline-none cursor-not-allowed"
+                            />
+                            <button
+                                disabled
+                                className="flex items-center gap-1.5 rounded-xl bg-brand-solid px-4 py-2.5 text-xs font-bold text-white shadow-xs shrink-0 cursor-not-allowed"
+                            >
+                                <ArrowRight className="size-4" />
+                                <span>Explore</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
+
+    if (!isAuthenticated) return null;
 
     /* ── Derived slide data ── */
     const hasSlides = exchanges.length > 0;
