@@ -23,6 +23,8 @@ async def run_migrations(conn):
     
     # Define columns to verify
     required_cols = {
+        "google_id": "VARCHAR(255)",
+        "avatar_url": "VARCHAR(1000)",
         "age": "INTEGER",
         "occupation": "VARCHAR(255)",
         "onboarding_reason": "TEXT",
