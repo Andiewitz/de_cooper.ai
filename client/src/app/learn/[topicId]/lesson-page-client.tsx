@@ -112,11 +112,21 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [navDirection, setNavDirection] = useState(1);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [isPageLoading, setIsPageLoading] = useState(true);
 
     /* ── Auth guard ── */
     useEffect(() => {
         if (!isLoading && !isAuthenticated) router.push("/login");
     }, [isLoading, isAuthenticated, router]);
+
+    useEffect(() => {
+        if (!isLoading) {
+            const timer = setTimeout(() => {
+                setIsPageLoading(false);
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading]);
 
     /* ── Create lesson on mount ── */
     useEffect(() => {
@@ -235,7 +245,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     };
 
     /* ── Loading guard ── */
-    if (isLoading) {
+    if (isPageLoading) {
         return (
             <div className="flex h-dvh flex-col bg-primary overflow-hidden">
                 {/* ═══════════════ Header ═══════════════ */}

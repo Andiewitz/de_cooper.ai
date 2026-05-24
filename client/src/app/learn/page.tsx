@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -184,6 +184,7 @@ function DashboardSkeleton() {
 export default function LearnPage() {
     const router = useRouter();
     const { user, isLoading, isAuthenticated } = useAuth();
+    const [isPageLoading, setIsPageLoading] = useState(true);
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -191,7 +192,16 @@ export default function LearnPage() {
         }
     }, [isLoading, isAuthenticated, router]);
 
-    if (isLoading) {
+    useEffect(() => {
+        if (!isLoading) {
+            const timer = setTimeout(() => {
+                setIsPageLoading(false);
+            }, 800);
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading]);
+
+    if (isPageLoading) {
         return (
             <LearnDashboardLayout title="Workspace Dashboard" subtitle="Interactive STEM Q&A and AI-Guided Lessons">
                 <DashboardSkeleton />
@@ -215,7 +225,12 @@ export default function LearnPage() {
 
     return (
         <LearnDashboardLayout title="Workspace Dashboard" subtitle="Interactive STEM Q&A and AI-Guided Lessons">
-            <div className="mx-auto max-w-6xl">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="mx-auto max-w-6xl"
+            >
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                     
                     {/* Main Workspace (Left - Cardless Layout) */}
@@ -399,7 +414,7 @@ export default function LearnPage() {
                     </div>
 
                 </div>
-            </div>
+            </motion.div>
         </LearnDashboardLayout>
     );
 }
