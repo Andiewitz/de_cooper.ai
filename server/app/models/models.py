@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 
-from sqlalchemy import String, DateTime, func, ForeignKey, Text
+from sqlalchemy import String, DateTime, Date, func, ForeignKey, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -137,3 +137,65 @@ class Message(Base):
 
     def __repr__(self) -> str:
         return f"<Message {self.role}: {self.content[:50]}>"
+
+
+class CalendarEntry(Base):
+    __tablename__ = "calendar_entries"
+    __table_args__ = (
+        UniqueConstraint("user_id", "scheduled_date", name="uq_user_scheduled_date"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=generate_uuid
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    lesson_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False
+    )
+    scheduled_date: Mapped[date] = mapped_column(Date, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    # Relationships
+    user: Mapped["User"] = relationship()
+    lesson: Mapped["Lesson"] = relationship()
+    flashcards: Mapped[list["Flashcard"]] = relationship(
+        back_populates="calendar_entry", cascade="all, delete-orphan"
+    )
+
+    def __repr__(self) -> str:
+        return f"<CalendarEntry {self.scheduled_date} lesson={self.lesson_id}>"
+
+
+class Flashcard(Base):
+    __tablename__ = "flashcards"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=generate_uuid
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    calendar_entry_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("calendar_entries.id", ondelete="CASCADE"), nullable=False
+    )
+    lesson_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("lessons.id"), nullable=False
+    )
+    front: Mapped[str] = mapped_column(Text, nullable=False)
+    back: Mapped[str] = mapped_column(Text, nullable=False)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True, default="{}")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    # Relationships
+    user: Mapped["User"] = relationship()
+    calendar_entry: Mapped["CalendarEntry"] = relationship(back_populates="flashcards")
+    lesson: Mapped["Lesson"] = relationship()
+
+    def __repr__(self) -> str:
+        return f"<Flashcard {self.front[:40]}>"

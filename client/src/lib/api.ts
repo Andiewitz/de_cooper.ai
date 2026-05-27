@@ -194,3 +194,49 @@ export const lessonsApi = {
 
 export { ApiError, fetchApi };
 
+// --- Calendar API ---
+
+export interface CalendarEntryResponse {
+    id: string;
+    user_id: string;
+    lesson_id: string;
+    scheduled_date: string;
+    created_at: string;
+    lesson_title: string | null;
+    lesson_topic_id: string | null;
+}
+
+export interface FlashcardResponse {
+    id: string;
+    front: string;
+    back: string;
+    metadata: Record<string, unknown>;
+    created_at: string;
+}
+
+export interface CalendarDayResponse {
+    date: string;
+    lesson: LessonResponse;
+    flashcards: FlashcardResponse[];
+}
+
+export const calendarApi = {
+    createEntry: (data: { lesson_id: string; scheduled_date: string }, token: string) =>
+        fetchApi<CalendarEntryResponse>("/calendar/", {
+            method: "POST",
+            body: JSON.stringify(data),
+            token,
+        }),
+
+    getMonth: (month: string, token: string) =>
+        fetchApi<CalendarEntryResponse[]>(`/calendar/?month=${month}`, { token }),
+
+    getDayFlashcards: (date: string, token: string) =>
+        fetchApi<CalendarDayResponse>(`/calendar/${date}/flashcards`, { token }),
+
+    deleteEntry: (date: string, token: string) =>
+        fetchApi<void>(`/calendar/${date}`, {
+            method: "DELETE",
+            token,
+        }),
+};

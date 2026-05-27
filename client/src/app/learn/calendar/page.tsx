@@ -5,111 +5,224 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Plus,
     Trash01,
-    CheckCircle,
-    Circle,
     ChevronLeft,
     ChevronRight,
+    RefreshCw01,
+    BookOpen01,
+    Zap,
+    AlertCircle,
 } from "@untitledui/icons";
+import { Button } from "@/components/base/buttons/button";
 import { LearnDashboardLayout } from "@/components/learn/learn-dashboard-layout";
-import { CalendarDate, getLocalTimeZone, today, getDayOfWeek } from "@internationalized/date";
 import { useAuth } from "@/providers/auth-provider";
-
-/* ─── Types ─── */
-interface FlashcardNote {
-    id: string;
-    text: string;
-    done: boolean;
-}
-
-type CalendarData = Record<string, FlashcardNote[]>;
+import {
+    calendarApi,
+    lessonsApi,
+    type CalendarEntryResponse,
+    type FlashcardResponse,
+    type LessonResponse as LessonRes,
+} from "@/lib/api";
 
 /* ─── Helpers ─── */
-const STORAGE_KEY = "decooper-calendar-notes";
-const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const dateKey = (y: number, m: number, d: number) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+const dateKey = (y: number, m: number, d: number) =>
+    `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+const todayKey = () => {
+    const now = new Date();
+    return dateKey(now.getFullYear(), now.getMonth() + 1, now.getDate());
+};
+
+const monthKey = (y: number, m: number) => `${y}-${String(m).padStart(2, "0")}`;
 
 function getDaysInMonth(year: number, month: number) {
     return new Date(year, month, 0).getDate();
 }
 
 function getFirstDayOfWeek(year: number, month: number) {
-    // 0=Sun..6=Sat → convert to Mon-start: Mon=0..Sun=6
     const day = new Date(year, month - 1, 1).getDay();
-    return day === 0 ? 6 : day - 1;
+    return day === 0 ? 6 : day - 1; // Mon-start
 }
 
-/* Default seed data */
-function seedDefaults(): CalendarData {
-    const t = today(getLocalTimeZone());
-    return {
-        [dateKey(t.year, t.month, t.day)]: [
-            { id: "1", text: "Review Quantum Mechanics flashcards", done: false },
-            { id: "2", text: "Create Linear Algebra eigenvalue cards", done: false },
-        ],
-        [dateKey(t.add({ days: 1 }).year, t.add({ days: 1 }).month, t.add({ days: 1 }).day)]: [
-            { id: "3", text: "Thermodynamics review deck", done: false },
-        ],
-        [dateKey(t.subtract({ days: 2 }).year, t.subtract({ days: 2 }).month, t.subtract({ days: 2 }).day)]: [
-            { id: "4", text: "Heisenberg principle cards", done: true },
-        ],
-    };
+/* ─── Flashcard Flip Card ─── */
+function FlashcardCard({
+    card,
+    index,
+    total,
+    onPrev,
+    onNext,
+}: {
+    card: FlashcardResponse;
+    index: number;
+    total: number;
+    onPrev: () => void;
+    onNext: () => void;
+}) {
+    const [flipped, setFlipped] = useState(false);
+
+    // Reset flip on card change
+    useEffect(() => { setFlipped(false); }, [card.id]);
+
+    return (
+        <div className="space-y-4">
+            {/* Card */}
+            <div
+                className="relative cursor-pointer select-none"
+                style={{ perspective: "1000px" }}
+                onClick={() => setFlipped((f) => !f)}
+            >
+                <motion.div
+                    className="relative w-full rounded-2xl"
+                    style={{ transformStyle: "preserve-3d" }}
+                    animate={{ rotateY: flipped ? 180 : 0 }}
+                    transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                >
+                    {/* Front */}
+                    <div
+                        className="w-full rounded-2xl border border-secondary bg-primary p-8 shadow-xs"
+                        style={{ backfaceVisibility: "hidden" }}
+                    >
+                        <p className="text-xs font-bold uppercase tracking-wider text-brand-secondary mb-3">Question</p>
+                        <p className="text-md font-semibold text-primary leading-relaxed min-h-[80px] flex items-center">
+                            {card.front}
+                        </p>
+                        <p className="mt-4 text-xs text-quaternary">Tap to reveal answer</p>
+                    </div>
+
+                    {/* Back */}
+                    <div
+                        className="absolute inset-0 w-full rounded-2xl border border-brand-secondary/30 bg-brand-secondary/5 p-8 shadow-xs"
+                        style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                    >
+                        <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-3">Answer</p>
+                        <p className="text-md font-semibold text-primary leading-relaxed min-h-[80px] flex items-center">
+                            {card.back}
+                        </p>
+                        <p className="mt-4 text-xs text-quaternary">Tap to see question</p>
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between">
+                <button
+                    type="button"
+                    onClick={onPrev}
+                    disabled={index === 0}
+                    className="flex size-9 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                    <ChevronLeft className="size-4" />
+                </button>
+                <span className="text-xs font-semibold text-tertiary">
+                    {index + 1} / {total}
+                </span>
+                <button
+                    type="button"
+                    onClick={onNext}
+                    disabled={index === total - 1}
+                    className="flex size-9 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                    <ChevronRight className="size-4" />
+                </button>
+            </div>
+        </div>
+    );
 }
 
-/* ─── Component ─── */
+/* ─── Main Page ─── */
 export default function LearnCalendarPage() {
-    const { isAuthenticated, isLoading } = useAuth();
-    const t = today(getLocalTimeZone());
+    const { user, token, isAuthenticated, isLoading: authLoading } = useAuth();
+    const now = new Date();
 
-    const [viewYear, setViewYear] = useState(t.year);
-    const [viewMonth, setViewMonth] = useState(t.month);
-    const [selectedDay, setSelectedDay] = useState<string>(dateKey(t.year, t.month, t.day));
-    const [data, setData] = useState<CalendarData>({});
-    const [newText, setNewText] = useState("");
-    const inputRef = useRef<HTMLInputElement>(null);
+    // Calendar state
+    const [viewYear, setViewYear] = useState(now.getFullYear());
+    const [viewMonth, setViewMonth] = useState(now.getMonth() + 1);
+    const [selectedDay, setSelectedDay] = useState(todayKey());
 
-    /* Persistence */
-    useEffect(() => {
+    // Data state
+    const [monthEntries, setMonthEntries] = useState<CalendarEntryResponse[]>([]);
+    const [lessons, setLessons] = useState<LessonRes[]>([]);
+    const [monthLoading, setMonthLoading] = useState(false);
+
+    // Day panel state
+    const [dayCards, setDayCards] = useState<FlashcardResponse[]>([]);
+    const [dayLesson, setDayLesson] = useState<LessonRes | null>(null);
+    const [dayLoading, setDayLoading] = useState(false);
+    const [dayError, setDayError] = useState<string | null>(null);
+    const [cardIndex, setCardIndex] = useState(0);
+
+    // Schedule form
+    const [showScheduleForm, setShowScheduleForm] = useState(false);
+    const [selectedLessonId, setSelectedLessonId] = useState("");
+
+    // Mapped entries for dot display
+    const entryDates = useMemo(() => {
+        const map = new Map<string, CalendarEntryResponse>();
+        monthEntries.forEach((e) => map.set(e.scheduled_date, e));
+        return map;
+    }, [monthEntries]);
+
+    // Fetch month entries
+    const fetchMonth = useCallback(async () => {
+        if (!token) return;
+        setMonthLoading(true);
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) { setData(JSON.parse(raw)); return; }
-        } catch {}
-        const defaults = seedDefaults();
-        setData(defaults);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-    }, []);
+            const entries = await calendarApi.getMonth(monthKey(viewYear, viewMonth), token);
+            setMonthEntries(entries);
+        } catch {
+            setMonthEntries([]);
+        } finally {
+            setMonthLoading(false);
+        }
+    }, [token, viewYear, viewMonth]);
 
-    const save = useCallback((next: CalendarData) => {
-        setData(next);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    }, []);
+    // Fetch user lessons (for schedule dropdown)
+    const fetchLessons = useCallback(async () => {
+        if (!token) return;
+        try {
+            const data = await lessonsApi.getAll(token);
+            setLessons(data);
+        } catch {
+            setLessons([]);
+        }
+    }, [token]);
 
-    /* Actions */
-    const addNote = () => {
-        const text = newText.trim();
-        if (!text) return;
-        const notes = data[selectedDay] || [];
-        const next = { ...data, [selectedDay]: [...notes, { id: String(Date.now()), text, done: false }] };
-        save(next);
-        setNewText("");
-        inputRef.current?.focus();
-    };
+    // Fetch flashcards for selected day
+    const fetchDay = useCallback(async () => {
+        if (!token) return;
+        const entry = entryDates.get(selectedDay);
 
-    const toggleNote = (id: string) => {
-        const notes = data[selectedDay] || [];
-        const next = { ...data, [selectedDay]: notes.map((n) => n.id === id ? { ...n, done: !n.done } : n) };
-        save(next);
-    };
+        if (!entry) {
+            setDayCards([]);
+            setDayLesson(null);
+            setDayError(null);
+            return;
+        }
 
-    const deleteNote = (id: string) => {
-        const notes = (data[selectedDay] || []).filter((n) => n.id !== id);
-        const next = { ...data };
-        if (notes.length === 0) delete next[selectedDay]; else next[selectedDay] = notes;
-        save(next);
-    };
+        setDayLoading(true);
+        setDayError(null);
+        setCardIndex(0);
+        try {
+            const res = await calendarApi.getDayFlashcards(selectedDay, token);
+            setDayLesson(res.lesson);
+            setDayCards(res.flashcards);
+        } catch (err: any) {
+            setDayError(err?.detail || err?.message || "Failed to load flashcards");
+            setDayCards([]);
+            setDayLesson(null);
+        } finally {
+            setDayLoading(false);
+        }
+    }, [token, selectedDay, entryDates]);
 
-    /* Navigation */
+    // Initial load
+    useEffect(() => { fetchMonth(); }, [fetchMonth]);
+    useEffect(() => { fetchLessons(); }, [fetchLessons]);
+    useEffect(() => { fetchDay(); }, [fetchDay]);
+
+    // Month navigation
     const prevMonth = () => {
         if (viewMonth === 1) { setViewMonth(12); setViewYear((y) => y - 1); }
         else setViewMonth((m) => m - 1);
@@ -119,59 +232,83 @@ export default function LearnCalendarPage() {
         else setViewMonth((m) => m + 1);
     };
     const goToday = () => {
-        setViewYear(t.year); setViewMonth(t.month);
-        setSelectedDay(dateKey(t.year, t.month, t.day));
+        const n = new Date();
+        setViewYear(n.getFullYear()); setViewMonth(n.getMonth() + 1);
+        setSelectedDay(todayKey());
     };
 
-    /* Calendar grid data */
+    // Schedule a lesson on the selected day
+    const handleSchedule = async () => {
+        if (!token || !selectedLessonId) return;
+        try {
+            await calendarApi.createEntry({ lesson_id: selectedLessonId, scheduled_date: selectedDay }, token);
+            setShowScheduleForm(false);
+            setSelectedLessonId("");
+            await fetchMonth();
+        } catch (err: any) {
+            setDayError(err?.detail || "Failed to schedule lesson");
+        }
+    };
+
+    // Delete entry for the selected day
+    const handleDelete = async () => {
+        if (!token) return;
+        try {
+            await calendarApi.deleteEntry(selectedDay, token);
+            setDayCards([]);
+            setDayLesson(null);
+            await fetchMonth();
+        } catch {}
+    };
+
+    // Calendar grid
     const calendarGrid = useMemo(() => {
         const daysInMonth = getDaysInMonth(viewYear, viewMonth);
         const firstDay = getFirstDayOfWeek(viewYear, viewMonth);
-        const todayKey = dateKey(t.year, t.month, t.day);
+        const tk = todayKey();
 
-        const cells: { day: number; key: string; isToday: boolean; isSelected: boolean; hasDots: boolean; isCurrentMonth: boolean }[] = [];
+        const cells: { day: number; key: string; isToday: boolean; isSelected: boolean; hasEntry: boolean; isCurrentMonth: boolean }[] = [];
 
-        // Previous month padding
-        const prevMonthDays = viewMonth === 1 ? getDaysInMonth(viewYear - 1, 12) : getDaysInMonth(viewYear, viewMonth - 1);
+        // Prev month padding
+        const prevDays = viewMonth === 1 ? getDaysInMonth(viewYear - 1, 12) : getDaysInMonth(viewYear, viewMonth - 1);
         const prevY = viewMonth === 1 ? viewYear - 1 : viewYear;
         const prevM = viewMonth === 1 ? 12 : viewMonth - 1;
         for (let i = firstDay - 1; i >= 0; i--) {
-            const d = prevMonthDays - i;
+            const d = prevDays - i;
             const k = dateKey(prevY, prevM, d);
-            cells.push({ day: d, key: k, isToday: k === todayKey, isSelected: k === selectedDay, hasDots: (data[k]?.length ?? 0) > 0, isCurrentMonth: false });
+            cells.push({ day: d, key: k, isToday: k === tk, isSelected: k === selectedDay, hasEntry: entryDates.has(k), isCurrentMonth: false });
         }
 
         // Current month
         for (let d = 1; d <= daysInMonth; d++) {
             const k = dateKey(viewYear, viewMonth, d);
-            cells.push({ day: d, key: k, isToday: k === todayKey, isSelected: k === selectedDay, hasDots: (data[k]?.length ?? 0) > 0, isCurrentMonth: true });
+            cells.push({ day: d, key: k, isToday: k === tk, isSelected: k === selectedDay, hasEntry: entryDates.has(k), isCurrentMonth: true });
         }
 
-        // Next month padding (fill to 42 cells = 6 rows)
+        // Next month padding
         const remaining = 42 - cells.length;
         const nextY = viewMonth === 12 ? viewYear + 1 : viewYear;
         const nextM = viewMonth === 12 ? 1 : viewMonth + 1;
         for (let d = 1; d <= remaining; d++) {
             const k = dateKey(nextY, nextM, d);
-            cells.push({ day: d, key: k, isToday: k === todayKey, isSelected: k === selectedDay, hasDots: (data[k]?.length ?? 0) > 0, isCurrentMonth: false });
+            cells.push({ day: d, key: k, isToday: k === tk, isSelected: k === selectedDay, hasEntry: entryDates.has(k), isCurrentMonth: false });
         }
-
         return cells;
-    }, [viewYear, viewMonth, selectedDay, data, t]);
+    }, [viewYear, viewMonth, selectedDay, entryDates]);
 
-    /* Selected day label */
+    // Selected day label
     const selectedLabel = useMemo(() => {
         const [y, m, d] = selectedDay.split("-").map(Number);
         return new Date(y, m - 1, d).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
     }, [selectedDay]);
 
-    const selectedNotes = data[selectedDay] || [];
-    const doneCount = selectedNotes.filter((n) => n.done).length;
+    const isToday = selectedDay === todayKey();
+    const hasEntry = entryDates.has(selectedDay);
 
-    if (isLoading || !isAuthenticated) return null;
+    if (authLoading || !isAuthenticated) return null;
 
     return (
-        <LearnDashboardLayout title="Calendar" subtitle="Schedule your flashcard sessions">
+        <LearnDashboardLayout title="Calendar" subtitle="Schedule lessons and review flashcards">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -182,31 +319,18 @@ export default function LearnCalendarPage() {
 
                     {/* ═══ Calendar Grid ═══ */}
                     <div className="lg:col-span-7">
-                        {/* Month nav */}
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="font-display text-display-xs font-bold text-primary sm:text-display-sm">
                                 {MONTHS[viewMonth - 1]} {viewYear}
                             </h2>
                             <div className="flex items-center gap-1">
-                                <button
-                                    type="button"
-                                    onClick={goToday}
-                                    className="mr-2 rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-secondary hover:bg-brand-secondary/10 transition cursor-pointer"
-                                >
+                                <button type="button" onClick={goToday} className="mr-2 rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-secondary hover:bg-brand-secondary/10 transition cursor-pointer">
                                     Today
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={prevMonth}
-                                    className="flex size-8 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer"
-                                >
+                                <button type="button" onClick={prevMonth} className="flex size-8 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer">
                                     <ChevronLeft className="size-4" />
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={nextMonth}
-                                    className="flex size-8 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer"
-                                >
+                                <button type="button" onClick={nextMonth} className="flex size-8 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer">
                                     <ChevronRight className="size-4" />
                                 </button>
                             </div>
@@ -215,9 +339,7 @@ export default function LearnCalendarPage() {
                         {/* Weekday headers */}
                         <div className="grid grid-cols-7 mb-1">
                             {WEEKDAYS.map((wd) => (
-                                <div key={wd} className="py-2 text-center text-xs font-semibold text-quaternary uppercase tracking-wider">
-                                    {wd}
-                                </div>
+                                <div key={wd} className="py-2 text-center text-xs font-semibold text-quaternary uppercase tracking-wider">{wd}</div>
                             ))}
                         </div>
 
@@ -229,8 +351,7 @@ export default function LearnCalendarPage() {
                                     type="button"
                                     onClick={() => setSelectedDay(cell.key)}
                                     className={`
-                                        relative flex flex-col items-center justify-center py-3 cursor-pointer transition-all duration-100
-                                        rounded-xl
+                                        relative flex flex-col items-center justify-center py-3 cursor-pointer transition-all duration-100 rounded-xl
                                         ${!cell.isCurrentMonth ? "opacity-30" : ""}
                                         ${cell.isSelected
                                             ? "bg-brand-solid text-white shadow-sm"
@@ -240,12 +361,9 @@ export default function LearnCalendarPage() {
                                         }
                                     `}
                                 >
-                                    <span className={`text-sm font-medium ${cell.isSelected ? "font-bold" : ""}`}>
-                                        {cell.day}
-                                    </span>
-                                    {/* Dot indicator */}
-                                    {cell.hasDots && (
-                                        <span className={`absolute bottom-1.5 size-1 rounded-full ${cell.isSelected ? "bg-white/70" : "bg-brand-secondary"}`} />
+                                    <span className={`text-sm font-medium ${cell.isSelected ? "font-bold" : ""}`}>{cell.day}</span>
+                                    {cell.hasEntry && (
+                                        <span className={`absolute bottom-1.5 size-1.5 rounded-full ${cell.isSelected ? "bg-white/70" : "bg-brand-secondary"}`} />
                                     )}
                                 </button>
                             ))}
@@ -255,86 +373,146 @@ export default function LearnCalendarPage() {
                     {/* ═══ Day Panel ═══ */}
                     <div className="lg:col-span-5 lg:border-l lg:border-secondary/80 lg:pl-8 space-y-6">
                         {/* Day header */}
-                        <div>
-                            <p className="text-xs font-bold uppercase tracking-wider text-brand-secondary">
-                                {selectedNotes.length > 0
-                                    ? `${doneCount}/${selectedNotes.length} completed`
-                                    : "No items"
-                                }
-                            </p>
-                            <h3 className="mt-1 font-display text-lg font-bold text-primary">{selectedLabel}</h3>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-bold uppercase tracking-wider text-brand-secondary">
+                                    {isToday ? "Today" : "Selected Date"}
+                                </p>
+                                <h3 className="mt-1 font-display text-lg font-bold text-primary">{selectedLabel}</h3>
+                            </div>
+                            {hasEntry && (
+                                <Button size="xs" color="tertiary" iconLeading={Trash01} onClick={handleDelete} />
+                            )}
                         </div>
 
-                        {/* Quick add */}
-                        <form
-                            onSubmit={(e) => { e.preventDefault(); addNote(); }}
-                            className="flex gap-2"
-                        >
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                value={newText}
-                                onChange={(e) => setNewText(e.target.value)}
-                                placeholder="Add flashcard note..."
-                                className="flex-1 rounded-lg border border-secondary bg-primary px-3.5 py-2 text-sm text-primary placeholder-quaternary shadow-xs focus:outline-hidden focus:ring-2 focus:ring-brand-secondary/30 focus:border-brand-secondary/40 transition"
-                            />
-                            <button
-                                type="submit"
-                                disabled={!newText.trim()}
-                                className="flex size-9 items-center justify-center rounded-lg bg-brand-solid text-white shadow-xs hover:bg-brand-solid_hover disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer shrink-0"
-                            >
-                                <Plus className="size-4" />
-                            </button>
-                        </form>
+                        {/* Content */}
+                        {dayLoading ? (
+                            /* Loading skeleton */
+                            <div className="space-y-4 animate-pulse">
+                                <div className="h-4 w-2/3 bg-secondary/60 rounded" />
+                                <div className="h-40 bg-secondary/40 rounded-2xl" />
+                                <div className="flex justify-between">
+                                    <div className="h-8 w-8 bg-secondary/40 rounded" />
+                                    <div className="h-4 w-12 bg-secondary/40 rounded" />
+                                    <div className="h-8 w-8 bg-secondary/40 rounded" />
+                                </div>
+                            </div>
+                        ) : dayError ? (
+                            /* Error state */
+                            <div className="rounded-2xl border border-error-secondary bg-error-primary/5 p-6 text-center space-y-3">
+                                <AlertCircle className="size-8 text-error-primary mx-auto" />
+                                <p className="text-sm font-semibold text-error-primary">{dayError}</p>
+                                <Button size="sm" color="secondary" iconLeading={RefreshCw01} onClick={fetchDay}>
+                                    Retry
+                                </Button>
+                            </div>
+                        ) : !hasEntry ? (
+                            /* No lesson scheduled */
+                            <div className="space-y-4">
+                                <div className="rounded-2xl border border-dashed border-secondary/80 py-12 flex flex-col items-center justify-center text-center space-y-3">
+                                    <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary/40 text-quaternary">
+                                        <BookOpen01 className="size-5" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-secondary">No lesson scheduled</p>
+                                    <p className="text-xs text-quaternary max-w-xs">
+                                        Assign a lesson to this day to generate flashcards for review.
+                                    </p>
+                                </div>
 
-                        {/* Notes list */}
-                        <div className="space-y-1">
-                            <AnimatePresence mode="popLayout">
-                                {selectedNotes.length === 0 ? (
-                                    <motion.p
-                                        key="empty"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        className="py-8 text-center text-sm text-quaternary"
+                                {!showScheduleForm ? (
+                                    <Button
+                                        size="sm"
+                                        color="primary"
+                                        iconLeading={Plus}
+                                        className="w-full justify-center"
+                                        onClick={() => setShowScheduleForm(true)}
                                     >
-                                        No flashcards planned for this day.
-                                    </motion.p>
+                                        Schedule Lesson
+                                    </Button>
                                 ) : (
-                                    selectedNotes.map((note) => (
-                                        <motion.div
-                                            key={note.id}
-                                            layout
-                                            initial={{ opacity: 0, y: 4 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, x: -12 }}
-                                            className="group flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-primary_hover transition"
-                                        >
-                                            <button
-                                                type="button"
-                                                onClick={() => toggleNote(note.id)}
-                                                className="mt-0.5 shrink-0 cursor-pointer"
-                                            >
-                                                {note.done ? (
-                                                    <CheckCircle className="size-5 text-brand-secondary" />
-                                                ) : (
-                                                    <Circle className="size-5 text-quaternary group-hover:text-tertiary transition" />
-                                                )}
-                                            </button>
-                                            <span className={`flex-1 text-sm leading-relaxed ${note.done ? "text-quaternary line-through" : "text-primary"}`}>
-                                                {note.text}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => deleteNote(note.id)}
-                                                className="shrink-0 opacity-0 group-hover:opacity-100 p-1 rounded-md text-quaternary hover:text-error-primary transition cursor-pointer"
-                                            >
-                                                <Trash01 className="size-3.5" />
-                                            </button>
-                                        </motion.div>
-                                    ))
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="rounded-2xl border border-secondary bg-primary p-5 shadow-xs space-y-4"
+                                    >
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-tertiary">Pick a Lesson</h4>
+
+                                        {lessons.length === 0 ? (
+                                            <p className="text-xs text-quaternary py-4 text-center">
+                                                No lessons yet. Start a STEM session first to create one.
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <select
+                                                    value={selectedLessonId}
+                                                    onChange={(e) => setSelectedLessonId(e.target.value)}
+                                                    className="w-full rounded-lg border border-secondary bg-primary px-3.5 py-2.5 text-sm text-primary shadow-xs focus:outline-hidden focus:ring-2 focus:ring-brand-secondary/30 transition"
+                                                >
+                                                    <option value="">Select a lesson...</option>
+                                                    {lessons.map((l) => (
+                                                        <option key={l.id} value={l.id}>{l.title}</option>
+                                                    ))}
+                                                </select>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        color="primary"
+                                                        className="flex-1 justify-center"
+                                                        onClick={handleSchedule}
+                                                        disabled={!selectedLessonId}
+                                                    >
+                                                        Schedule
+                                                    </Button>
+                                                    <Button size="sm" color="secondary" onClick={() => setShowScheduleForm(false)}>
+                                                        Cancel
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </motion.div>
                                 )}
-                            </AnimatePresence>
-                        </div>
+                            </div>
+                        ) : (
+                            /* Has entry — show lesson + flashcards */
+                            <div className="space-y-6">
+                                {/* Lesson info */}
+                                {dayLesson && (
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
+                                            <Zap className="size-4" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-xs text-quaternary">{dayLesson.topic_id}</p>
+                                            <p className="text-sm font-bold text-primary truncate">{dayLesson.title}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Flashcards */}
+                                {dayCards.length === 0 ? (
+                                    <div className="rounded-2xl border border-dashed border-secondary/80 py-10 flex flex-col items-center justify-center text-center space-y-3">
+                                        <p className="text-sm font-semibold text-secondary">No flashcards yet</p>
+                                        <p className="text-xs text-quaternary max-w-xs">
+                                            This lesson needs at least one chat exchange with Dr. Cooper before flashcards can be generated.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="h-px bg-secondary/60 w-full" />
+                                        <p className="text-xs font-bold uppercase tracking-wider text-tertiary">
+                                            Flashcards · {dayCards.length} cards
+                                        </p>
+                                        <FlashcardCard
+                                            card={dayCards[cardIndex]}
+                                            index={cardIndex}
+                                            total={dayCards.length}
+                                            onPrev={() => setCardIndex((i) => Math.max(0, i - 1))}
+                                            onNext={() => setCardIndex((i) => Math.min(dayCards.length - 1, i + 1))}
+                                        />
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                 </div>

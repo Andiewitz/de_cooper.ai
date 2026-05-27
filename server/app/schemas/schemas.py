@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -83,3 +83,44 @@ class MessageResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# --- Calendar Schemas ---
+
+class CalendarEntryCreate(BaseModel):
+    lesson_id: str
+    scheduled_date: date
+
+
+class CalendarEntryResponse(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    lesson_id: uuid.UUID
+    scheduled_date: date
+    created_at: datetime
+    lesson_title: str | None = None
+    lesson_topic_id: str | None = None
+
+    model_config = {"from_attributes": True}
+
+
+# --- Flashcard Schemas ---
+
+class FlashcardResponse(BaseModel):
+    id: uuid.UUID
+    front: str
+    back: str
+    metadata: dict = {}
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class FlashcardGenerateRequest(BaseModel):
+    calendar_entry_id: str
+
+
+class CalendarDayResponse(BaseModel):
+    date: date
+    lesson: LessonResponse
+    flashcards: list[FlashcardResponse]

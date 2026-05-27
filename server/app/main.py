@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.core.database import engine, Base
-from app.api.routes import auth, health, lessons
+from app.api.routes import auth, health, lessons, calendar
 
 settings = get_settings()
 
@@ -72,6 +72,7 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(lessons.router, prefix="/api")
+app.include_router(calendar.router, prefix="/api")
 
 
 # Static files serving

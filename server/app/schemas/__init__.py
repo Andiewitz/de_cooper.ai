@@ -11,6 +11,11 @@ from app.schemas.schemas import (
     MessageCreate,
     MessageResponse,
     UserOnboardingUpdate,
+    CalendarEntryCreate,
+    CalendarEntryResponse,
+    FlashcardResponse,
+    FlashcardGenerateRequest,
+    CalendarDayResponse,
 )
 
 __all__ = [
@@ -25,4 +30,9 @@ __all__ = [
     "MessageCreate",
     "MessageResponse",
     "UserOnboardingUpdate",
+    "CalendarEntryCreate",
+    "CalendarEntryResponse",
+    "FlashcardResponse",
+    "FlashcardGenerateRequest",
+    "CalendarDayResponse",
 ]
