@@ -13,6 +13,7 @@ import {
     Lightbulb02,
     Globe01,
     BookOpen01,
+    ChevronDown,
 } from "@untitledui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/auth-provider";
@@ -180,6 +181,15 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const [isPageLoading, setIsPageLoading] = useState(true);
     const [slideFlashcards, setSlideFlashcards] = useState<any[]>([]);
     const [slideLoadingCards, setSlideLoadingCards] = useState(false);
+    
+    // Premium input widget states
+    const [showPlusMenu, setShowPlusMenu] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showModelMenu, setShowModelMenu] = useState(false);
+    const [selectedModel, setSelectedModel] = useState("Sheldon 3.5 Flash");
+    const [customDate, setCustomDate] = useState("");
+    const plusMenuRef = useRef<HTMLDivElement>(null);
+    const modelMenuRef = useRef<HTMLDivElement>(null);
 
     /* ── Auth guard ── */
     useEffect(() => {
@@ -241,6 +251,21 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
             }
         })();
     }, [token, exchanges, currentSlide, isStreaming]);
+
+    /* ── Click outside helper for menus ── */
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (plusMenuRef.current && !plusMenuRef.current.contains(e.target as Node)) {
+                setShowPlusMenu(false);
+                setShowDatePicker(false);
+            }
+            if (modelMenuRef.current && !modelMenuRef.current.contains(e.target as Node)) {
+                setShowModelMenu(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     /* ── Typewriter loop (3 chars / 6 ms — snappy) ── */
     useEffect(() => {
@@ -328,6 +353,19 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         },
         [input, lessonId, token, isStreaming]
     );
+
+    // Quick tag session scheduling helper
+    const handleQuickSchedule = useCallback((daysAhead: number) => {
+        const target = new Date();
+        target.setDate(target.getDate() + daysAhead);
+        const y = target.getFullYear();
+        const m = String(target.getMonth() + 1).padStart(2, "0");
+        const d = String(target.getDate()).padStart(2, "0");
+        const dateStr = `${y}-${m}-${d}`;
+        sendMessage(`Please schedule flashcards for ${dateStr}`);
+        setShowPlusMenu(false);
+        setShowDatePicker(false);
+    }, [sendMessage]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -718,32 +756,287 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                 </div>
             </div>
 
-            {/* ═══════════════ Input Bar ═══════════════ */}
+            {/* ═══════════════ Premium Prompt Input Card ═══════════════ */}
             <div className="shrink-0 bg-primary px-4 sm:px-8 py-5">
-                <div className="max-w-2xl mx-auto">
-                    <div className="flex items-center gap-3 rounded-2xl border-2 border-secondary bg-primary p-2 shadow-xs focus-within:border-brand focus-within:shadow-md transition-all">
-                        <input
-                            ref={inputRef}
-                            id="lesson-input"
-                            type="text"
+                <div className="max-w-2xl mx-auto space-y-4">
+                    
+                    {/* Prompt Box */}
+                    <div className="relative rounded-3xl border-2 border-secondary bg-primary p-4 shadow-sm focus-within:border-brand focus-within:shadow-lg transition-all duration-200">
+                        
+                        {/* Textarea for Multi-line / Expanding feel */}
+                        <textarea
+                            rows={2}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder={`What do you want to explore in ${topicLabels[topicId]?.toLowerCase() || "STEM"}?`}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    sendMessage();
+                                }
+                            }}
+                            placeholder={`How can I help you today in ${topicLabels[topicId]?.toLowerCase() || "STEM"}?`}
                             disabled={isStreaming || !lessonId}
-                            className="flex-1 h-11 px-4 bg-transparent text-md text-primary outline-none placeholder:text-placeholder disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="w-full resize-none bg-transparent px-3 py-1 text-[15px] leading-relaxed text-primary outline-none placeholder:text-placeholder disabled:opacity-40 disabled:cursor-not-allowed"
                         />
+
+                        {/* Toolbar Area */}
+                        <div className="flex items-center justify-between border-t border-secondary/40 pt-3 mt-2">
+                            
+                            {/* Left Side Actions: Plus Popover */}
+                            <div className="relative" ref={plusMenuRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowPlusMenu(!showPlusMenu);
+                                        setShowDatePicker(false);
+                                    }}
+                                    disabled={isStreaming || !lessonId}
+                                    className="flex size-9 items-center justify-center rounded-full bg-secondary/50 text-secondary hover:bg-brand-secondary/15 hover:text-brand-secondary hover:scale-105 active:scale-95 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                    aria-label="Add options"
+                                >
+                                    <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+
+                                {/* Gorgeous Floating Dropdown */}
+                                <AnimatePresence>
+                                    {showPlusMenu && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute bottom-12 left-0 z-50 w-64 rounded-2xl border border-secondary bg-primary p-2.5 shadow-xl animate-in fade-in zoom-in-95 duration-100"
+                                        >
+                                            {!showDatePicker ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowDatePicker(true)}
+                                                    className="flex w-full items-center gap-3 rounded-xl p-2.5 text-left text-xs font-bold text-primary hover:bg-primary_hover transition-colors cursor-pointer"
+                                                >
+                                                    <div className="flex size-7 items-center justify-center rounded-lg bg-brand-solid/10 text-brand-solid">
+                                                        <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-primary">Schedule Flashcards</p>
+                                                        <p className="text-[10px] text-quaternary font-normal mt-0.5">Let Cooper study & schedule cards</p>
+                                                    </div>
+                                                </button>
+                                            ) : (
+                                                <div className="space-y-2.5 p-1 animate-in fade-in duration-200">
+                                                    <div className="flex items-center justify-between pb-1 border-b border-secondary/40">
+                                                        <p className="text-[10px] font-extrabold uppercase tracking-wider text-quaternary">Pick Scheduled Date</p>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowDatePicker(false)}
+                                                            className="text-[10px] font-bold text-brand-secondary hover:underline cursor-pointer"
+                                                        >
+                                                            Back
+                                                        </button>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleQuickSchedule(1)}
+                                                        className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-primary hover:bg-primary_hover transition cursor-pointer"
+                                                    >
+                                                        <span>Tomorrow</span>
+                                                        <span className="text-[10px] font-mono text-quaternary">
+                                                            {(() => {
+                                                                const d = new Date(); d.setDate(d.getDate() + 1);
+                                                                return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                                                            })()}
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            // Find next Monday
+                                                            const d = new Date();
+                                                            const day = d.getDay();
+                                                            const diff = d.getDate() + (day === 0 ? 1 : 8 - day);
+                                                            const nextMon = new Date(d.setDate(diff));
+                                                            const y = nextMon.getFullYear();
+                                                            const m = String(nextMon.getMonth() + 1).padStart(2, "0");
+                                                            const dayStr = String(nextMon.getDate()).padStart(2, "0");
+                                                            sendMessage(`Please schedule flashcards for ${y}-${m}-${dayStr}`);
+                                                            setShowPlusMenu(false);
+                                                            setShowDatePicker(false);
+                                                        }}
+                                                        className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-primary hover:bg-primary_hover transition cursor-pointer"
+                                                    >
+                                                        <span>Next Monday</span>
+                                                        <span className="text-[10px] font-mono text-quaternary">
+                                                            {(() => {
+                                                                const d = new Date();
+                                                                const day = d.getDay();
+                                                                const diff = d.getDate() + (day === 0 ? 1 : 8 - day);
+                                                                const nextMon = new Date(d.setDate(diff));
+                                                                return nextMon.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+                                                            })()}
+                                                        </span>
+                                                    </button>
+                                                    
+                                                    {/* Custom Input */}
+                                                    <div className="pt-1 space-y-1.5">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="YYYY-MM-DD"
+                                                            value={customDate}
+                                                            onChange={(e) => setCustomDate(e.target.value)}
+                                                            className="w-full text-center text-xs font-bold font-mono rounded-lg border border-secondary bg-primary py-1.5 text-primary focus:outline-hidden focus:border-brand"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            disabled={!/^\d{4}-\d{2}-\d{2}$/.test(customDate.trim())}
+                                                            onClick={() => {
+                                                                sendMessage(`Please schedule flashcards for ${customDate.trim()}`);
+                                                                setShowPlusMenu(false);
+                                                                setShowDatePicker(false);
+                                                                setCustomDate("");
+                                                            }}
+                                                            className="w-full rounded-lg bg-brand-solid text-white text-[10px] font-bold py-1.5 hover:bg-brand-solid_hover shadow-2xs active:scale-[0.97] transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                                                        >
+                                                            Schedule Custom
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Right Side Actions: Model Selection, Mic, Voice Wave, Send button */}
+                            <div className="flex items-center gap-2.5">
+                                
+                                {/* Model selection dropdown */}
+                                <div className="relative" ref={modelMenuRef}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowModelMenu(!showModelMenu)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/30 hover:bg-secondary/60 text-xs font-semibold text-secondary active:scale-[0.97] transition cursor-pointer"
+                                    >
+                                        <span>{selectedModel}</span>
+                                        <ChevronDown className="size-3.5 text-tertiary" />
+                                    </button>
+
+                                    {/* Floating Model Dropdown */}
+                                    <AnimatePresence>
+                                        {showModelMenu && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute bottom-10 right-0 z-50 w-52 rounded-2xl border border-secondary bg-primary p-1.5 shadow-xl"
+                                            >
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedModel("Sheldon 3.5 Flash");
+                                                        setShowModelMenu(false);
+                                                    }}
+                                                    className={`w-full text-left text-xs font-semibold rounded-xl px-3 py-2 transition ${selectedModel === "Sheldon 3.5 Flash" ? "bg-brand-solid/10 text-brand-secondary" : "text-primary hover:bg-primary_hover"} cursor-pointer`}
+                                                >
+                                                    Sheldon 3.5 Flash
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedModel("Sheldon 70B Instruct");
+                                                        setShowModelMenu(false);
+                                                    }}
+                                                    className={`w-full text-left text-xs font-semibold rounded-xl px-3 py-2 transition ${selectedModel === "Sheldon 70B Instruct" ? "bg-brand-solid/10 text-brand-secondary" : "text-primary hover:bg-primary_hover"} cursor-pointer`}
+                                                >
+                                                    Sheldon 70B Instruct
+                                                </button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+
+                                {/* Microphone Icon */}
+                                <button
+                                    type="button"
+                                    className="flex size-9 items-center justify-center rounded-full hover:bg-secondary/50 text-secondary hover:text-primary transition cursor-pointer"
+                                    aria-label="Voice input"
+                                >
+                                    <svg className="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                    </svg>
+                                </button>
+
+                                {/* Soundwave Icon */}
+                                <button
+                                    type="button"
+                                    className="flex size-9 items-center justify-center rounded-full hover:bg-secondary/50 text-secondary hover:text-primary transition cursor-pointer"
+                                    aria-label="Voice visualizer"
+                                >
+                                    <svg className="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                    </svg>
+                                </button>
+
+                                {/* Send / Explore button */}
+                                <button
+                                    type="button"
+                                    onClick={() => sendMessage()}
+                                    disabled={!input.trim() || isStreaming || !lessonId}
+                                    className="flex size-9 items-center justify-center rounded-full bg-brand-solid text-white hover:bg-brand-solid_hover shadow-xs active:scale-[0.95] transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                    <ArrowRight className="size-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Curated STEM Pills below the text area */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 pt-1.5">
                         <button
                             type="button"
-                            id="lesson-send-btn"
-                            onClick={() => sendMessage()}
-                            disabled={!input.trim() || isStreaming || !lessonId}
-                            className="h-11 px-5 rounded-xl bg-brand-solid text-white font-bold text-sm flex items-center gap-2 hover:bg-brand-solid_hover shadow-xs active:scale-[0.97] transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            onClick={() => setInput("Explain the formulas and derivations of ")}
+                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
                         >
-                            <ArrowRight className="size-4" aria-hidden />
-                            <span className="hidden sm:inline">Explore</span>
+                            <span className="text-brand-secondary">✎</span>
+                            <span>Write</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setInput("Teach me the core concepts of ")}
+                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                        >
+                            <span>🎓</span>
+                            <span>Learn</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setInput("Provide a practical algorithm or code for ")}
+                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                        >
+                            <span className="font-mono text-brand-secondary">&lt;/&gt;</span>
+                            <span>Code</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setInput("Give me the fundamental equations for ")}
+                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                        >
+                            <span>💡</span>
+                            <span>Formulas</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => sendMessage("Surprise me with a challenging STEM problem!")}
+                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                        >
+                            <span>🔮</span>
+                            <span>Cooper's Choice</span>
                         </button>
                     </div>
+
                 </div>
             </div>
         </div>

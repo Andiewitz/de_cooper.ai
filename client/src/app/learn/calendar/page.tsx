@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Plus,
@@ -133,6 +134,7 @@ function FlashcardCard({
 
 /* ─── Main Page ─── */
 export default function LearnCalendarPage() {
+    const router = useRouter();
     const { user, token, isAuthenticated, isLoading: authLoading } = useAuth();
     const now = new Date();
 
@@ -477,14 +479,23 @@ export default function LearnCalendarPage() {
                             <div className="space-y-6">
                                 {/* Lesson info */}
                                 {dayLesson && (
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
-                                            <Zap className="size-4" />
+                                    <div className="flex items-center justify-between gap-4 p-4 rounded-2xl border border-secondary bg-primary shadow-xs hover:border-brand/40 transition">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-secondary/10 text-brand-secondary">
+                                                <Zap className="size-4" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[10px] font-bold text-quaternary uppercase tracking-wider">{dayLesson.topic_id}</p>
+                                                <p className="text-sm font-bold text-primary truncate mt-0.5">{dayLesson.title}</p>
+                                            </div>
                                         </div>
-                                        <div className="min-w-0">
-                                            <p className="text-xs text-quaternary">{dayLesson.topic_id}</p>
-                                            <p className="text-sm font-bold text-primary truncate">{dayLesson.title}</p>
-                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => router.push(`/learn/${dayLesson.topic_id}`)}
+                                            className="shrink-0 rounded-xl bg-brand-solid hover:bg-brand-solid_hover text-white text-xs font-bold px-4 py-2.5 shadow-xs active:scale-[0.97] transition cursor-pointer"
+                                        >
+                                            Go to lesson
+                                        </button>
                                     </div>
                                 )}
 
