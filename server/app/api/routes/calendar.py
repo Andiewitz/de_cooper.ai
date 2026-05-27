@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, extract
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -90,7 +91,7 @@ async def create_calendar_entry(
     result = await db.execute(
         select(CalendarEntry)
         .where(CalendarEntry.id == entry.id)
-        .join(CalendarEntry.lesson)
+        .options(selectinload(CalendarEntry.lesson))
     )
     entry = result.scalar_one()
 
@@ -109,7 +110,7 @@ async def get_calendar_entries(
 
     result = await db.execute(
         select(CalendarEntry)
-        .join(CalendarEntry.lesson)
+        .options(selectinload(CalendarEntry.lesson))
         .where(
             CalendarEntry.user_id == current_user.id,
             extract("year", CalendarEntry.scheduled_date) == year,
@@ -133,7 +134,7 @@ async def get_day_flashcards(
     # Find the calendar entry for this date
     result = await db.execute(
         select(CalendarEntry)
-        .join(CalendarEntry.lesson)
+        .options(selectinload(CalendarEntry.lesson))
         .where(
             CalendarEntry.user_id == current_user.id,
             CalendarEntry.scheduled_date == date,

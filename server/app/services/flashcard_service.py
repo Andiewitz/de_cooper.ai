@@ -17,7 +17,7 @@ Rules:
 - Each "front" should be a clear question or prompt
 - Each "back" should be a concise, accurate answer
 - Return ONLY a JSON array, no markdown fences, no extra text
-- Format: [{"front": "...", "back": "..."}]
+- Format: [{{"front": "...", "back": "..."}}]
 
 Lesson content:
 {content}"""
