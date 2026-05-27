@@ -32,6 +32,7 @@ MATH & FORMATTING:
 async def stream_ai_response(
     messages: list[dict],
     topic: str = "general",
+    current_date: str = None,
 ) -> AsyncGenerator[str, None]:
     """Stream a response from OpenRouter using the de_cooper.ai tutor persona."""
 
@@ -46,6 +47,22 @@ async def stream_ai_response(
         "role": "system",
         "content": SYSTEM_PROMPT,
     }
+
+    # Add scheduling rules and date context
+    if current_date:
+        system_message["content"] += f"\n\nToday's date is: {current_date}."
+        system_message["content"] += (
+            "\n\nCRITICAL — FLASHCARD SCHEDULING TOOL:\n"
+            "- If the student explicitly asks you to schedule a study session, schedule flashcards, or create flashcards for a specific date "
+            '(e.g., "schedule a session for next Friday", "create flashcards for June 5th"), you MUST schedule it by outputting a special '
+            "scheduling block on its own lines anywhere in your response:\n"
+            "```schedule-flashcards\n"
+            '{"date": "YYYY-MM-DD"}\n'
+            "```\n"
+            "- Strictly use the format YYYY-MM-DD for the date. Calculate the target date relative to Today's date.\n"
+            "- Confirm to the student in your text explanation that you have successfully scheduled their study session and flashcards for that date.\n"
+            "- Do NOT output this block unless specifically requested by the student to schedule/create flashcards on a date."
+        )
 
     # Add topic context
     if topic != "general":

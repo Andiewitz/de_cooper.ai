@@ -25,6 +25,17 @@ async def create_lesson(
     # Update user streak
     current_user.update_streak()
     
+    # Check if a lesson with this topic_id already exists for the user
+    result = await db.execute(
+        select(Lesson).where(
+            Lesson.user_id == current_user.id,
+            Lesson.topic_id == data.topic_id
+        )
+    )
+    existing_lesson = result.scalar_one_or_none()
+    if existing_lesson:
+        return existing_lesson
+    
     lesson = Lesson(
         user_id=current_user.id,
         topic_id=data.topic_id,
@@ -136,18 +147,61 @@ async def chat(
     # Stream the response
     async def generate():
         full_response = ""
-        async for chunk in stream_ai_response(ai_messages, topic=lesson.topic_id):
+        from datetime import datetime, timezone
+        current_date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        
+        async for chunk in stream_ai_response(ai_messages, topic=lesson.topic_id, current_date=current_date_str):
             full_response += chunk
             yield f"data: {json.dumps({'content': chunk})}\n\n"
 
-        # Save Sheldon's full response
-        sheldon_msg = Message(
-            lesson_id=lesson_id,
-            role="sheldon",
-            content=full_response,
-        )
-        db.add(sheldon_msg)
-        await db.commit()
+        # Save Sheldon's full response using a new database session
+        from app.core.database import async_session_factory
+        
+        async with async_session_factory() as session:
+            sheldon_msg = Message(
+                lesson_id=lesson_id,
+                role="sheldon",
+                content=full_response,
+            )
+            session.add(sheldon_msg)
+            await session.commit()
+
+            # Check for schedule block
+            import re
+            match = re.search(r"```schedule-flashcards\s*([\s\S]*?)\s*```", full_response)
+            if match:
+                try:
+                    block_data = json.loads(match.group(1).strip())
+                    scheduled_date_str = block_data.get("date")
+                    if scheduled_date_str:
+                        # Parse target date
+                        target_date = datetime.strptime(scheduled_date_str, "%Y-%m-%d").date()
+                        
+                        # Get user_id of the lesson
+                        lesson_result = await session.execute(
+                            select(Lesson).where(Lesson.id == lesson_id)
+                        )
+                        lesson_obj = lesson_result.scalar_one_or_none()
+                        if lesson_obj:
+                            # Check if calendar entry already exists for user on this date
+                            from app.models import CalendarEntry
+                            existing_entry = await session.execute(
+                                select(CalendarEntry).where(
+                                    CalendarEntry.user_id == lesson_obj.user_id,
+                                    CalendarEntry.scheduled_date == target_date
+                                )
+                            )
+                            if not existing_entry.scalar_one_or_none():
+                                new_entry = CalendarEntry(
+                                    user_id=lesson_obj.user_id,
+                                    lesson_id=lesson_id,
+                                    scheduled_date=target_date
+                                )
+                                session.add(new_entry)
+                                await session.commit()
+                except Exception:
+                    # Don't break streaming response if parsing/saving fails
+                    pass
 
         yield "data: [DONE]\n\n"
 

@@ -72,11 +72,76 @@ function isDiagramStreaming(text: string): boolean {
     return !text.slice(idx + 10).includes("```");
 }
 
-/** Strip all complete AND incomplete mermaid fences from displayed text */
-function stripMermaid(text: string): string {
-    let result = text.replace(/```mermaid[\s\S]*?```/g, "");
+/** Extract target schedule date from sheldon's response */
+function extractScheduleDate(text: string): string | null {
+    const m = /```schedule-flashcards([\s\S]*?)```/.exec(text);
+    if (!m) return null;
+    try {
+        const parsed = JSON.parse(m[1].trim());
+        return parsed.date || null;
+    } catch {
+        return null;
+    }
+}
+
+/** Strip all complete AND incomplete special blocks (mermaid & schedule) from displayed text */
+function stripSpecialBlocks(text: string): string {
+    let result = text;
+    // Strip mermaid
+    result = result.replace(/```mermaid[\s\S]*?```/g, "");
     result = result.replace(/```mermaid[\s\S]*$/, "");
+    // Strip schedule-flashcards
+    result = result.replace(/```schedule-flashcards[\s\S]*?```/g, "");
+    result = result.replace(/```schedule-flashcards[\s\S]*$/, "");
     return result.trim();
+}
+
+/** Group flat backend message responses into alternating Exchange items */
+function groupMessagesToExchanges(messages: any[]): Exchange[] {
+    const list: Exchange[] = [];
+    let currentExchange: Partial<Exchange> | null = null;
+
+    for (const msg of messages) {
+        if (msg.role === "student") {
+            if (currentExchange) {
+                list.push({
+                    id: currentExchange.id || crypto.randomUUID(),
+                    question: currentExchange.question || "",
+                    answer: currentExchange.answer || "",
+                    displayed: currentExchange.displayed || currentExchange.answer || "",
+                });
+            }
+            currentExchange = {
+                id: msg.id,
+                question: msg.content,
+                answer: "",
+                displayed: "",
+            };
+        } else if (msg.role === "sheldon") {
+            if (currentExchange) {
+                currentExchange.answer = msg.content;
+                currentExchange.displayed = msg.content;
+                list.push(currentExchange as Exchange);
+                currentExchange = null;
+            } else {
+                list.push({
+                    id: msg.id,
+                    question: "Introduction",
+                    answer: msg.content,
+                    displayed: msg.content,
+                });
+            }
+        }
+    }
+    if (currentExchange) {
+        list.push({
+            id: currentExchange.id || crypto.randomUUID(),
+            question: currentExchange.question || "",
+            answer: currentExchange.answer || "",
+            displayed: currentExchange.displayed || "",
+        });
+    }
+    return list;
 }
 
 /* ────────────────────────── Sub‑components ───────────────── */
@@ -128,7 +193,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         }
     }, [isLoading]);
 
-    /* ── Create lesson on mount ── */
+    /* ── Create or get lesson on mount ── */
     useEffect(() => {
         if (!token || lessonId) return;
         (async () => {
@@ -139,8 +204,16 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                     token
                 );
                 setLessonId(lesson.id);
+                
+                // Fetch existing conversation messages
+                const messages = await lessonsApi.getMessages(lesson.id, token);
+                const grouped = groupMessagesToExchanges(messages);
+                setExchanges(grouped);
+                if (grouped.length > 0) {
+                    setCurrentSlide(grouped.length - 1);
+                }
             } catch (err) {
-                console.error("Failed to create lesson:", err);
+                console.error("Failed to establish lesson or fetch history:", err);
             }
         })();
     }, [token, topicId, lessonId]);
@@ -327,7 +400,8 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const active = hasSlides ? exchanges[currentSlide] : null;
     const diagram = active ? extractDiagram(active.answer) : null;
     const diagramPending = active ? isDiagramStreaming(active.answer) : false;
-    const displayedText = active ? stripMermaid(active.displayed) : "";
+    const scheduleDate = active ? extractScheduleDate(active.answer) : null;
+    const displayedText = active ? stripSpecialBlocks(active.displayed) : "";
     const isWaiting = !!(active?.isStreaming && active.answer.length === 0);
     const isTyping = active
         ? active.displayed.length < active.answer.length
@@ -486,6 +560,28 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                             chart={diagram}
                                             inline={false}
                                         />
+                                    </div>
+                                )}
+
+                                {/* Schedule Widget: rendered */}
+                                {!isWaiting && scheduleDate && (
+                                    <div className="w-full max-w-md rounded-2xl bg-brand-primary border border-brand/30 p-5 shadow-xs mb-6 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-solid text-white shadow-sm">
+                                            <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <h4 className="text-sm font-bold text-primary tracking-tight">Study Session Scheduled</h4>
+                                            <p className="text-xs text-secondary mt-0.5 font-medium">
+                                                Cooper scheduled flashcards for <strong className="text-brand-secondary">{new Date(scheduleDate + "T00:00:00").toLocaleDateString(undefined, { dateStyle: "long" })}</strong>
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center justify-center size-6 rounded-full bg-emerald-500/10 text-emerald-600">
+                                            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 )}
 

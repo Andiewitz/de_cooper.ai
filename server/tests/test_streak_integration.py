@@ -47,6 +47,10 @@ def test_create_lesson_updates_streak(client, test_user):
     mock_db.add = MagicMock()
     mock_db.commit = AsyncMock()
     mock_db.refresh = AsyncMock()
+    mock_db.execute = AsyncMock()
+    mock_result = MagicMock()
+    mock_result.scalar_one_or_none.return_value = None
+    mock_db.execute.return_value = mock_result
     
     async def mock_refresh(instance):
         instance.id = uuid.uuid4()
@@ -161,6 +165,10 @@ def test_same_day_activity_no_streak_change(client, test_user):
     mock_db.add = MagicMock()
     mock_db.commit = AsyncMock()
     mock_db.refresh = AsyncMock()
+    mock_db.execute = AsyncMock()
+    mock_result = MagicMock()
+    mock_result.scalar_one_or_none.return_value = None
+    mock_db.execute.return_value = mock_result
     
     async def mock_refresh(instance):
         instance.id = uuid.uuid4()

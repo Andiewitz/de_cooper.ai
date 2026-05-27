@@ -17,5 +17,5 @@ interface Props {
 
 export default async function LessonPage({ params }: Props) {
     const resolvedParams = await params;
-    return <LessonPageClient topicId={resolvedParams.topicId} />;
+    return <LessonPageClient key={resolvedParams.topicId} topicId={resolvedParams.topicId} />;
 }
