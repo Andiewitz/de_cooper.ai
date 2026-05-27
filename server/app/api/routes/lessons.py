@@ -42,9 +42,24 @@ async def create_lesson(
         title=data.title,
     )
     db.add(lesson)
-    await db.commit()
-    await db.refresh(lesson)
-    return lesson
+    from sqlalchemy.exc import IntegrityError
+    try:
+        await db.commit()
+        await db.refresh(lesson)
+        return lesson
+    except IntegrityError:
+        await db.rollback()
+        # Fetch the existing lesson that won the race
+        result = await db.execute(
+            select(Lesson).where(
+                Lesson.user_id == current_user.id,
+                Lesson.topic_id == data.topic_id
+            )
+        )
+        existing_lesson = result.scalar_one_or_none()
+        if existing_lesson:
+            return existing_lesson
+        raise
 
 
 @router.get("/", response_model=list[LessonResponse])

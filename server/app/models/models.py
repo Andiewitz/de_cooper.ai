@@ -89,6 +89,9 @@ class User(Base):
 
 class Lesson(Base):
     __tablename__ = "lessons"
+    __table_args__ = (
+        UniqueConstraint("user_id", "topic_id", name="uq_user_topic"),
+    )
 
     id: Mapped[str] = mapped_column(
         String(36), primary_key=True, default=generate_uuid

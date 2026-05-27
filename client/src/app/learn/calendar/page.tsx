@@ -329,10 +329,10 @@ export default function LearnCalendarPage() {
                                 <button type="button" onClick={goToday} className="mr-2 rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-secondary hover:bg-brand-secondary/10 transition cursor-pointer">
                                     Today
                                 </button>
-                                <button type="button" onClick={prevMonth} className="flex size-8 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer">
+                                <button type="button" onClick={prevMonth} className="flex size-8 items-center justify-center rounded-lg text-secondary hover:bg-primary_hover hover:text-primary transition cursor-pointer">
                                     <ChevronLeft className="size-4" />
                                 </button>
-                                <button type="button" onClick={nextMonth} className="flex size-8 items-center justify-center rounded-lg text-quaternary hover:bg-primary_hover hover:text-secondary transition cursor-pointer">
+                                <button type="button" onClick={nextMonth} className="flex size-8 items-center justify-center rounded-lg text-secondary hover:bg-primary_hover hover:text-primary transition cursor-pointer">
                                     <ChevronRight className="size-4" />
                                 </button>
                             </div>
@@ -341,7 +341,7 @@ export default function LearnCalendarPage() {
                         {/* Weekday headers */}
                         <div className="grid grid-cols-7 mb-1">
                             {WEEKDAYS.map((wd) => (
-                                <div key={wd} className="py-2 text-center text-xs font-semibold text-quaternary uppercase tracking-wider">{wd}</div>
+                                <div key={wd} className="py-2 text-center text-xs font-semibold text-tertiary uppercase tracking-wider">{wd}</div>
                             ))}
                         </div>
 
@@ -354,7 +354,7 @@ export default function LearnCalendarPage() {
                                     onClick={() => setSelectedDay(cell.key)}
                                     className={`
                                         relative flex flex-col items-center justify-center py-3 cursor-pointer transition-all duration-100 rounded-xl
-                                        ${!cell.isCurrentMonth ? "opacity-30" : ""}
+                                        ${!cell.isCurrentMonth ? "opacity-50" : ""}
                                         ${cell.isSelected
                                             ? "bg-brand-solid text-white shadow-sm"
                                             : cell.isToday
@@ -412,11 +412,11 @@ export default function LearnCalendarPage() {
                             /* No lesson scheduled */
                             <div className="space-y-4">
                                 <div className="rounded-2xl border border-dashed border-secondary/80 py-12 flex flex-col items-center justify-center text-center space-y-3">
-                                    <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary/40 text-quaternary">
+                                    <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary/40 text-secondary">
                                         <BookOpen01 className="size-5" />
                                     </div>
                                     <p className="text-sm font-semibold text-secondary">No lesson scheduled</p>
-                                    <p className="text-xs text-quaternary max-w-xs">
+                                    <p className="text-xs text-tertiary max-w-xs">
                                         Assign a lesson to this day to generate flashcards for review.
                                     </p>
                                 </div>
@@ -440,7 +440,7 @@ export default function LearnCalendarPage() {
                                         <h4 className="text-xs font-bold uppercase tracking-wider text-tertiary">Pick a Lesson</h4>
 
                                         {lessons.length === 0 ? (
-                                            <p className="text-xs text-quaternary py-4 text-center">
+                                            <p className="text-xs text-tertiary py-4 text-center">
                                                 No lessons yet. Start a STEM session first to create one.
                                             </p>
                                         ) : (
@@ -485,7 +485,7 @@ export default function LearnCalendarPage() {
                                                 <Zap className="size-4" />
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="text-[10px] font-bold text-quaternary uppercase tracking-wider">{dayLesson.topic_id}</p>
+                                                <p className="text-[10px] font-bold text-tertiary uppercase tracking-wider">{dayLesson.topic_id}</p>
                                                 <p className="text-sm font-bold text-primary truncate mt-0.5">{dayLesson.title}</p>
                                             </div>
                                         </div>
@@ -503,7 +503,7 @@ export default function LearnCalendarPage() {
                                 {dayCards.length === 0 ? (
                                     <div className="rounded-2xl border border-dashed border-secondary/80 py-10 flex flex-col items-center justify-center text-center space-y-3">
                                         <p className="text-sm font-semibold text-secondary">No flashcards yet</p>
-                                        <p className="text-xs text-quaternary max-w-xs">
+                                        <p className="text-xs text-tertiary max-w-xs">
                                             This lesson needs at least one chat exchange with Dr. Cooper before flashcards can be generated.
                                         </p>
                                     </div>
