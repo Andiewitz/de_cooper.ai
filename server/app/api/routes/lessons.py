@@ -191,7 +191,24 @@ async def chat(
                                     CalendarEntry.scheduled_date == target_date
                                 )
                             )
-                            if not existing_entry.scalar_one_or_none():
+                            entry_obj = existing_entry.scalar_one_or_none()
+                            
+                            from app.services.flashcard_service import generate_flashcards
+                            if entry_obj:
+                                # Overwrite existing entry's lesson and clear old cards
+                                entry_obj.lesson_id = lesson_id
+                                session.add(entry_obj)
+                                
+                                from sqlalchemy import delete
+                                from app.models import Flashcard
+                                await session.execute(
+                                    delete(Flashcard).where(Flashcard.calendar_entry_id == entry_obj.id)
+                                )
+                                await session.commit()
+                                
+                                # Generate immediately
+                                await generate_flashcards(entry_obj.id, lesson_obj.user_id, session)
+                            else:
                                 new_entry = CalendarEntry(
                                     user_id=lesson_obj.user_id,
                                     lesson_id=lesson_id,
@@ -199,6 +216,10 @@ async def chat(
                                 )
                                 session.add(new_entry)
                                 await session.commit()
+                                await session.refresh(new_entry)
+                                
+                                # Generate immediately
+                                await generate_flashcards(new_entry.id, lesson_obj.user_id, session)
                 except Exception:
                     # Don't break streaming response if parsing/saving fails
                     pass

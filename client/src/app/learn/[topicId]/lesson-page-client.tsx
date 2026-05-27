@@ -16,7 +16,7 @@ import {
 } from "@untitledui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/auth-provider";
-import { lessonsApi } from "@/lib/api";
+import { lessonsApi, calendarApi } from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -178,6 +178,8 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const [navDirection, setNavDirection] = useState(1);
     const inputRef = useRef<HTMLInputElement>(null);
     const [isPageLoading, setIsPageLoading] = useState(true);
+    const [slideFlashcards, setSlideFlashcards] = useState<any[]>([]);
+    const [slideLoadingCards, setSlideLoadingCards] = useState(false);
 
     /* ── Auth guard ── */
     useEffect(() => {
@@ -217,6 +219,28 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
             }
         })();
     }, [token, topicId, lessonId]);
+
+    /* ── Fetch flashcards for scheduled slide ── */
+    useEffect(() => {
+        const active = exchanges[currentSlide];
+        const targetScheduleDate = active ? extractScheduleDate(active.answer) : null;
+        if (!token || !targetScheduleDate || isStreaming) {
+            setSlideFlashcards([]);
+            return;
+        }
+        (async () => {
+            setSlideLoadingCards(true);
+            try {
+                const res = await calendarApi.getDayFlashcards(targetScheduleDate, token);
+                setSlideFlashcards(res.flashcards);
+            } catch (err) {
+                console.error("Failed to load slide flashcards:", err);
+                setSlideFlashcards([]);
+            } finally {
+                setSlideLoadingCards(false);
+            }
+        })();
+    }, [token, exchanges, currentSlide, isStreaming]);
 
     /* ── Typewriter loop (3 chars / 6 ms — snappy) ── */
     useEffect(() => {
@@ -565,23 +589,50 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
                                 {/* Schedule Widget: rendered */}
                                 {!isWaiting && scheduleDate && (
-                                    <div className="w-full max-w-md rounded-2xl bg-brand-primary border border-brand/30 p-5 shadow-xs mb-6 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-solid text-white shadow-sm">
-                                            <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
+                                    <div className="w-full max-w-md rounded-2xl bg-brand-primary border border-brand/30 p-5 shadow-xs mb-6 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-solid text-white shadow-sm">
+                                                <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <h4 className="text-sm font-bold text-primary tracking-tight">Study Session Scheduled</h4>
+                                                <p className="text-xs text-secondary mt-0.5 font-medium">
+                                                    Cooper scheduled flashcards for <strong className="text-brand-secondary">{new Date(scheduleDate + "T00:00:00").toLocaleDateString(undefined, { dateStyle: "long" })}</strong>
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-center size-6 rounded-full bg-emerald-500/10 text-emerald-600">
+                                                <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
                                         </div>
-                                        <div className="min-w-0 flex-1">
-                                            <h4 className="text-sm font-bold text-primary tracking-tight">Study Session Scheduled</h4>
-                                            <p className="text-xs text-secondary mt-0.5 font-medium">
-                                                Cooper scheduled flashcards for <strong className="text-brand-secondary">{new Date(scheduleDate + "T00:00:00").toLocaleDateString(undefined, { dateStyle: "long" })}</strong>
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center justify-center size-6 rounded-full bg-emerald-500/10 text-emerald-600">
-                                            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </div>
+                                        
+                                        {/* Flashcards Preview inside Chat */}
+                                        {slideLoadingCards ? (
+                                            <div className="flex flex-col items-center py-4 gap-2 border-t border-brand/10 pt-3 animate-pulse">
+                                                <span className="size-5 rounded-full bg-brand-solid animate-pulse" />
+                                                <span className="text-xs text-quaternary font-semibold">Generating flashcards...</span>
+                                            </div>
+                                        ) : slideFlashcards.length > 0 ? (
+                                            <div className="space-y-3 border-t border-brand/10 pt-3">
+                                                <p className="text-[10px] font-bold uppercase tracking-wider text-tertiary">Generated Flashcards</p>
+                                                <div className="max-h-[220px] overflow-y-auto pr-1 space-y-2.5">
+                                                    {slideFlashcards.map((fc, index) => (
+                                                        <div key={fc.id} className="text-left rounded-xl border border-secondary bg-primary p-3 shadow-2xs hover:border-brand/40 transition">
+                                                            <p className="text-[10px] font-bold text-brand-secondary uppercase">Card {index + 1}</p>
+                                                            <p className="text-xs font-semibold text-primary mt-1"><span className="text-quaternary font-normal">Q:</span> {fc.front}</p>
+                                                            <p className="text-xs text-secondary mt-1"><span className="text-quaternary font-normal">A:</span> {fc.back}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="border-t border-brand/10 pt-3">
+                                                <p className="text-[10px] font-semibold text-quaternary text-center py-2">Flashcards will be generated once Sheldon finishes speaking.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 

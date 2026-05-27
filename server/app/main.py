@@ -41,12 +41,99 @@ async def run_migrations(conn):
             await conn.execute(text(alter_query))
 
 
+async def cleanup_database_duplicates():
+    from app.core.database import async_session_factory
+    from app.models import Lesson, Message, CalendarEntry, Flashcard
+    from sqlalchemy import select, func, text
+    
+    async with async_session_factory() as session:
+        try:
+            # 1. Fetch all lessons
+            result = await session.execute(select(Lesson))
+            all_lessons = result.scalars().all()
+            
+            # Group by (user_id, topic_id)
+            groups = {}
+            for l in all_lessons:
+                key = (l.user_id, l.topic_id)
+                if key not in groups:
+                    groups[key] = []
+                groups[key].append(l)
+                
+            for key, lessons in groups.items():
+                if len(lessons) <= 1:
+                    continue
+                    
+                # Count messages for each duplicate
+                lesson_msg_counts = []
+                for l in lessons:
+                    msg_res = await session.execute(
+                        select(func.count(Message.id)).where(Message.lesson_id == l.id)
+                    )
+                    count = msg_res.scalar() or 0
+                    lesson_msg_counts.append((count, l.created_at, l))
+                
+                # Keep the one with most messages, or oldest
+                lesson_msg_counts.sort(key=lambda x: (-x[0], x[1]))
+                keeper = lesson_msg_counts[0][2]
+                duplicates = [x[2] for x in lesson_msg_counts[1:]]
+                
+                for dup in duplicates:
+                    # Update messages
+                    await session.execute(
+                        text("UPDATE messages SET lesson_id = :keeper_id WHERE lesson_id = :dup_id"),
+                        {"keeper_id": keeper.id, "dup_id": dup.id}
+                    )
+                    # Update flashcards
+                    await session.execute(
+                        text("UPDATE flashcards SET lesson_id = :keeper_id WHERE lesson_id = :dup_id"),
+                        {"keeper_id": keeper.id, "dup_id": dup.id}
+                    )
+                    # For calendar entries, update them or delete if there's a conflict
+                    cal_res = await session.execute(
+                        select(CalendarEntry).where(CalendarEntry.lesson_id == dup.id)
+                    )
+                    cal_entries = cal_res.scalars().all()
+                    for entry in cal_entries:
+                        # Check if keeper already has a scheduled entry on this date
+                        existing_res = await session.execute(
+                            select(CalendarEntry).where(
+                                CalendarEntry.user_id == key[0],
+                                CalendarEntry.scheduled_date == entry.scheduled_date
+                            )
+                        )
+                        existing = existing_res.scalar_one_or_none()
+                        if existing:
+                            # Re-link flashcards
+                            await session.execute(
+                                text("UPDATE flashcards SET calendar_entry_id = :est_id WHERE calendar_entry_id = :dup_entry_id"),
+                                {"est_id": existing.id, "dup_entry_id": entry.id}
+                            )
+                            # Delete the duplicate entry
+                            await session.delete(entry)
+                        else:
+                            # Re-link to keeper
+                            entry.lesson_id = keeper.id
+                            session.add(entry)
+                    
+                    # Delete duplicate lesson
+                    dup_lesson = await session.get(Lesson, dup.id)
+                    if dup_lesson:
+                        await session.delete(dup_lesson)
+                        
+            await session.commit()
+        except Exception:
+            await session.rollback()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: create tables (dev only — use Alembic in production)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         await run_migrations(conn)
+    # Deduplicate existing database records
+    await cleanup_database_duplicates()
     yield
     # Shutdown: dispose engine
     await engine.dispose()
