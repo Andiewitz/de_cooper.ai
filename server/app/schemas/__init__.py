@@ -14,6 +14,7 @@ from app.schemas.schemas import (
     CalendarEntryCreate,
     CalendarEntryResponse,
     FlashcardResponse,
+    FlashcardCreate,
     FlashcardGenerateRequest,
     CalendarDayResponse,
 )
@@ -33,6 +34,7 @@ __all__ = [
     "CalendarEntryCreate",
     "CalendarEntryResponse",
     "FlashcardResponse",
+    "FlashcardCreate",
     "FlashcardGenerateRequest",
     "CalendarDayResponse",
 ]

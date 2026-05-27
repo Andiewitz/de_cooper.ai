@@ -113,6 +113,10 @@ class Lesson(Base):
     messages: Mapped[list["Message"]] = relationship(
         back_populates="lesson", cascade="all, delete-orphan", order_by="Message.created_at"
     )
+    flashcards: Mapped[list["Flashcard"]] = relationship(
+        back_populates="lesson", cascade="all, delete-orphan", order_by="Flashcard.created_at",
+        foreign_keys="Flashcard.lesson_id",
+    )
 
     def __repr__(self) -> str:
         return f"<Lesson {self.title}>"
@@ -182,8 +186,8 @@ class Flashcard(Base):
     user_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    calendar_entry_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("calendar_entries.id", ondelete="CASCADE"), nullable=False
+    calendar_entry_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("calendar_entries.id", ondelete="CASCADE"), nullable=True
     )
     lesson_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("lessons.id"), nullable=False

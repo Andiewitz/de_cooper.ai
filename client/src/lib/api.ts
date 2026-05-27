@@ -143,6 +143,9 @@ export const lessonsApi = {
     getMessages: (lessonId: string, token: string) =>
         fetchApi<MessageResponse[]>(`/lessons/${lessonId}/messages`, { token }),
 
+    getFlashcards: (lessonId: string, token: string) =>
+        fetchApi<FlashcardResponse[]>(`/lessons/${lessonId}/flashcards`, { token }),
+
     streamChat: async function* (
         lessonId: string,
         content: string,

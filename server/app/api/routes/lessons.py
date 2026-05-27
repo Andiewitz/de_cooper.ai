@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -8,8 +9,8 @@ from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.security import get_current_user
-from app.models import User, Lesson, Message
-from app.schemas import LessonCreate, LessonResponse, MessageCreate, MessageResponse
+from app.models import User, Lesson, Message, Flashcard
+from app.schemas import LessonCreate, LessonResponse, MessageCreate, MessageResponse, FlashcardResponse
 from app.services.ai_service import stream_ai_response
 
 router = APIRouter(prefix="/lessons", tags=["lessons"])
@@ -114,6 +115,46 @@ async def get_messages(
     return result.scalars().all()
 
 
+@router.get("/{lesson_id}/flashcards")
+async def get_lesson_flashcards(
+    lesson_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get all flashcards for a lesson."""
+    # Verify lesson belongs to user
+    result = await db.execute(
+        select(Lesson).where(Lesson.id == lesson_id, Lesson.user_id == current_user.id)
+    )
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Lesson not found.")
+
+    result = await db.execute(
+        select(Flashcard)
+        .where(Flashcard.lesson_id == lesson_id, Flashcard.user_id == current_user.id)
+        .order_by(Flashcard.created_at)
+    )
+    flashcards = result.scalars().all()
+
+    response_cards = []
+    for fc in flashcards:
+        metadata = {}
+        if fc.metadata_json:
+            try:
+                metadata = json.loads(fc.metadata_json)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        response_cards.append(FlashcardResponse(
+            id=fc.id,
+            front=fc.front,
+            back=fc.back,
+            metadata=metadata,
+            created_at=fc.created_at,
+        ))
+
+    return response_cards
+
+
 @router.post("/{lesson_id}/chat")
 async def chat(
     lesson_id: str,
@@ -181,63 +222,33 @@ async def chat(
             session.add(sheldon_msg)
             await session.commit()
 
-            # Check for schedule block
-            import re
-            match = re.search(r"```schedule-flashcards\s*([\s\S]*?)\s*```", full_response)
-            if match:
+            # Detect ```flashcards blocks and save them
+            flashcard_match = re.search(r"```flashcards\s*([\s\S]*?)\s*```", full_response)
+            if flashcard_match:
                 try:
-                    block_data = json.loads(match.group(1).strip())
-                    scheduled_date_str = block_data.get("date")
-                    if scheduled_date_str:
-                        # Parse target date
-                        target_date = datetime.strptime(scheduled_date_str, "%Y-%m-%d").date()
-                        
-                        # Get user_id of the lesson
-                        lesson_result = await session.execute(
-                            select(Lesson).where(Lesson.id == lesson_id)
-                        )
-                        lesson_obj = lesson_result.scalar_one_or_none()
-                        if lesson_obj:
-                            # Check if calendar entry already exists for user on this date
-                            from app.models import CalendarEntry
-                            existing_entry = await session.execute(
-                                select(CalendarEntry).where(
-                                    CalendarEntry.user_id == lesson_obj.user_id,
-                                    CalendarEntry.scheduled_date == target_date
-                                )
-                            )
-                            entry_obj = existing_entry.scalar_one_or_none()
-                            
-                            from app.services.flashcard_service import generate_flashcards
-                            if entry_obj:
-                                # Overwrite existing entry's lesson and clear old cards
-                                entry_obj.lesson_id = lesson_id
-                                session.add(entry_obj)
-                                
-                                from sqlalchemy import delete
-                                from app.models import Flashcard
-                                await session.execute(
-                                    delete(Flashcard).where(Flashcard.calendar_entry_id == entry_obj.id)
-                                )
-                                await session.commit()
-                                
-                                # Generate immediately
-                                await generate_flashcards(entry_obj.id, lesson_obj.user_id, session)
-                            else:
-                                new_entry = CalendarEntry(
-                                    user_id=lesson_obj.user_id,
+                    raw_json = flashcard_match.group(1).strip()
+                    cards_data = json.loads(raw_json)
+
+                    if isinstance(cards_data, list):
+                        for card in cards_data:
+                            if isinstance(card, dict) and "front" in card and "back" in card:
+                                fc = Flashcard(
+                                    user_id=current_user.id,
                                     lesson_id=lesson_id,
-                                    scheduled_date=target_date
+                                    calendar_entry_id=None,
+                                    front=card["front"],
+                                    back=card["back"],
+                                    metadata_json=json.dumps({
+                                        "generated_by": "ai_inline",
+                                        "source": "chat",
+                                    }),
                                 )
-                                session.add(new_entry)
-                                await session.commit()
-                                await session.refresh(new_entry)
-                                
-                                # Generate immediately
-                                await generate_flashcards(new_entry.id, lesson_obj.user_id, session)
-                except Exception:
-                    # Don't break streaming response if parsing/saving fails
-                    pass
+                                session.add(fc)
+                        await session.commit()
+                except Exception as e:
+                    # Don't break streaming if flashcard parsing/saving fails
+                    import logging
+                    logging.getLogger(__name__).error(f"Failed to save flashcards: {e}")
 
         yield "data: [DONE]\n\n"
 
@@ -250,3 +261,6 @@ async def chat(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+

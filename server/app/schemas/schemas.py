@@ -116,6 +116,11 @@ class FlashcardResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class FlashcardCreate(BaseModel):
+    front: str = Field(min_length=1)
+    back: str = Field(min_length=1)
+
+
 class FlashcardGenerateRequest(BaseModel):
     calendar_entry_id: str
 

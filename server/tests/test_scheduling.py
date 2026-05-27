@@ -5,19 +5,31 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 from app.main import app
 from app.core.security import get_current_user
-from app.models.models import User, Lesson, Message, CalendarEntry
+from app.models.models import User, Lesson, Message, Flashcard
 from app.core.database import get_db, async_session_factory
-from sqlalchemy import select
+from sqlalchemy import select, delete
+
 
 @pytest.fixture
-def test_user():
+def unique_user_id():
+    return str(uuid.uuid4())
+
+
+@pytest.fixture
+def unique_email(unique_user_id):
+    return f"test_{unique_user_id[:8]}@example.com"
+
+
+@pytest.fixture
+def test_user(unique_user_id, unique_email):
     return User(
-        id=str(uuid.uuid4()),
-        email="test_schedule@example.com",
-        username="scheduleuser",
+        id=unique_user_id,
+        email=unique_email,
+        username=f"user_{unique_user_id[:8]}",
         hashed_password="hashed_password",
-        display_name="Schedule User",
+        display_name="Flashcard User",
     )
+
 
 @pytest.fixture
 def client(test_user):
@@ -26,21 +38,15 @@ def client(test_user):
         yield test_client
     app.dependency_overrides.clear()
 
+
 @pytest.mark.anyio
-async def test_chat_schedules_flashcards(client, test_user):
-    # Set up user and lesson in a test db session
+async def test_chat_generates_inline_flashcards(client, test_user):
+    """Test that a ```flashcards block in the AI response saves flashcards to the DB."""
+    # Insert user and lesson into the test database
     async with async_session_factory() as session:
-        # Check if user already exists to avoid unique constraint violations
-        user_result = await session.execute(
-            select(User).where(User.email == "test_schedule@example.com")
-        )
-        db_user = user_result.scalar_one_or_none()
-        if not db_user:
-            session.add(test_user)
-            await session.commit()
-            await session.refresh(test_user)
-        else:
-            test_user = db_user
+        session.add(test_user)
+        await session.commit()
+        await session.refresh(test_user)
 
         lesson = Lesson(
             id=str(uuid.uuid4()),
@@ -52,41 +58,42 @@ async def test_chat_schedules_flashcards(client, test_user):
         await session.commit()
         lesson_id = lesson.id
 
-    # Mock stream_ai_response to yield a scheduling block
+    # Mock stream_ai_response to yield a flashcards block
     async def mock_stream(*args, **kwargs):
-        yield "Sure. I have scheduled a session.\n"
-        yield "```schedule-flashcards\n"
-        yield '{"date": "2026-06-05"}\n'
+        yield "Here are your flashcards.\n"
+        yield "```flashcards\n"
+        yield '[{"front": "What is Newton first law?", "back": "An object at rest stays at rest."}, '
+        yield '{"front": "What is F=ma?", "back": "Force equals mass times acceleration."}]\n'
         yield "```\n"
 
     with patch("app.api.routes.lessons.stream_ai_response", side_effect=mock_stream):
         response = client.post(
             f"/api/lessons/{lesson_id}/chat",
-            json={"content": "Please schedule flashcards for June 5th"}
+            json={"content": "Review my flashcards for this lesson"}
         )
         assert response.status_code == 200
         # Read full stream to trigger generator completion
         content = response.text
-        assert "schedule-flashcards" in content
+        assert "flashcards" in content
 
-    # Verify that a CalendarEntry was created in the database
+    # Verify that Flashcard records were created in the database
     async with async_session_factory() as session:
         result = await session.execute(
-            select(CalendarEntry).where(
-                CalendarEntry.user_id == test_user.id,
-                CalendarEntry.lesson_id == lesson_id
+            select(Flashcard).where(
+                Flashcard.user_id == test_user.id,
+                Flashcard.lesson_id == lesson_id
             )
         )
-        entry = result.scalar_one_or_none()
-        assert entry is not None
-        assert entry.scheduled_date == date(2026, 6, 5)
+        flashcards = result.scalars().all()
+        assert len(flashcards) == 2
+        assert flashcards[0].front == "What is Newton first law?"
+        assert flashcards[0].back == "An object at rest stays at rest."
+        assert flashcards[0].calendar_entry_id is None  # Not tied to calendar
+        assert flashcards[1].front == "What is F=ma?"
 
-        # Cleanup test data to keep database clean
-        await session.delete(entry)
-        lesson_to_del = await session.get(Lesson, lesson_id)
-        if lesson_to_del:
-            await session.delete(lesson_to_del)
-        user_to_del = await session.get(User, test_user.id)
-        if user_to_del:
-            await session.delete(user_to_del)
+        # Cleanup
+        await session.execute(delete(Flashcard).where(Flashcard.user_id == test_user.id))
+        await session.execute(delete(Message).where(Message.lesson_id == lesson_id))
+        await session.execute(delete(Lesson).where(Lesson.id == lesson_id))
+        await session.execute(delete(User).where(User.id == test_user.id))
         await session.commit()

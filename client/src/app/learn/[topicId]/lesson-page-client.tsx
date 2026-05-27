@@ -17,12 +17,13 @@ import {
 } from "@untitledui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/providers/auth-provider";
-import { lessonsApi, calendarApi } from "@/lib/api";
+import { lessonsApi } from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { MermaidRenderer } from "@/components/learn/mermaid-renderer";
+import { FlashcardWidget } from "@/components/learn/flashcard-widget";
 
 /* ────────────────────────── Types ────────────────────────── */
 
@@ -73,25 +74,38 @@ function isDiagramStreaming(text: string): boolean {
     return !text.slice(idx + 10).includes("```");
 }
 
-/** Extract target schedule date from sheldon's response */
-function extractScheduleDate(text: string): string | null {
-    const m = /```schedule-flashcards([\s\S]*?)```/.exec(text);
+/** Extract flashcards JSON from a ```flashcards block */
+function extractFlashcards(text: string): { front: string; back: string }[] | null {
+    const m = /```flashcards\s*([\s\S]*?)\s*```/.exec(text);
     if (!m) return null;
     try {
         const parsed = JSON.parse(m[1].trim());
-        return parsed.date || null;
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].front && parsed[0].back) {
+            return parsed;
+        }
+        return null;
     } catch {
         return null;
     }
 }
 
-/** Strip all complete AND incomplete special blocks (mermaid & schedule) from displayed text */
+/** True when a ```flashcards block has been opened but not yet closed (still streaming) */
+function isFlashcardsStreaming(text: string): boolean {
+    const idx = text.lastIndexOf("```flashcards");
+    if (idx === -1) return false;
+    return !text.slice(idx + 13).includes("```");
+}
+
+/** Strip all complete AND incomplete special blocks from displayed text */
 function stripSpecialBlocks(text: string): string {
     let result = text;
     // Strip mermaid
     result = result.replace(/```mermaid[\s\S]*?```/g, "");
     result = result.replace(/```mermaid[\s\S]*$/, "");
-    // Strip schedule-flashcards
+    // Strip flashcards
+    result = result.replace(/```flashcards[\s\S]*?```/g, "");
+    result = result.replace(/```flashcards[\s\S]*$/, "");
+    // Strip legacy schedule-flashcards (backward compat)
     result = result.replace(/```schedule-flashcards[\s\S]*?```/g, "");
     result = result.replace(/```schedule-flashcards[\s\S]*$/, "");
     return result.trim();
@@ -179,15 +193,11 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const [navDirection, setNavDirection] = useState(1);
     const inputRef = useRef<HTMLInputElement>(null);
     const [isPageLoading, setIsPageLoading] = useState(true);
-    const [slideFlashcards, setSlideFlashcards] = useState<any[]>([]);
-    const [slideLoadingCards, setSlideLoadingCards] = useState(false);
     
     // Premium input widget states
     const [showPlusMenu, setShowPlusMenu] = useState(false);
-    const [showDatePicker, setShowDatePicker] = useState(false);
     const [showModelMenu, setShowModelMenu] = useState(false);
     const [selectedModel, setSelectedModel] = useState("Sheldon 3.5 Flash");
-    const [customDate, setCustomDate] = useState("");
     const plusMenuRef = useRef<HTMLDivElement>(null);
     const modelMenuRef = useRef<HTMLDivElement>(null);
 
@@ -230,34 +240,13 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         })();
     }, [token, topicId, lessonId]);
 
-    /* ── Fetch flashcards for scheduled slide ── */
-    useEffect(() => {
-        const active = exchanges[currentSlide];
-        const targetScheduleDate = active ? extractScheduleDate(active.answer) : null;
-        if (!token || !targetScheduleDate || isStreaming) {
-            setSlideFlashcards([]);
-            return;
-        }
-        (async () => {
-            setSlideLoadingCards(true);
-            try {
-                const res = await calendarApi.getDayFlashcards(targetScheduleDate, token);
-                setSlideFlashcards(res.flashcards);
-            } catch (err) {
-                console.error("Failed to load slide flashcards:", err);
-                setSlideFlashcards([]);
-            } finally {
-                setSlideLoadingCards(false);
-            }
-        })();
-    }, [token, exchanges, currentSlide, isStreaming]);
+
 
     /* ── Click outside helper for menus ── */
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (plusMenuRef.current && !plusMenuRef.current.contains(e.target as Node)) {
                 setShowPlusMenu(false);
-                setShowDatePicker(false);
             }
             if (modelMenuRef.current && !modelMenuRef.current.contains(e.target as Node)) {
                 setShowModelMenu(false);
@@ -354,18 +343,6 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
         [input, lessonId, token, isStreaming]
     );
 
-    // Quick tag session scheduling helper
-    const handleQuickSchedule = useCallback((daysAhead: number) => {
-        const target = new Date();
-        target.setDate(target.getDate() + daysAhead);
-        const y = target.getFullYear();
-        const m = String(target.getMonth() + 1).padStart(2, "0");
-        const d = String(target.getDate()).padStart(2, "0");
-        const dateStr = `${y}-${m}-${d}`;
-        sendMessage(`Please schedule flashcards for ${dateStr}`);
-        setShowPlusMenu(false);
-        setShowDatePicker(false);
-    }, [sendMessage]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -462,7 +439,8 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     const active = hasSlides ? exchanges[currentSlide] : null;
     const diagram = active ? extractDiagram(active.answer) : null;
     const diagramPending = active ? isDiagramStreaming(active.answer) : false;
-    const scheduleDate = active ? extractScheduleDate(active.answer) : null;
+    const flashcards = active ? extractFlashcards(active.answer) : null;
+    const flashcardsPending = active ? isFlashcardsStreaming(active.answer) : false;
     const displayedText = active ? stripSpecialBlocks(active.displayed) : "";
     const isWaiting = !!(active?.isStreaming && active.answer.length === 0);
     const isTyping = active
@@ -625,52 +603,22 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     </div>
                                 )}
 
-                                {/* Schedule Widget: rendered */}
-                                {!isWaiting && scheduleDate && (
-                                    <div className="w-full max-w-md rounded-2xl bg-brand-primary border border-brand/30 p-5 shadow-xs mb-6 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-solid text-white shadow-sm">
-                                                <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <h4 className="text-sm font-bold text-primary tracking-tight">Study Session Scheduled</h4>
-                                                <p className="text-xs text-secondary mt-0.5 font-medium">
-                                                    Cooper scheduled flashcards for <strong className="text-brand-secondary">{new Date(scheduleDate + "T00:00:00").toLocaleDateString(undefined, { dateStyle: "long" })}</strong>
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center justify-center size-6 rounded-full bg-emerald-500/10 text-emerald-600">
-                                                <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </div>
+                                {/* Flashcard Widget: constructing placeholder */}
+                                {!isWaiting && !flashcards && flashcardsPending && (
+                                    <div className="w-full max-w-md aspect-[4/3] rounded-2xl bg-brand-primary border border-brand/20 flex flex-col items-center justify-center mb-6 shadow-xs">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="size-2.5 rounded-full bg-brand-solid animate-pulse" />
+                                            <span className="text-xs font-bold text-brand-secondary">
+                                                Generating flashcards...
+                                            </span>
                                         </div>
-                                        
-                                        {/* Flashcards Preview inside Chat */}
-                                        {slideLoadingCards ? (
-                                            <div className="flex flex-col items-center py-4 gap-2 border-t border-brand/10 pt-3 animate-pulse">
-                                                <span className="size-5 rounded-full bg-brand-solid animate-pulse" />
-                                                <span className="text-xs text-quaternary font-semibold">Generating flashcards...</span>
-                                            </div>
-                                        ) : slideFlashcards.length > 0 ? (
-                                            <div className="space-y-3 border-t border-brand/10 pt-3">
-                                                <p className="text-[10px] font-bold uppercase tracking-wider text-tertiary">Generated Flashcards</p>
-                                                <div className="max-h-[220px] overflow-y-auto pr-1 space-y-2.5">
-                                                    {slideFlashcards.map((fc, index) => (
-                                                        <div key={fc.id} className="text-left rounded-xl border border-secondary bg-primary p-3 shadow-2xs hover:border-brand/40 transition">
-                                                            <p className="text-[10px] font-bold text-brand-secondary uppercase">Card {index + 1}</p>
-                                                            <p className="text-xs font-semibold text-primary mt-1"><span className="text-quaternary font-normal">Q:</span> {fc.front}</p>
-                                                            <p className="text-xs text-secondary mt-1"><span className="text-quaternary font-normal">A:</span> {fc.back}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="border-t border-brand/10 pt-3">
-                                                <p className="text-[10px] font-semibold text-quaternary text-center py-2">Flashcards will be generated once Sheldon finishes speaking.</p>
-                                            </div>
-                                        )}
+                                    </div>
+                                )}
+
+                                {/* Flashcard Widget: rendered */}
+                                {!isWaiting && flashcards && (
+                                    <div className="mb-6">
+                                        <FlashcardWidget cards={flashcards} />
                                     </div>
                                 )}
 
@@ -812,18 +760,18 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                                 type="button"
                                                 onClick={() => {
                                                     setShowPlusMenu(false);
-                                                    router.push("/learn/calendar");
+                                                    sendMessage("Review my flashcards for this lesson");
                                                 }}
                                                 className="flex w-full items-center gap-3 rounded-xl p-2.5 text-left text-xs font-bold text-primary hover:bg-primary_hover transition-colors cursor-pointer"
                                             >
                                                 <div className="flex size-7 items-center justify-center rounded-lg bg-brand-solid/10 text-brand-solid">
                                                     <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                                     </svg>
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-primary">Review Flashcards</p>
-                                                    <p className="text-[10px] text-quaternary font-normal mt-0.5">Open calendar & study flashcards</p>
+                                                    <p className="text-[10px] text-quaternary font-normal mt-0.5">Generate study cards from this lesson</p>
                                                 </div>
                                             </button>
                                         </motion.div>

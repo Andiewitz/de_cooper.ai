@@ -132,11 +132,52 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         await run_migrations(conn)
+        # Migrate flashcards.calendar_entry_id to be nullable (SQLite requires table rebuild)
+        await migrate_flashcards_nullable_calendar(conn)
     # Deduplicate existing database records
     await cleanup_database_duplicates()
     yield
     # Shutdown: dispose engine
     await engine.dispose()
+
+
+async def migrate_flashcards_nullable_calendar(conn):
+    """Make flashcards.calendar_entry_id nullable. SQLite doesn't support ALTER COLUMN."""
+    def _check_nullable(connection):
+        inspector = inspect(connection)
+        try:
+            columns = inspector.get_columns("flashcards")
+        except Exception:
+            return True  # Table doesn't exist yet, create_all will handle it
+        for col in columns:
+            if col["name"] == "calendar_entry_id":
+                return col.get("nullable", True)
+        return True  # Column not found
+
+    is_nullable = await conn.run_sync(_check_nullable)
+    if is_nullable:
+        return  # Already nullable, nothing to do
+
+    # SQLite table rebuild: create new table, copy data, swap
+    await conn.execute(text("""
+        CREATE TABLE IF NOT EXISTS flashcards_new (
+            id VARCHAR(36) NOT NULL PRIMARY KEY,
+            user_id VARCHAR(36) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            calendar_entry_id VARCHAR(36) REFERENCES calendar_entries(id) ON DELETE CASCADE,
+            lesson_id VARCHAR(36) NOT NULL REFERENCES lessons(id),
+            front TEXT NOT NULL,
+            back TEXT NOT NULL,
+            metadata_json TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """))
+    await conn.execute(text("""
+        INSERT INTO flashcards_new (id, user_id, calendar_entry_id, lesson_id, front, back, metadata_json, created_at)
+        SELECT id, user_id, calendar_entry_id, lesson_id, front, back, metadata_json, created_at
+        FROM flashcards
+    """))
+    await conn.execute(text("DROP TABLE flashcards"))
+    await conn.execute(text("ALTER TABLE flashcards_new RENAME TO flashcards"))
 
 
 app = FastAPI(

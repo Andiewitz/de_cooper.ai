@@ -48,21 +48,24 @@ async def stream_ai_response(
         "content": SYSTEM_PROMPT,
     }
 
-    # Add scheduling rules and date context
+    # Add date context
     if current_date:
         system_message["content"] += f"\n\nToday's date is: {current_date}."
-        system_message["content"] += (
-            "\n\nCRITICAL — FLASHCARD SCHEDULING TOOL:\n"
-            "- If the student explicitly asks you to schedule a study session, schedule flashcards, or create flashcards for a specific date "
-            '(e.g., "schedule a session for next Friday", "create flashcards for June 5th"), you MUST schedule it by outputting a special '
-            "scheduling block on its own lines anywhere in your response:\n"
-            "```schedule-flashcards\n"
-            '{"date": "YYYY-MM-DD"}\n'
-            "```\n"
-            "- Strictly use the format YYYY-MM-DD for the date. Calculate the target date relative to Today's date.\n"
-            "- Confirm to the student in your text explanation that you have successfully scheduled their study session and flashcards for that date.\n"
-            "- Do NOT output this block unless specifically requested by the student to schedule/create flashcards on a date."
-        )
+
+    # Flashcard generation tool — always available
+    system_message["content"] += (
+        "\n\nCRITICAL — FLASHCARD TOOL:\n"
+        "- When the student asks to review, generate flashcards, study, quiz themselves, or requests flashcards in any way, "
+        "output a ```flashcards fenced code block containing a JSON array of flashcard objects.\n"
+        "- Format: ```flashcards\n"
+        '[{"front": "Question text", "back": "Answer text"}, ...]\n'
+        "```\n"
+        "- Generate 5-8 high-quality flashcards covering the key concepts discussed so far in this lesson.\n"
+        "- Each \"front\" should be a clear, specific question. Each \"back\" should be a concise, accurate answer.\n"
+        "- Return ONLY valid JSON inside the block — no markdown fences inside, no extra text.\n"
+        "- Include a brief text explanation alongside the block (e.g., confirming you generated cards and suggesting how to study).\n"
+        "- Do NOT output this block unless the student explicitly asks for flashcards or review."
+    )
 
     # Add topic context
     if topic != "general":
