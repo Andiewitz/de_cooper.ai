@@ -26,20 +26,10 @@ import { Avatar } from "@/components/base/avatar/avatar";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
 import { Tooltip } from "@/components/base/tooltip/tooltip";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
-    Collapsible,
-    CollapsibleTrigger,
-    CollapsibleContent,
-} from "@/components/ui/collapsible";
-import { Separator } from "@/components/ui/separator";
+import { Dropdown } from "@/components/base/dropdown/dropdown";
+import * as Collapsible from "@radix-ui/react-collapsible";
+import { AnimatePresence, motion } from "framer-motion";
+import { Button as AriaButton } from "react-aria-components";
 import { useAuth } from "@/providers/auth-provider";
 import { cx } from "@/utils/cx";
 
@@ -117,53 +107,50 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         isCollapsed ? "flex-col justify-center gap-2 px-2" : "justify-between gap-2 px-4",
                     )}
                 >
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button
-                                type="button"
-                                className={cx(
-                                    "flex w-full items-center gap-2.5 rounded-lg border border-secondary/50 bg-primary/40 p-2 text-left hover:bg-primary_hover transition select-none cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-solid/40",
-                                    isCollapsed ? "justify-center" : ""
-                                )}
-                            >
-                                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-brand-solid text-white font-bold text-sm shadow-sm">
-                                    {activeWorkspace[0]}
-                                </div>
-                                {!isCollapsed && (
-                                    <div className="grid flex-1 leading-tight min-w-0">
-                                        <span className="truncate text-sm font-bold text-primary">{activeWorkspace}</span>
-                                        <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-quaternary/70">STEM Workspace</span>
-                                    </div>
-                                )}
-                                {!isCollapsed && (
-                                    <ChevronRight className="size-4 shrink-0 text-fg-quaternary transition duration-150" />
-                                )}
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="start"
-                            side={isCollapsed ? "right" : "bottom"}
+                    <Dropdown.Root>
+                        <AriaButton
+                            className={cx(
+                                "flex w-full items-center gap-2.5 rounded-lg border border-secondary bg-primary p-2 text-left hover:bg-primary_hover transition select-none cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-solid/40",
+                                isCollapsed ? "justify-center" : ""
+                            )}
                         >
-                            <DropdownMenuLabel>Switch Workspaces</DropdownMenuLabel>
-                            {WORKSPACES.map((ws) => (
-                                <DropdownMenuItem
-                                    key={ws}
-                                    onClick={() => setActiveWorkspace(ws)}
-                                    className={cx(
-                                        ws === activeWorkspace ? "font-semibold text-primary bg-secondary/30" : ""
-                                    )}
-                                >
-                                    <div className="flex size-6 shrink-0 items-center justify-center rounded bg-secondary/80 text-xs font-bold text-secondary">
-                                        {ws[0]}
-                                    </div>
-                                    <span className="flex-1 truncate">{ws}</span>
-                                    {ws === activeWorkspace && (
-                                        <span className="text-brand-solid font-bold text-xs">✓</span>
-                                    )}
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-brand-solid text-white font-bold text-sm shadow-sm">
+                                {activeWorkspace[0]}
+                            </div>
+                            {!isCollapsed && (
+                                <div className="grid flex-1 leading-tight min-w-0">
+                                    <span className="truncate text-sm font-bold text-primary">{activeWorkspace}</span>
+                                    <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-quaternary/70">STEM Workspace</span>
+                                </div>
+                            )}
+                            {!isCollapsed && (
+                                <ChevronRight className="size-4 shrink-0 text-fg-quaternary transition duration-150" />
+                            )}
+                        </AriaButton>
+                        <Dropdown.Popover
+                            placement={isCollapsed ? "right top" : "bottom left"}
+                            className="w-60 rounded-b-xl bg-secondary_alt"
+                        >
+                            <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
+                                <Dropdown.SectionHeader className="px-4 pt-1.5 pb-0.5 text-xs font-semibold text-brand-secondary">
+                                    Switch Workspaces
+                                </Dropdown.SectionHeader>
+                                {WORKSPACES.map((ws) => (
+                                    <Dropdown.Item
+                                        key={ws}
+                                        id={ws}
+                                        onAction={() => setActiveWorkspace(ws)}
+                                        selectionIndicator={ws === activeWorkspace ? "checkmark" : "none"}
+                                    >
+                                        <div className="flex size-6 shrink-0 items-center justify-center rounded bg-secondary/80 text-xs font-bold text-secondary mr-2">
+                                            {ws[0]}
+                                        </div>
+                                        <span className="flex-1 truncate">{ws}</span>
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
+                    </Dropdown.Root>
 
                     {!forceExpanded && (
                         <Button
@@ -195,55 +182,55 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                     </Link>
 
                     {/* Collapsible Topics Accordion */}
-                    <Collapsible
+                    <Collapsible.Root
                         open={isCollapsed ? false : topicsOpen}
                         onOpenChange={setTopicsOpen}
                         className="w-full"
                     >
                         {isCollapsed ? (
                             // Collapsed Popover Trigger for Topics
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button
-                                        type="button"
-                                        className={cx(
-                                            "group/item flex w-full items-center justify-center rounded-lg p-2.5 outline-none hover:bg-primary_hover text-secondary transition",
-                                            isAnyTopicActive ? "bg-secondary text-primary" : ""
-                                        )}
-                                    >
-                                        <Beaker01 className={cx("size-5 shrink-0 transition-colors", isAnyTopicActive ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    align="start"
-                                    side="right"
-                                    className="min-w-[180px]"
+                            <Dropdown.Root>
+                                <AriaButton
+                                    className={cx(
+                                        "group/item flex w-full items-center justify-center rounded-lg p-2.5 outline-none hover:bg-primary_hover text-secondary transition",
+                                        isAnyTopicActive ? "bg-secondary text-primary" : ""
+                                    )}
                                 >
-                                    <DropdownMenuLabel>STEM Modules</DropdownMenuLabel>
-                                    {TOPIC_ITEMS.map((topic) => {
-                                        const TopicIcon = topic.icon;
-                                        return (
-                                            <DropdownMenuItem
-                                                key={topic.id}
-                                                onClick={() => {
-                                                    router.push(`/learn/${topic.id}`);
-                                                    setMobileNavOpen(false);
-                                                }}
-                                                className={cx(
-                                                    isTopicRouteActive(topic.id) ? "font-semibold text-brand-secondary bg-brand-primary/40" : ""
-                                                )}
-                                            >
-                                                <TopicIcon className="size-4 shrink-0 text-fg-quaternary" />
-                                                <span>{topic.label}</span>
-                                            </DropdownMenuItem>
-                                        );
-                                    })}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                    <Beaker01 className={cx("size-5 shrink-0 transition-colors", isAnyTopicActive ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
+                                </AriaButton>
+                                <Dropdown.Popover
+                                    placement="right top"
+                                    className="w-56 rounded-b-xl bg-secondary_alt"
+                                >
+                                    <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
+                                        <Dropdown.SectionHeader className="px-4 pt-1.5 pb-0.5 text-xs font-semibold text-brand-secondary">
+                                            STEM Modules
+                                        </Dropdown.SectionHeader>
+                                        {TOPIC_ITEMS.map((topic) => {
+                                            const TopicIcon = topic.icon;
+                                            const active = isTopicRouteActive(topic.id);
+                                            return (
+                                                <Dropdown.Item
+                                                    key={topic.id}
+                                                    id={topic.id}
+                                                    onAction={() => {
+                                                        router.push(`/learn/${topic.id}`);
+                                                        setMobileNavOpen(false);
+                                                    }}
+                                                    selectionIndicator={active ? "checkmark" : "none"}
+                                                >
+                                                    <TopicIcon className="size-4 shrink-0 text-fg-quaternary mr-2" />
+                                                    <span>{topic.label}</span>
+                                                </Dropdown.Item>
+                                            );
+                                        })}
+                                    </Dropdown.Menu>
+                                </Dropdown.Popover>
+                            </Dropdown.Root>
                         ) : (
                             // Expanded Accordion Trigger
                             <>
-                                <CollapsibleTrigger asChild>
+                                <Collapsible.Trigger asChild>
                                     <button
                                         type="button"
                                         className={cx(
@@ -262,32 +249,44 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                             )}
                                         />
                                     </button>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent isOpen={topicsOpen} className="pl-3">
-                                    <div className="mt-1 border-l-2 border-secondary/80 pl-2.5 space-y-1">
-                                        {TOPIC_ITEMS.map((topic) => {
-                                            const TopicIcon = topic.icon;
-                                            const active = isTopicRouteActive(topic.id);
-                                            return (
-                                                <Link
-                                                    key={topic.id}
-                                                    href={`/learn/${topic.id}`}
-                                                    onClick={() => setMobileNavOpen(false)}
-                                                    className={cx(
-                                                        "group/sub flex items-center gap-2 rounded-md p-1.5 text-xs select-none transition duration-150",
-                                                        active ? "bg-brand-primary text-brand-secondary font-bold" : "hover:bg-primary_hover text-secondary hover:text-primary"
-                                                    )}
-                                                >
-                                                    <TopicIcon className={cx("size-4 shrink-0 transition-colors", active ? "text-brand-secondary" : "text-fg-quaternary group-hover/sub:text-fg-quaternary_hover")} />
-                                                    <span>{topic.label}</span>
-                                                </Link>
-                                            );
-                                        })}
-                                    </div>
-                                </CollapsibleContent>
+                                </Collapsible.Trigger>
+                                <AnimatePresence initial={false}>
+                                    {topicsOpen && (
+                                        <Collapsible.Content asChild>
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.2, ease: "easeInOut" }}
+                                                className="overflow-hidden pl-3"
+                                            >
+                                                <div className="mt-1 border-l-2 border-secondary/80 pl-2.5 space-y-1">
+                                                    {TOPIC_ITEMS.map((topic) => {
+                                                        const TopicIcon = topic.icon;
+                                                        const active = isTopicRouteActive(topic.id);
+                                                        return (
+                                                            <Link
+                                                                key={topic.id}
+                                                                href={`/learn/${topic.id}`}
+                                                                onClick={() => setMobileNavOpen(false)}
+                                                                className={cx(
+                                                                    "group/sub flex items-center gap-2 rounded-md p-1.5 text-xs select-none transition duration-150",
+                                                                    active ? "bg-brand-primary text-brand-secondary font-bold" : "hover:bg-primary_hover text-secondary hover:text-primary"
+                                                                )}
+                                                            >
+                                                                <TopicIcon className={cx("size-4 shrink-0 transition-colors", active ? "text-brand-secondary" : "text-fg-quaternary group-hover/sub:text-fg-quaternary_hover")} />
+                                                                <span>{topic.label}</span>
+                                                            </Link>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </motion.div>
+                                        </Collapsible.Content>
+                                    )}
+                                </AnimatePresence>
                             </>
                         )}
-                    </Collapsible>
+                    </Collapsible.Root>
 
                     {/* Calendar */}
                     <Link
@@ -349,63 +348,68 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
 
                 {/* ── Footer: User Profile Dropdown ── */}
                 <div className={cx("border-t border-secondary p-3", isCollapsed && "flex flex-col items-center gap-2")}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button
-                                type="button"
-                                className={cx(
-                                    "flex w-full items-center gap-3 rounded-xl p-2.5 text-left hover:bg-primary_hover transition duration-150 select-none cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-solid/40",
-                                    isCollapsed ? "justify-center" : ""
-                                )}
-                            >
-                                <Avatar size="sm" initials={initials} alt={displayName} className="ring-2 ring-secondary/50 shadow-inner" />
-                                {!isCollapsed && (
-                                    <div className="min-w-0 flex-1 leading-tight">
-                                        <p className="truncate text-sm font-bold text-primary">{displayName}</p>
-                                        <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
-                                    </div>
-                                )}
-                                {!isCollapsed && <ChevronRight className="size-4 shrink-0 text-fg-quaternary" />}
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align={isCollapsed ? "start" : "end"}
-                            side={isCollapsed ? "right" : "top"}
-                            className="min-w-[230px] rounded-2xl shadow-xl"
+                    <Dropdown.Root>
+                        <AriaButton
+                            className={cx(
+                                "flex w-full items-center gap-3 rounded-xl p-2.5 text-left hover:bg-primary_hover transition duration-150 select-none cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-solid/40",
+                                isCollapsed ? "justify-center" : ""
+                            )}
                         >
-                            <div className="flex items-center gap-3 px-3 py-2.5 select-none">
-                                <Avatar size="sm" initials={initials} alt={displayName} />
+                            <Avatar size="sm" initials={initials} alt={displayName} className="ring-2 ring-secondary/50 shadow-inner" />
+                            {!isCollapsed && (
                                 <div className="min-w-0 flex-1 leading-tight">
                                     <p className="truncate text-sm font-bold text-primary">{displayName}</p>
                                     <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
                                 </div>
-                            </div>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                                <span className="text-amber-500 font-bold select-none text-base leading-none">✦</span>
-                                <span className="font-semibold text-brand-secondary">Upgrade to Pro</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <span className="text-fg-quaternary text-base leading-none">⚙</span>
-                                <span>Account & Settings</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <span className="text-fg-quaternary text-base leading-none">💳</span>
-                                <span>Billing details</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                onClick={() => {
-                                    logout();
-                                    router.push("/login");
-                                }}
-                                className="text-error-primary hover:bg-error-primary/10 hover:text-error-primary_hover focus:bg-error-primary/10"
-                            >
-                                <LogOut01 className="size-4 shrink-0 text-fg-error-secondary" />
-                                <span className="font-semibold">Log out</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                            )}
+                            {!isCollapsed && <ChevronRight className="size-4 shrink-0 text-fg-quaternary" />}
+                        </AriaButton>
+                        <Dropdown.Popover
+                            placement={isCollapsed ? "right bottom" : "top right"}
+                            className="w-[230px] rounded-b-xl bg-secondary_alt"
+                        >
+                            <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
+                                <div className="flex items-center gap-3 px-3 py-2.5 select-none border-b border-secondary/50">
+                                    <Avatar size="sm" initials={initials} alt={displayName} />
+                                    <div className="min-w-0 flex-1 leading-tight">
+                                        <p className="truncate text-sm font-bold text-primary">{displayName}</p>
+                                        <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
+                                    </div>
+                                </div>
+                                <Dropdown.Item
+                                    onAction={() => router.push("/learn/upgrade")}
+                                >
+                                    <span className="text-amber-500 font-bold select-none text-base leading-none mr-2">✦</span>
+                                    <span className="font-semibold text-brand-secondary">Upgrade to Pro</span>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    onAction={() => router.push("/settings")}
+                                >
+                                    <span className="text-fg-quaternary text-base leading-none mr-2">⚙</span>
+                                    <span>Account & Settings</span>
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    onAction={() => router.push("/billing")}
+                                >
+                                    <span className="text-fg-quaternary text-base leading-none mr-2">💳</span>
+                                    <span>Billing details</span>
+                                </Dropdown.Item>
+                                <Dropdown.Separator />
+                                <Dropdown.Item
+                                    onAction={() => {
+                                        logout();
+                                        router.push("/login");
+                                    }}
+                                    className="text-error-primary hover:bg-error-primary/10 hover:text-error-primary_hover focus:bg-error-primary/10"
+                                >
+                                    <div className="flex items-center gap-2.5">
+                                        <LogOut01 className="size-4 shrink-0 text-fg-error-secondary" />
+                                        <span className="font-semibold">Log out</span>
+                                    </div>
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown.Popover>
+                    </Dropdown.Root>
                 </div>
             </aside>
         );

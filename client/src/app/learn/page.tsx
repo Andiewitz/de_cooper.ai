@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import {
     BookOpen01,
     Atom01,
+    Beaker01,
     Calculator,
     Code01,
     Globe01,
@@ -18,8 +19,6 @@ import {
 import { Badge } from "@/components/base/badges/badges";
 import { CircleProgressBar } from "@/components/base/progress-indicators/simple-circle";
 import { Avatar } from "@/components/base/avatar/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/providers/auth-provider";
 import OnboardingWizard from "@/components/onboarding-wizard";
 import { LearnDashboardLayout } from "@/components/learn/learn-dashboard-layout";
@@ -50,31 +49,31 @@ export const topics = [
     {
         id: "computer-science",
         title: "Computer Science",
-        description: "Algorithms, data structures, computational theory, and systems design. The engineering discipline of computational problem-solving.",
+        description: "Algorithms, complexity theory, data structures, and software engineering principles designed to scale.",
         icon: Code01,
-        accentBg: "bg-[#FEF7E0]",
-        accentGradient: "from-amber-400/20 to-orange-500/20",
-        accentIcon: "text-amber-600",
-        hoverRing: "hover:ring-amber-400/50",
-        hoverText: "group-hover:text-amber-600",
+        accentBg: "bg-[#FCE8E6]",
+        accentGradient: "from-red-400/20 to-rose-500/20",
+        accentIcon: "text-red-600",
+        hoverRing: "hover:ring-red-400/50",
+        hoverText: "group-hover:text-red-600",
     },
     {
         id: "chemistry",
         title: "Chemistry",
-        description: "Organic synthesis, molecular bonding, reaction kinetics, and thermochemistry. Understanding matter at its most fundamental level.",
-        icon: Lightbulb02,
-        accentBg: "bg-[#FCE8E6]",
-        accentGradient: "from-rose-400/20 to-red-500/20",
-        accentIcon: "text-rose-600",
-        hoverRing: "hover:ring-rose-400/50",
-        hoverText: "group-hover:text-rose-600",
+        description: "Molecular orbital theory, reaction kinetics, organic synthesis, and the physical chemistry of materials.",
+        icon: Beaker01,
+        accentBg: "bg-[#E8F0FE]",
+        accentGradient: "from-indigo-400/20 to-violet-500/20",
+        accentIcon: "text-indigo-600",
+        hoverRing: "hover:ring-indigo-400/50",
+        hoverText: "group-hover:text-indigo-600",
     },
     {
         id: "astronomy",
         title: "Astronomy",
-        description: "Stellar evolution, cosmological models, planetary dynamics, and the cosmic microwave background radiation.",
+        description: "Astrophysics, stellar evolution, cosmology, and the exploration of orbital dynamics and celestial bodies.",
         icon: Globe01,
-        accentBg: "bg-[#F3E8FF]",
+        accentBg: "bg-[#FDF2F8]",
         accentGradient: "from-pink-400/20 to-fuchsia-500/20",
         accentIcon: "text-pink-600",
         hoverRing: "hover:ring-pink-400/50",
@@ -107,13 +106,13 @@ interface StatCardProps {
 
 function StatCard({ icon: Icon, label, value, sublabel, className, iconClassName, children }: StatCardProps) {
     return (
-        <Card className={`p-4 text-center shadow-xs flex flex-col items-center justify-center relative overflow-hidden group ${className ?? ""}`}>
+        <div className={`rounded-2xl border border-secondary bg-primary p-4 text-center shadow-xs flex flex-col items-center justify-center relative overflow-hidden group ${className ?? ""}`}>
             {children}
             <Icon className={`size-7 mb-2 relative z-10 ${iconClassName ?? "text-tertiary"}`} />
             <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-quaternary mb-1 relative z-10">{label}</span>
             <span className="font-display text-display-xs font-bold text-primary relative z-10">{value}</span>
             <span className="text-xs text-quaternary mt-1 relative z-10">{sublabel}</span>
-        </Card>
+        </div>
     );
 }
 
@@ -128,36 +127,36 @@ function DashboardSkeleton() {
                 <div className="lg:col-span-8 space-y-10">
                     
                     {/* Hero Skeleton */}
-                    <Card className="p-8">
+                    <div className="rounded-2xl border border-secondary bg-primary p-8 shadow-xs">
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                             <div className="flex-1 space-y-4">
-                                <Skeleton className="h-4 w-28 rounded-full" />
-                                <Skeleton className="h-12 w-3/4 rounded-xl" />
+                                <div className="h-4 w-28 rounded-full bg-secondary animate-pulse" />
+                                <div className="h-12 w-3/4 rounded-xl bg-secondary animate-pulse" />
                                 <div className="space-y-2.5 mt-4">
-                                    <Skeleton className="h-4 w-full rounded-full bg-secondary/60" />
-                                    <Skeleton className="h-4 w-5/6 rounded-full bg-secondary/60" />
+                                    <div className="h-4 w-full rounded-full bg-secondary/60 animate-pulse" />
+                                    <div className="h-4 w-5/6 rounded-full bg-secondary/60 animate-pulse" />
                                 </div>
                             </div>
-                            <Skeleton className="size-28 rounded-full shrink-0" />
+                            <div className="size-28 rounded-full bg-secondary animate-pulse shrink-0" />
                         </div>
-                    </Card>
+                    </div>
 
                     {/* Module Cards Skeleton */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3">
                             <div className="w-0.5 h-5 bg-brand-solid rounded-full" />
-                            <Skeleton className="h-4 w-44 rounded-full" />
+                            <div className="h-4 w-44 rounded-full bg-secondary animate-pulse" />
                         </div>
                         <div className="space-y-4">
                             {[1, 2, 3, 4].map((i) => (
-                                <Card key={i} className="p-6 flex items-center gap-6">
-                                    <Skeleton className="size-16 rounded-xl shrink-0" />
+                                <div key={i} className="rounded-2xl border border-secondary bg-primary p-6 flex items-center gap-6 shadow-xs">
+                                    <div className="size-16 rounded-xl bg-secondary animate-pulse shrink-0" />
                                     <div className="flex-1 space-y-2.5">
-                                        <Skeleton className="h-5 w-36 rounded-lg" />
-                                        <Skeleton className="h-4 w-5/6 max-w-xl rounded-full bg-secondary/60" />
+                                        <div className="h-5 w-36 rounded-lg bg-secondary animate-pulse" />
+                                        <div className="h-4 w-5/6 max-w-xl rounded-full bg-secondary/60 animate-pulse" />
                                     </div>
-                                    <Skeleton className="h-8 w-20 rounded-full bg-secondary/40 shrink-0" />
-                                </Card>
+                                    <div className="h-8 w-20 rounded-full bg-secondary/40 animate-pulse shrink-0" />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -165,30 +164,30 @@ function DashboardSkeleton() {
 
                 {/* Sidebar Skeleton */}
                 <div className="lg:col-span-4 space-y-6">
-                    <Skeleton className="h-8 w-40 rounded-lg" />
-                    <Card className="p-4 flex items-center gap-4">
-                        <Skeleton className="size-12 rounded-full shrink-0" />
+                    <div className="h-8 w-40 rounded-lg bg-secondary animate-pulse" />
+                    <div className="rounded-2xl border border-secondary bg-primary p-4 flex items-center gap-4 shadow-xs">
+                        <div className="size-12 rounded-full bg-secondary animate-pulse shrink-0" />
                         <div className="space-y-2 flex-1">
-                            <Skeleton className="h-4 w-28 rounded-lg" />
-                            <Skeleton className="h-4 w-20 rounded-full bg-secondary/40" />
+                            <div className="h-4 w-28 rounded-lg bg-secondary animate-pulse" />
+                            <div className="h-4 w-20 rounded-full bg-secondary/40 animate-pulse" />
                         </div>
-                    </Card>
-                    <Card className="p-6 flex flex-col items-center gap-4">
-                        <Skeleton className="size-28 rounded-full border-4 border-secondary/40 bg-transparent" />
-                        <Skeleton className="h-4 w-24 rounded-full" />
-                        <Skeleton className="h-3 w-40 rounded-full bg-secondary/40" />
-                    </Card>
+                    </div>
+                    <div className="rounded-2xl border border-secondary bg-primary p-6 flex flex-col items-center gap-4 shadow-xs">
+                        <div className="size-28 rounded-full border-4 border-secondary/40 bg-transparent animate-pulse" />
+                        <div className="h-4 w-24 rounded-full bg-secondary animate-pulse" />
+                        <div className="h-3 w-40 rounded-full bg-secondary/40 animate-pulse" />
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <Card className="p-4 space-y-2 flex flex-col items-center">
-                            <Skeleton className="h-6 w-6 rounded" />
-                            <Skeleton className="h-8 w-10 rounded-lg" />
-                            <Skeleton className="h-3 w-16 rounded-full bg-secondary/40" />
-                        </Card>
-                        <Card className="p-4 space-y-2 flex flex-col items-center">
-                            <Skeleton className="h-6 w-6 rounded" />
-                            <Skeleton className="h-8 w-10 rounded-lg" />
-                            <Skeleton className="h-3 w-16 rounded-full bg-secondary/40" />
-                        </Card>
+                        <div className="rounded-2xl border border-secondary bg-primary p-4 space-y-2 flex flex-col items-center shadow-xs">
+                            <div className="h-6 w-6 rounded bg-secondary animate-pulse" />
+                            <div className="h-8 w-10 rounded-lg bg-secondary animate-pulse" />
+                            <div className="h-3 w-16 rounded-full bg-secondary/40 animate-pulse" />
+                        </div>
+                        <div className="rounded-2xl border border-secondary bg-primary p-4 space-y-2 flex flex-col items-center shadow-xs">
+                            <div className="h-6 w-6 rounded bg-secondary animate-pulse" />
+                            <div className="h-8 w-10 rounded-lg bg-secondary animate-pulse" />
+                            <div className="h-3 w-16 rounded-full bg-secondary/40 animate-pulse" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -361,7 +360,7 @@ export default function LearnPage() {
                         </h3>
 
                         {/* ── Profile Snippet ── */}
-                        <Card className="p-4 flex items-center gap-4">
+                        <div className="rounded-2xl border border-secondary bg-primary p-4 flex items-center gap-4 shadow-xs">
                             <Avatar size="lg" initials={initials} alt={displayName} className="ring-2 ring-brand-secondary/30 shadow-inner" />
                             <div className="min-w-0">
                                 <p className="font-bold text-sm text-primary truncate">{displayName}</p>
@@ -369,10 +368,10 @@ export default function LearnPage() {
                                     STEM Explorer
                                 </Badge>
                             </div>
-                        </Card>
+                        </div>
 
                         {/* ── Progress Telemetry ── */}
-                        <Card className="p-6 shadow-md text-center relative overflow-hidden">
+                        <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-md text-center relative overflow-hidden">
                             {/* Subtle grid texture */}
                             <div
                                 className="absolute inset-0 pointer-events-none opacity-[0.04]"
@@ -388,7 +387,7 @@ export default function LearnPage() {
                                 <p className="text-sm font-bold text-brand-secondary">0% complete</p>
                                 <p className="mt-1 text-xs text-quaternary">Start lessons to advance your standing</p>
                             </div>
-                        </Card>
+                        </div>
 
                         {/* ── Stats Grid ── */}
                         <div className="grid grid-cols-2 gap-4">
@@ -410,7 +409,7 @@ export default function LearnPage() {
                         </div>
 
                         {/* ── Learning Path Trajectory ── */}
-                        <Card className="p-6 shadow-xs relative overflow-hidden">
+                        <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-xs relative overflow-hidden">
                             {/* Subtle grid texture */}
                             <div
                                 className="absolute inset-0 pointer-events-none opacity-[0.03]"
@@ -462,7 +461,7 @@ export default function LearnPage() {
                                     </div>
                                 </div>
                             </div>
-                        </Card>
+                        </div>
                     </aside>
 
                 </div>
