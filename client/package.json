@@ -10,6 +10,8 @@
     },
     "dependencies": {
         "@internationalized/date": "^3.12.1",
+        "@radix-ui/react-collapsible": "^1.1.12",
+        "@radix-ui/react-dropdown-menu": "^2.1.16",
         "@react-aria/interactions": "^3.28.0",
         "@react-aria/utils": "^3.34.0",
         "@react-stately/collections": "^3.13.0",
