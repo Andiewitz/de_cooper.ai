@@ -1,12 +1,9 @@
 "use client";
 
-import type { ComponentType, ReactNode, SVGProps } from "react";
+import type { ReactNode } from "react";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import * as Collapsible from "@radix-ui/react-collapsible";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
     Atom01,
     Beaker01,
@@ -29,6 +26,20 @@ import { Avatar } from "@/components/base/avatar/avatar";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
 import { Tooltip } from "@/components/base/tooltip/tooltip";
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+    Collapsible,
+    CollapsibleTrigger,
+    CollapsibleContent,
+} from "@/components/ui/collapsible";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/providers/auth-provider";
 import { cx } from "@/utils/cx";
 
@@ -106,8 +117,8 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         isCollapsed ? "flex-col justify-center gap-2 px-2" : "justify-between gap-2 px-4",
                     )}
                 >
-                    <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
                                 className={cx(
@@ -128,38 +139,31 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                     <ChevronRight className="size-4 shrink-0 text-fg-quaternary transition duration-150" />
                                 )}
                             </button>
-                        </DropdownMenu.Trigger>
-                        <DropdownMenu.Portal>
-                            <DropdownMenu.Content
-                                className="z-50 min-w-[210px] rounded-xl border border-secondary/60 bg-primary p-1.5 shadow-lg animate-in fade-in slide-in-from-top-2 duration-150 focus:outline-none"
-                                align="start"
-                                side={isCollapsed ? "right" : "bottom"}
-                                sideOffset={8}
-                            >
-                                <DropdownMenu.Label className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-quaternary/60">
-                                    Switch Workspaces
-                                </DropdownMenu.Label>
-                                {WORKSPACES.map((ws) => (
-                                    <DropdownMenu.Item
-                                        key={ws}
-                                        onClick={() => setActiveWorkspace(ws)}
-                                        className={cx(
-                                            "flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-secondary outline-none hover:bg-primary_hover hover:text-primary transition focus:bg-primary_hover",
-                                            ws === activeWorkspace ? "font-semibold text-primary bg-secondary/30" : ""
-                                        )}
-                                    >
-                                        <div className="flex size-6 shrink-0 items-center justify-center rounded bg-secondary/80 text-xs font-bold text-secondary">
-                                            {ws[0]}
-                                        </div>
-                                        <span className="flex-1 truncate">{ws}</span>
-                                        {ws === activeWorkspace && (
-                                            <span className="text-brand-solid font-bold text-xs">✓</span>
-                                        )}
-                                    </DropdownMenu.Item>
-                                ))}
-                            </DropdownMenu.Content>
-                        </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="start"
+                            side={isCollapsed ? "right" : "bottom"}
+                        >
+                            <DropdownMenuLabel>Switch Workspaces</DropdownMenuLabel>
+                            {WORKSPACES.map((ws) => (
+                                <DropdownMenuItem
+                                    key={ws}
+                                    onClick={() => setActiveWorkspace(ws)}
+                                    className={cx(
+                                        ws === activeWorkspace ? "font-semibold text-primary bg-secondary/30" : ""
+                                    )}
+                                >
+                                    <div className="flex size-6 shrink-0 items-center justify-center rounded bg-secondary/80 text-xs font-bold text-secondary">
+                                        {ws[0]}
+                                    </div>
+                                    <span className="flex-1 truncate">{ws}</span>
+                                    {ws === activeWorkspace && (
+                                        <span className="text-brand-solid font-bold text-xs">✓</span>
+                                    )}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     {!forceExpanded && (
                         <Button
@@ -191,15 +195,15 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                     </Link>
 
                     {/* Collapsible Topics Accordion */}
-                    <Collapsible.Root
+                    <Collapsible
                         open={isCollapsed ? false : topicsOpen}
                         onOpenChange={setTopicsOpen}
                         className="w-full"
                     >
                         {isCollapsed ? (
                             // Collapsed Popover Trigger for Topics
-                            <DropdownMenu.Root>
-                                <DropdownMenu.Trigger asChild>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
                                     <button
                                         type="button"
                                         className={cx(
@@ -209,43 +213,37 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                     >
                                         <Beaker01 className={cx("size-5 shrink-0 transition-colors", isAnyTopicActive ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
                                     </button>
-                                </DropdownMenu.Trigger>
-                                <DropdownMenu.Portal>
-                                    <DropdownMenu.Content
-                                        className="z-50 min-w-[180px] rounded-xl border border-secondary/60 bg-primary p-1.5 shadow-lg animate-in fade-in slide-in-from-left-2 duration-150 focus:outline-none"
-                                        align="start"
-                                        side="right"
-                                        sideOffset={8}
-                                    >
-                                        <DropdownMenu.Label className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-quaternary/60">
-                                            STEM Modules
-                                        </DropdownMenu.Label>
-                                        {TOPIC_ITEMS.map((topic) => {
-                                            const TopicIcon = topic.icon;
-                                            return (
-                                                <DropdownMenu.Item
-                                                    key={topic.id}
-                                                    onClick={() => {
-                                                        router.push(`/learn/${topic.id}`);
-                                                        setMobileNavOpen(false);
-                                                    }}
-                                                    className={cx(
-                                                        "flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm outline-none transition focus:bg-primary_hover",
-                                                        isTopicRouteActive(topic.id) ? "font-semibold text-brand-secondary bg-brand-primary/40" : "text-secondary hover:text-primary"
-                                                    )}
-                                                >
-                                                    <TopicIcon className="size-4 shrink-0 text-fg-quaternary" />
-                                                    <span>{topic.label}</span>
-                                                </DropdownMenu.Item>
-                                            );
-                                        })}
-                                    </DropdownMenu.Content>
-                                </DropdownMenu.Portal>
-                            </DropdownMenu.Root>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    align="start"
+                                    side="right"
+                                    className="min-w-[180px]"
+                                >
+                                    <DropdownMenuLabel>STEM Modules</DropdownMenuLabel>
+                                    {TOPIC_ITEMS.map((topic) => {
+                                        const TopicIcon = topic.icon;
+                                        return (
+                                            <DropdownMenuItem
+                                                key={topic.id}
+                                                onClick={() => {
+                                                    router.push(`/learn/${topic.id}`);
+                                                    setMobileNavOpen(false);
+                                                }}
+                                                className={cx(
+                                                    isTopicRouteActive(topic.id) ? "font-semibold text-brand-secondary bg-brand-primary/40" : ""
+                                                )}
+                                            >
+                                                <TopicIcon className="size-4 shrink-0 text-fg-quaternary" />
+                                                <span>{topic.label}</span>
+                                            </DropdownMenuItem>
+                                        );
+                                    })}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         ) : (
                             // Expanded Accordion Trigger
                             <>
-                                <Collapsible.Trigger asChild>
+                                <CollapsibleTrigger asChild>
                                     <button
                                         type="button"
                                         className={cx(
@@ -264,44 +262,32 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                             )}
                                         />
                                     </button>
-                                </Collapsible.Trigger>
-                                <AnimatePresence initial={false}>
-                                    {topicsOpen && (
-                                        <Collapsible.Content asChild>
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: "auto", opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.2, ease: "easeInOut" }}
-                                                className="overflow-hidden pl-3"
-                                            >
-                                                <div className="mt-1 border-l-2 border-secondary/80 pl-2.5 space-y-1">
-                                                    {TOPIC_ITEMS.map((topic) => {
-                                                        const TopicIcon = topic.icon;
-                                                        const active = isTopicRouteActive(topic.id);
-                                                        return (
-                                                            <Link
-                                                                key={topic.id}
-                                                                href={`/learn/${topic.id}`}
-                                                                onClick={() => setMobileNavOpen(false)}
-                                                                className={cx(
-                                                                    "group/sub flex items-center gap-2 rounded-md p-1.5 text-xs select-none transition duration-150",
-                                                                    active ? "bg-brand-primary text-brand-secondary font-bold" : "hover:bg-primary_hover text-secondary hover:text-primary"
-                                                                )}
-                                                            >
-                                                                <TopicIcon className={cx("size-4 shrink-0 transition-colors", active ? "text-brand-secondary" : "text-fg-quaternary group-hover/sub:text-fg-quaternary_hover")} />
-                                                                <span>{topic.label}</span>
-                                                            </Link>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </motion.div>
-                                        </Collapsible.Content>
-                                    )}
-                                </AnimatePresence>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent isOpen={topicsOpen} className="pl-3">
+                                    <div className="mt-1 border-l-2 border-secondary/80 pl-2.5 space-y-1">
+                                        {TOPIC_ITEMS.map((topic) => {
+                                            const TopicIcon = topic.icon;
+                                            const active = isTopicRouteActive(topic.id);
+                                            return (
+                                                <Link
+                                                    key={topic.id}
+                                                    href={`/learn/${topic.id}`}
+                                                    onClick={() => setMobileNavOpen(false)}
+                                                    className={cx(
+                                                        "group/sub flex items-center gap-2 rounded-md p-1.5 text-xs select-none transition duration-150",
+                                                        active ? "bg-brand-primary text-brand-secondary font-bold" : "hover:bg-primary_hover text-secondary hover:text-primary"
+                                                    )}
+                                                >
+                                                    <TopicIcon className={cx("size-4 shrink-0 transition-colors", active ? "text-brand-secondary" : "text-fg-quaternary group-hover/sub:text-fg-quaternary_hover")} />
+                                                    <span>{topic.label}</span>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </CollapsibleContent>
                             </>
                         )}
-                    </Collapsible.Root>
+                    </Collapsible>
 
                     {/* Calendar */}
                     <Link
@@ -363,8 +349,8 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
 
                 {/* ── Footer: User Profile Dropdown ── */}
                 <div className={cx("border-t border-secondary p-3", isCollapsed && "flex flex-col items-center gap-2")}>
-                    <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                             <button
                                 type="button"
                                 className={cx(
@@ -381,48 +367,45 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                 )}
                                 {!isCollapsed && <ChevronRight className="size-4 shrink-0 text-fg-quaternary" />}
                             </button>
-                        </DropdownMenu.Trigger>
-                        <DropdownMenu.Portal>
-                            <DropdownMenu.Content
-                                className="z-50 min-w-[230px] rounded-2xl border border-secondary/60 bg-primary p-1.5 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-150 focus:outline-none"
-                                align={isCollapsed ? "start" : "end"}
-                                side={isCollapsed ? "right" : "top"}
-                                sideOffset={8}
-                            >
-                                <div className="flex items-center gap-3 px-3 py-2.5 select-none">
-                                    <Avatar size="sm" initials={initials} alt={displayName} />
-                                    <div className="min-w-0 flex-1 leading-tight">
-                                        <p className="truncate text-sm font-bold text-primary">{displayName}</p>
-                                        <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
-                                    </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align={isCollapsed ? "start" : "end"}
+                            side={isCollapsed ? "right" : "top"}
+                            className="min-w-[230px] rounded-2xl shadow-xl"
+                        >
+                            <div className="flex items-center gap-3 px-3 py-2.5 select-none">
+                                <Avatar size="sm" initials={initials} alt={displayName} />
+                                <div className="min-w-0 flex-1 leading-tight">
+                                    <p className="truncate text-sm font-bold text-primary">{displayName}</p>
+                                    <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
                                 </div>
-                                <DropdownMenu.Separator className="my-1.5 h-px bg-secondary" />
-                                <DropdownMenu.Item className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm text-secondary outline-none hover:bg-primary_hover hover:text-primary transition focus:bg-primary_hover">
-                                    <span className="text-amber-500 font-bold select-none text-base leading-none">✦</span>
-                                    <span className="font-semibold text-brand-secondary">Upgrade to Pro</span>
-                                </DropdownMenu.Item>
-                                <DropdownMenu.Item className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm text-secondary outline-none hover:bg-primary_hover hover:text-primary transition focus:bg-primary_hover">
-                                    <span className="text-fg-quaternary text-base leading-none">⚙</span>
-                                    <span>Account & Settings</span>
-                                </DropdownMenu.Item>
-                                <DropdownMenu.Item className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm text-secondary outline-none hover:bg-primary_hover hover:text-primary transition focus:bg-primary_hover">
-                                    <span className="text-fg-quaternary text-base leading-none">💳</span>
-                                    <span>Billing details</span>
-                                </DropdownMenu.Item>
-                                <DropdownMenu.Separator className="my-1.5 h-px bg-secondary" />
-                                <DropdownMenu.Item
-                                    onClick={() => {
-                                        logout();
-                                        router.push("/login");
-                                    }}
-                                    className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm text-error-primary outline-none hover:bg-error-primary/10 hover:text-error-primary_hover transition focus:bg-error-primary/10"
-                                >
-                                    <LogOut01 className="size-4 shrink-0 text-fg-error-secondary" />
-                                    <span className="font-semibold">Log out</span>
-                                </DropdownMenu.Item>
-                            </DropdownMenu.Content>
-                        </DropdownMenu.Portal>
-                    </DropdownMenu.Root>
+                            </div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <span className="text-amber-500 font-bold select-none text-base leading-none">✦</span>
+                                <span className="font-semibold text-brand-secondary">Upgrade to Pro</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <span className="text-fg-quaternary text-base leading-none">⚙</span>
+                                <span>Account & Settings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <span className="text-fg-quaternary text-base leading-none">💳</span>
+                                <span>Billing details</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    logout();
+                                    router.push("/login");
+                                }}
+                                className="text-error-primary hover:bg-error-primary/10 hover:text-error-primary_hover focus:bg-error-primary/10"
+                            >
+                                <LogOut01 className="size-4 shrink-0 text-fg-error-secondary" />
+                                <span className="font-semibold">Log out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </aside>
         );

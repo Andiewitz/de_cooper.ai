@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentType, SVGProps } from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -17,6 +18,8 @@ import {
 import { Badge } from "@/components/base/badges/badges";
 import { CircleProgressBar } from "@/components/base/progress-indicators/simple-circle";
 import { Avatar } from "@/components/base/avatar/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/providers/auth-provider";
 import OnboardingWizard from "@/components/onboarding-wizard";
 import { LearnDashboardLayout } from "@/components/learn/learn-dashboard-layout";
@@ -90,6 +93,30 @@ export const topics = [
     },
 ];
 
+/* ────────────────────────── Stat Card ───────────────── */
+
+interface StatCardProps {
+    icon: ComponentType<SVGProps<SVGSVGElement>>;
+    label: string;
+    value: string | number;
+    sublabel: string;
+    className?: string;
+    iconClassName?: string;
+    children?: React.ReactNode;
+}
+
+function StatCard({ icon: Icon, label, value, sublabel, className, iconClassName, children }: StatCardProps) {
+    return (
+        <Card className={`p-4 text-center shadow-xs flex flex-col items-center justify-center relative overflow-hidden group ${className ?? ""}`}>
+            {children}
+            <Icon className={`size-7 mb-2 relative z-10 ${iconClassName ?? "text-tertiary"}`} />
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-quaternary mb-1 relative z-10">{label}</span>
+            <span className="font-display text-display-xs font-bold text-primary relative z-10">{value}</span>
+            <span className="text-xs text-quaternary mt-1 relative z-10">{sublabel}</span>
+        </Card>
+    );
+}
+
 /* ────────────────────────── Loading Skeletons ───────────────── */
 
 function DashboardSkeleton() {
@@ -101,67 +128,67 @@ function DashboardSkeleton() {
                 <div className="lg:col-span-8 space-y-10">
                     
                     {/* Hero Skeleton */}
-                    <div className="rounded-2xl border border-secondary bg-primary/50 p-8 animate-pulse">
+                    <Card className="p-8">
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                             <div className="flex-1 space-y-4">
-                                <div className="h-4 w-28 rounded-full bg-secondary" />
-                                <div className="h-12 w-3/4 rounded-xl bg-secondary" />
+                                <Skeleton className="h-4 w-28 rounded-full" />
+                                <Skeleton className="h-12 w-3/4 rounded-xl" />
                                 <div className="space-y-2.5 mt-4">
-                                    <div className="h-4 w-full rounded-full bg-secondary/60" />
-                                    <div className="h-4 w-5/6 rounded-full bg-secondary/60" />
+                                    <Skeleton className="h-4 w-full rounded-full bg-secondary/60" />
+                                    <Skeleton className="h-4 w-5/6 rounded-full bg-secondary/60" />
                                 </div>
                             </div>
-                            <div className="size-28 rounded-full bg-secondary shrink-0" />
+                            <Skeleton className="size-28 rounded-full shrink-0" />
                         </div>
-                    </div>
+                    </Card>
 
                     {/* Module Cards Skeleton */}
-                    <div className="space-y-6 animate-pulse">
+                    <div className="space-y-6">
                         <div className="flex items-center gap-3">
                             <div className="w-0.5 h-5 bg-brand-solid rounded-full" />
-                            <div className="h-4 w-44 rounded-full bg-secondary" />
+                            <Skeleton className="h-4 w-44 rounded-full" />
                         </div>
                         <div className="space-y-4">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="rounded-xl border border-secondary/50 p-6 flex items-center gap-6">
-                                    <div className="size-16 rounded-xl bg-secondary shrink-0" />
+                                <Card key={i} className="p-6 flex items-center gap-6">
+                                    <Skeleton className="size-16 rounded-xl shrink-0" />
                                     <div className="flex-1 space-y-2.5">
-                                        <div className="h-5 w-36 rounded-lg bg-secondary" />
-                                        <div className="h-4 w-5/6 max-w-xl rounded-full bg-secondary/60" />
+                                        <Skeleton className="h-5 w-36 rounded-lg" />
+                                        <Skeleton className="h-4 w-5/6 max-w-xl rounded-full bg-secondary/60" />
                                     </div>
-                                    <div className="h-8 w-20 rounded-full bg-secondary/40 shrink-0" />
-                                </div>
+                                    <Skeleton className="h-8 w-20 rounded-full bg-secondary/40 shrink-0" />
+                                </Card>
                             ))}
                         </div>
                     </div>
                 </div>
 
                 {/* Sidebar Skeleton */}
-                <div className="lg:col-span-4 space-y-6 animate-pulse">
-                    <div className="h-8 w-40 rounded-lg bg-secondary" />
-                    <div className="rounded-xl border border-secondary/50 p-4 flex items-center gap-4">
-                        <div className="size-12 rounded-full bg-secondary shrink-0" />
+                <div className="lg:col-span-4 space-y-6">
+                    <Skeleton className="h-8 w-40 rounded-lg" />
+                    <Card className="p-4 flex items-center gap-4">
+                        <Skeleton className="size-12 rounded-full shrink-0" />
                         <div className="space-y-2 flex-1">
-                            <div className="h-4 w-28 rounded-lg bg-secondary" />
-                            <div className="h-4 w-20 rounded-full bg-secondary/40" />
+                            <Skeleton className="h-4 w-28 rounded-lg" />
+                            <Skeleton className="h-4 w-20 rounded-full bg-secondary/40" />
                         </div>
-                    </div>
-                    <div className="rounded-xl border border-secondary/50 p-6 flex flex-col items-center gap-4">
-                        <div className="size-28 rounded-full border-4 border-secondary/40" />
-                        <div className="h-4 w-24 rounded-full bg-secondary" />
-                        <div className="h-3 w-40 rounded-full bg-secondary/40" />
-                    </div>
+                    </Card>
+                    <Card className="p-6 flex flex-col items-center gap-4">
+                        <Skeleton className="size-28 rounded-full border-4 border-secondary/40 bg-transparent" />
+                        <Skeleton className="h-4 w-24 rounded-full" />
+                        <Skeleton className="h-3 w-40 rounded-full bg-secondary/40" />
+                    </Card>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="rounded-xl border border-secondary/50 p-4 space-y-2 flex flex-col items-center">
-                            <div className="h-6 w-6 rounded bg-secondary" />
-                            <div className="h-8 w-10 rounded-lg bg-secondary" />
-                            <div className="h-3 w-16 rounded-full bg-secondary/40" />
-                        </div>
-                        <div className="rounded-xl border border-secondary/50 p-4 space-y-2 flex flex-col items-center">
-                            <div className="h-6 w-6 rounded bg-secondary" />
-                            <div className="h-8 w-10 rounded-lg bg-secondary" />
-                            <div className="h-3 w-16 rounded-full bg-secondary/40" />
-                        </div>
+                        <Card className="p-4 space-y-2 flex flex-col items-center">
+                            <Skeleton className="h-6 w-6 rounded" />
+                            <Skeleton className="h-8 w-10 rounded-lg" />
+                            <Skeleton className="h-3 w-16 rounded-full bg-secondary/40" />
+                        </Card>
+                        <Card className="p-4 space-y-2 flex flex-col items-center">
+                            <Skeleton className="h-6 w-6 rounded" />
+                            <Skeleton className="h-8 w-10 rounded-lg" />
+                            <Skeleton className="h-3 w-16 rounded-full bg-secondary/40" />
+                        </Card>
                     </div>
                 </div>
             </div>
@@ -334,7 +361,7 @@ export default function LearnPage() {
                         </h3>
 
                         {/* ── Profile Snippet ── */}
-                        <div className="rounded-xl border border-secondary/50 bg-primary/50 backdrop-blur-sm p-4 shadow-xs flex items-center gap-4">
+                        <Card className="p-4 flex items-center gap-4">
                             <Avatar size="lg" initials={initials} alt={displayName} className="ring-2 ring-brand-secondary/30 shadow-inner" />
                             <div className="min-w-0">
                                 <p className="font-bold text-sm text-primary truncate">{displayName}</p>
@@ -342,10 +369,10 @@ export default function LearnPage() {
                                     STEM Explorer
                                 </Badge>
                             </div>
-                        </div>
+                        </Card>
 
                         {/* ── Progress Telemetry ── */}
-                        <div className="rounded-xl border border-secondary/50 bg-primary/50 backdrop-blur-sm p-6 shadow-md text-center relative overflow-hidden">
+                        <Card className="p-6 shadow-md text-center relative overflow-hidden">
                             {/* Subtle grid texture */}
                             <div
                                 className="absolute inset-0 pointer-events-none opacity-[0.04]"
@@ -361,27 +388,29 @@ export default function LearnPage() {
                                 <p className="text-sm font-bold text-brand-secondary">0% complete</p>
                                 <p className="mt-1 text-xs text-quaternary">Start lessons to advance your standing</p>
                             </div>
-                        </div>
+                        </Card>
 
                         {/* ── Stats Grid ── */}
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="rounded-xl border border-secondary/50 bg-primary/50 backdrop-blur-sm p-4 text-center shadow-xs flex flex-col items-center justify-center">
-                                <Trophy01 className="size-7 mb-2 text-tertiary" />
-                                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-quaternary mb-1">Completed</span>
-                                <span className="font-display text-display-xs font-bold text-primary">0</span>
-                                <span className="text-xs text-quaternary mt-1">lessons finished</span>
-                            </div>
-                            <div className="rounded-xl border border-secondary/50 bg-primary/50 backdrop-blur-sm p-4 text-center shadow-xs flex flex-col items-center justify-center relative overflow-hidden group">
+                            <StatCard
+                                icon={Trophy01}
+                                label="Completed"
+                                value={0}
+                                sublabel="lessons finished"
+                            />
+                            <StatCard
+                                icon={Zap}
+                                label="Streak"
+                                value={user?.current_streak ?? 0}
+                                sublabel="days active"
+                                iconClassName="text-brand-secondary"
+                            >
                                 <div className="absolute inset-0 bg-brand-primary opacity-0 group-hover:opacity-100 transition-opacity z-0" />
-                                <Zap className="size-7 mb-2 text-brand-secondary relative z-10" />
-                                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-quaternary mb-1 relative z-10">Streak</span>
-                                <span className="font-display text-display-xs font-bold text-primary relative z-10">{user?.current_streak ?? 0}</span>
-                                <span className="text-xs text-quaternary mt-1 relative z-10">days active</span>
-                            </div>
+                            </StatCard>
                         </div>
 
                         {/* ── Learning Path Trajectory ── */}
-                        <div className="rounded-xl border border-secondary/50 bg-primary/50 backdrop-blur-sm p-6 shadow-xs relative overflow-hidden">
+                        <Card className="p-6 shadow-xs relative overflow-hidden">
                             {/* Subtle grid texture */}
                             <div
                                 className="absolute inset-0 pointer-events-none opacity-[0.03]"
@@ -433,7 +462,7 @@ export default function LearnPage() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </Card>
                     </aside>
 
                 </div>
