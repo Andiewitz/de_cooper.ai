@@ -165,7 +165,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                 </AriaButton>
                                 <Dropdown.Popover
                                     placement="right top"
-                                    className="z-50 w-56 rounded-b-xl bg-secondary_alt"
+                                    className="z-[9999] w-56 rounded-b-xl bg-secondary_alt"
                                 >
                                     <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
                                         <Dropdown.SectionHeader className="px-4 pt-1.5 pb-0.5 text-xs font-semibold text-brand-secondary">
@@ -331,7 +331,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         </AriaButton>
                         <Dropdown.Popover
                             placement={isCollapsed ? "right bottom" : "top right"}
-                            className="z-50 w-[230px] rounded-b-xl bg-secondary_alt"
+                            className="z-[9999] w-[230px] rounded-b-xl bg-secondary_alt"
                         >
                             <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
                                 <div className="flex items-center gap-3 px-3 py-2.5 select-none border-b border-secondary/50">
