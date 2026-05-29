@@ -46,11 +46,6 @@ const TOPIC_ITEMS = [
     { id: "general", label: "Ask Anything", icon: BookOpen01 },
 ];
 
-const WORKSPACES = [
-    "Personal Workspace",
-    "Caltech Physics Lab",
-    "MIT Chem Study Group",
-];
 
 interface LearnDashboardLayoutProps {
     children: ReactNode;
@@ -65,7 +60,6 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
     const [topicsOpen, setTopicsOpen] = useState(true);
-    const [activeWorkspace, setActiveWorkspace] = useState(WORKSPACES[0]);
 
     useEffect(() => {
         const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
@@ -107,50 +101,21 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         isCollapsed ? "flex-col justify-center gap-2 px-2" : "justify-between gap-2 px-4",
                     )}
                 >
-                    <Dropdown.Root>
-                        <AriaButton
-                            className={cx(
-                                "flex w-full items-center gap-2.5 rounded-lg border border-secondary bg-primary p-2 text-left hover:bg-primary_hover transition select-none cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-solid/40",
-                                isCollapsed ? "justify-center" : ""
-                            )}
-                        >
+                    {isCollapsed ? (
+                        <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-brand-solid text-white font-bold text-sm shadow-sm select-none">
+                            C
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2.5 px-1 select-none min-w-0">
                             <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-brand-solid text-white font-bold text-sm shadow-sm">
-                                {activeWorkspace[0]}
+                                C
                             </div>
-                            {!isCollapsed && (
-                                <div className="grid flex-1 leading-tight min-w-0">
-                                    <span className="truncate text-sm font-bold text-primary">{activeWorkspace}</span>
-                                    <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-quaternary/70">STEM Workspace</span>
-                                </div>
-                            )}
-                            {!isCollapsed && (
-                                <ChevronRight className="size-4 shrink-0 text-fg-quaternary transition duration-150" />
-                            )}
-                        </AriaButton>
-                        <Dropdown.Popover
-                            placement={isCollapsed ? "right top" : "bottom left"}
-                            className="w-60 rounded-b-xl bg-secondary_alt"
-                        >
-                            <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
-                                <Dropdown.SectionHeader className="px-4 pt-1.5 pb-0.5 text-xs font-semibold text-brand-secondary">
-                                    Switch Workspaces
-                                </Dropdown.SectionHeader>
-                                {WORKSPACES.map((ws) => (
-                                    <Dropdown.Item
-                                        key={ws}
-                                        id={ws}
-                                        onAction={() => setActiveWorkspace(ws)}
-                                        selectionIndicator={ws === activeWorkspace ? "checkmark" : "none"}
-                                    >
-                                        <div className="flex size-6 shrink-0 items-center justify-center rounded bg-secondary/80 text-xs font-bold text-secondary mr-2">
-                                            {ws[0]}
-                                        </div>
-                                        <span className="flex-1 truncate">{ws}</span>
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown.Root>
+                            <div className="grid leading-tight min-w-0">
+                                <span className="truncate text-sm font-bold text-primary">de Cooper</span>
+                                <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-quaternary/70">STEM Learning</span>
+                            </div>
+                        </div>
+                    )}
 
                     {!forceExpanded && (
                         <Button
@@ -200,7 +165,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                 </AriaButton>
                                 <Dropdown.Popover
                                     placement="right top"
-                                    className="w-56 rounded-b-xl bg-secondary_alt"
+                                    className="z-50 w-56 rounded-b-xl bg-secondary_alt"
                                 >
                                     <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
                                         <Dropdown.SectionHeader className="px-4 pt-1.5 pb-0.5 text-xs font-semibold text-brand-secondary">
@@ -366,7 +331,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         </AriaButton>
                         <Dropdown.Popover
                             placement={isCollapsed ? "right bottom" : "top right"}
-                            className="w-[230px] rounded-b-xl bg-secondary_alt"
+                            className="z-50 w-[230px] rounded-b-xl bg-secondary_alt"
                         >
                             <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
                                 <div className="flex items-center gap-3 px-3 py-2.5 select-none border-b border-secondary/50">
