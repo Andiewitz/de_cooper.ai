@@ -331,16 +331,16 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         </AriaButton>
                         <Dropdown.Popover
                             placement={isCollapsed ? "right bottom" : "top right"}
-                            className="z-[9999] w-[230px] rounded-b-xl bg-secondary_alt"
+                            className="z-[9999] w-[230px] rounded-xl bg-primary shadow-lg ring-1 ring-secondary overflow-hidden"
                         >
-                            <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
-                                <div className="flex items-center gap-3 px-3 py-2.5 select-none border-b border-secondary/50">
-                                    <Avatar size="sm" initials={initials} alt={displayName} />
-                                    <div className="min-w-0 flex-1 leading-tight">
-                                        <p className="truncate text-sm font-bold text-primary">{displayName}</p>
-                                        <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
-                                    </div>
+                            <div className="flex items-center gap-3 px-3.5 py-3 select-none border-b border-secondary bg-primary">
+                                <Avatar size="sm" initials={initials} alt={displayName} />
+                                <div className="min-w-0 flex-1 leading-tight">
+                                    <p className="truncate text-sm font-bold text-primary">{displayName}</p>
+                                    <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
                                 </div>
+                            </div>
+                            <Dropdown.Menu className="bg-primary">
                                 <Dropdown.Item
                                     onAction={() => router.push("/learn/upgrade")}
                                 >
