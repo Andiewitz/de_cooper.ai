@@ -93,8 +93,8 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
         const isCollapsed = forceExpanded ? false : collapsed;
 
         return (
-            <aside className="flex h-full w-full flex-col bg-primary relative overflow-visible">
-                {/* ── Header: Workspace Switcher Dropdown ── */}
+            <aside className="flex h-full w-full flex-col bg-primary">
+                {/* ── Header: App Branding ── */}
                 <div
                     className={cx(
                         "flex items-center border-b border-secondary py-4",
@@ -312,7 +312,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                 </nav>
 
                 {/* ── Footer: User Profile Dropdown ── */}
-                <div className={cx("border-t border-secondary p-3", isCollapsed && "flex flex-col items-center gap-2")}>
+                <div className={cx("relative border-t border-secondary p-3", isCollapsed && "flex flex-col items-center gap-2")}>
                     <Dropdown.Root>
                         <AriaButton
                             className={cx(
