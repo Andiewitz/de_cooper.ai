@@ -23,6 +23,8 @@
         "@tailwindcss/typography": "^0.5.19",
         "@untitledui/file-icons": "^0.0.9",
         "@untitledui/icons": "^0.0.22",
+        "@react-spectrum/provider": "3.11.1",
+        "react-is": "19.2.6",
         "embla-carousel-react": "^8.6.0",
         "framer-motion": "^12.39.0",
         "input-otp": "^1.4.2",
