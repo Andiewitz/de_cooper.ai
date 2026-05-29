@@ -34,13 +34,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "de_cooper.ai — Learn from Dr. Sheldon Cooper",
+    title: "de_study.ai — Premium AI STEM Tutor & Study Workspace",
     description:
-        "An AI-powered teaching platform with the personality of Dr. Sheldon Cooper. Animated explanations, visual math, and a tutor who's smarter than you.",
-    keywords: ["AI tutor", "Sheldon Cooper", "physics", "math", "learning", "education"],
+        "An AI-powered premium teaching platform and STEM study calendar workspace. Animated explanations, visual math diagrams, and precise flashcards.",
+    keywords: ["AI tutor", "study calendar", "physics", "math", "learning", "education", "flashcards"],
     openGraph: {
-        title: "de_cooper.ai",
-        description: "I cry because others are stupid, and that makes me sad.",
+        title: "de_study.ai",
+        description: "An uncompromising study calendar and spaced repetition ecosystem.",
         type: "website",
     },
 };

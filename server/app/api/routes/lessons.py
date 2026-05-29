@@ -22,7 +22,7 @@ async def create_lesson(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new lesson. Another student who thinks they can learn. How quaint."""
+    """Create a new lesson."""
     # Update user streak
     current_user.update_streak()
     
@@ -89,7 +89,7 @@ async def get_lesson(
     )
     lesson = result.scalar_one_or_none()
     if not lesson:
-        raise HTTPException(status_code=404, detail="Lesson not found. Much like your attention span.")
+        raise HTTPException(status_code=404, detail="Lesson not found.")
     return lesson
 
 
@@ -162,7 +162,7 @@ async def chat(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Send a message and get a streamed response from Dr. Cooper."""
+    """Send a message and get a streamed response from the AI tutor."""
     
     # Update user streak
     current_user.update_streak()
@@ -210,16 +210,16 @@ async def chat(
             full_response += chunk
             yield f"data: {json.dumps({'content': chunk})}\n\n"
 
-        # Save Sheldon's full response using a new database session
+        # Save assistant's full response using a new database session
         from app.core.database import async_session_factory
         
         async with async_session_factory() as session:
-            sheldon_msg = Message(
+            assistant_msg = Message(
                 lesson_id=lesson_id,
-                role="sheldon",
+                role="assistant",
                 content=full_response,
             )
-            session.add(sheldon_msg)
+            session.add(assistant_msg)
             await session.commit()
 
             # Detect ```flashcards blocks and save them

@@ -19,21 +19,21 @@ const STEPS = [
     { id: 4, title: "Goals", hint: "Why you're here" },
 ] as const;
 
-function getSheldonComment(step: number, data: Partial<OnboardingData>) {
+function getTutorComment(step: number, data: Partial<OnboardingData>) {
     if (step === 1) {
-        return "Ah, a fresh intellect. Let's confirm your illustrious name, shall we?";
+        return "Welcome to de_study.ai. Let's start by establishing your learning profile.";
     }
     if (step === 2) {
         const age = data.age;
-        if (age && age < 18) return "You're quite younger than my PhD, but enthusiasm is commendable.";
-        if (age && age > 65) return "A seasoned mind! Hopefully you still remember Schrödinger's cat.";
-        return "Age is just a number, much like the countless equations I enjoy.";
+        if (age && age < 18) return "Enthusiastic and ready to learn. Early starts lead to strong foundations.";
+        if (age && age > 65) return "A seasoned mind! Lifelong learning is the key to mental clarity.";
+        return "Academic calibration helps us curate the optimal path for your educational goals.";
     }
     if (step === 3) {
-        return "Occupation? Please specify, so I may gauge your intellectual baseline.";
+        return "Occupation helps tailor exercises and real-world contexts to your daily domain.";
     }
     if (step === 4) {
-        return "Lastly, why venture into de_cooper.ai? I hope for scholarly ambition, not mere curiosity.";
+        return "Understanding your study motivations ensures that we optimize your calendar schedule.";
     }
     return "";
 }
@@ -85,12 +85,12 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
             <div className="relative hidden w-[42%] flex-col justify-between overflow-hidden bg-brand-section p-10 lg:flex">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(254,240,138,0.15),transparent_50%)]" />
                 <div className="relative">
-                    <p className="font-logo text-sm font-black uppercase tracking-wider text-primary_on-brand">COOPER.AI</p>
+                    <p className="font-logo text-sm font-black uppercase tracking-wider text-primary_on-brand">STUDY.AI</p>
                     <h1 className="mt-6 font-display text-display-sm font-bold text-primary_on-brand">
                         Set up your learning profile
                     </h1>
                     <p className="mt-3 max-w-sm text-md text-tertiary_on-brand">
-                        A quick calibration so Dr. Cooper can tailor explanations to your level — without lowering standards.
+                        A quick calibration so our AI system can tailor study schedules and explanations to your background.
                     </p>
                 </div>
 
@@ -134,7 +134,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
             <div className="flex flex-1 flex-col justify-center px-6 py-10 sm:px-10 lg:px-16">
                 <div className="mx-auto w-full max-w-lg">
                     <div className="mb-8 lg:hidden">
-                        <p className="font-logo text-xs font-black uppercase tracking-wider text-brand-secondary">COOPER.AI</p>
+                        <p className="font-logo text-xs font-black uppercase tracking-wider text-brand-secondary">STUDY.AI</p>
                         <div className="mt-4 flex items-center justify-between gap-4">
                             <span className="text-sm font-medium text-secondary">
                                 Step {step} of {STEPS.length}
@@ -156,7 +156,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                                 <h2 className="font-display text-display-xs font-semibold text-primary">
                                     {STEPS[step - 1]?.title}
                                 </h2>
-                                <p className="mt-1 text-sm italic text-tertiary">{getSheldonComment(step, form)}</p>
+                                <p className="mt-1 text-sm italic text-tertiary">{getTutorComment(step, form)}</p>
                             </div>
                         </div>
 
@@ -227,7 +227,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                                     className="space-y-4"
                                 >
                                     <TextArea
-                                        label="Why are you using de_cooper.ai?"
+                                        label="Why are you using de_study.ai?"
                                         placeholder="Exam prep, curiosity, proving a point to a friend..."
                                         rows={4}
                                         value={form.onboarding_reason}

@@ -132,7 +132,7 @@ function groupMessagesToExchanges(messages: any[]): Exchange[] {
                 answer: "",
                 displayed: "",
             };
-        } else if (msg.role === "sheldon") {
+        } else if (msg.role === "sheldon" || msg.role === "assistant" || msg.role === "tutor") {
             if (currentExchange) {
                 currentExchange.answer = msg.content;
                 currentExchange.displayed = msg.content;
@@ -197,7 +197,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     // Premium input widget states
     const [showPlusMenu, setShowPlusMenu] = useState(false);
     const [showModelMenu, setShowModelMenu] = useState(false);
-    const [selectedModel, setSelectedModel] = useState("Sheldon 3.5 Flash");
+    const [selectedModel, setSelectedModel] = useState("Llama 3.1 Flash");
     const plusMenuRef = useRef<HTMLDivElement>(null);
     const modelMenuRef = useRef<HTMLDivElement>(null);
 
@@ -415,7 +415,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                         <div className="flex items-center gap-3 rounded-2xl border-2 border-secondary bg-primary p-2 opacity-50">
                             <input
                                 disabled
-                                placeholder="Connecting to Dr. Cooper..."
+                                placeholder="Connecting to Tutor..."
                                 className="flex-1 bg-transparent px-3 py-2 text-sm outline-none cursor-not-allowed"
                             />
                             <button
@@ -806,22 +806,22 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        setSelectedModel("Sheldon 3.5 Flash");
+                                                        setSelectedModel("Llama 3.1 Flash");
                                                         setShowModelMenu(false);
                                                     }}
-                                                    className={`w-full text-left text-xs font-semibold rounded-xl px-3 py-2 transition ${selectedModel === "Sheldon 3.5 Flash" ? "bg-brand-solid/10 text-brand-secondary" : "text-primary hover:bg-primary_hover"} cursor-pointer`}
+                                                    className={`w-full text-left text-xs font-semibold rounded-xl px-3 py-2 transition ${selectedModel === "Llama 3.1 Flash" ? "bg-brand-solid/10 text-brand-secondary" : "text-primary hover:bg-primary_hover"} cursor-pointer`}
                                                 >
-                                                    Sheldon 3.5 Flash
+                                                    Llama 3.1 Flash
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        setSelectedModel("Sheldon 70B Instruct");
+                                                        setSelectedModel("Llama 3.1 70B");
                                                         setShowModelMenu(false);
                                                     }}
-                                                    className={`w-full text-left text-xs font-semibold rounded-xl px-3 py-2 transition ${selectedModel === "Sheldon 70B Instruct" ? "bg-brand-solid/10 text-brand-secondary" : "text-primary hover:bg-primary_hover"} cursor-pointer`}
+                                                    className={`w-full text-left text-xs font-semibold rounded-xl px-3 py-2 transition ${selectedModel === "Llama 3.1 70B" ? "bg-brand-solid/10 text-brand-secondary" : "text-primary hover:bg-primary_hover"} cursor-pointer`}
                                                 >
-                                                    Sheldon 70B Instruct
+                                                    Llama 3.1 70B
                                                 </button>
                                             </motion.div>
                                         )}
@@ -903,7 +903,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                             className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
                         >
                             <span>🔮</span>
-                            <span>Cooper's Choice</span>
+                            <span>Tutor's Choice</span>
                         </button>
                     </div>
 

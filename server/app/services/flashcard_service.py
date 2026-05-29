@@ -54,11 +54,11 @@ async def generate_flashcards(
     if existing:
         return list(existing)
 
-    # 3. Fetch lesson content from messages (Sheldon's responses)
+    # 3. Fetch lesson content from messages (Assistant's responses)
     result = await db.execute(
         select(Message).where(
             Message.lesson_id == entry.lesson_id,
-            Message.role == "sheldon",
+            Message.role.in_(["sheldon", "assistant", "tutor"]),
         ).order_by(Message.created_at)
     )
     messages = result.scalars().all()
@@ -82,8 +82,8 @@ async def generate_flashcards(
                 headers={
                     "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://decooper.ai",
-                    "X-Title": "de_cooper.ai",
+                    "HTTP-Referer": "https://destudy.ai",
+                    "X-Title": "de_study.ai",
                 },
                 json={
                     "model": settings.OPENROUTER_MODEL,

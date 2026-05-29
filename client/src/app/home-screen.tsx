@@ -93,13 +93,13 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                     className="w-full bg-[#FEF08A] text-black py-2 px-6 lg:px-16 flex flex-col md:flex-row md:items-center justify-between border-b border-secondary font-sans text-[10px] tracking-wider uppercase font-semibold"
                 >
                     <div className="flex items-center gap-2">
-                        <span className="font-logo font-black text-xs">COOPER.AI</span>
+                        <span className="font-logo font-black text-xs">STUDY.AI</span>
                         <span className="opacity-50">//</span>
-                        <span>THE UNCOMPROMISING AI TUTOR & STUDY CALENDAR</span>
+                        <span>THE VISUAL STEM STUDY WORKSPACE & CALENDAR</span>
                     </div>
                     <div className="mt-0.5 md:mt-0 flex items-center gap-2">
                         <span>UPGRADE YOUR FLASHCARDS</span>
-                        <span className="text-[#2563EB] font-bold">→ COOPER.AI/LEARN</span>
+                        <span className="text-[#2563EB] font-bold">→ STUDY.AI/LEARN</span>
                     </div>
                 </motion.div>
 
@@ -113,7 +113,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                     <nav className="border border-secondary bg-primary/80 backdrop-blur-md rounded-2xl px-6 py-3 shadow-sm flex items-center justify-between transition-all duration-300 hover:shadow-md">
                         {/* Left: Brand logo */}
                         <Link href="/" className="font-logo text-xl font-extrabold text-primary tracking-tight select-none">
-                            de_cooper.ai
+                            de_study.ai
                         </Link>
 
                         {/* Center: Navigation Links */}
@@ -173,13 +173,13 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                                 transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.45 }}
                                 className="block text-fg-brand-primary"
                             >
-                                Your relentless AI tutor.
+                                Your visual study calendar.
                             </motion.span>
                         </h1>
 
                         <p className="mt-4 max-w-xl text-lg text-tertiary min-h-[84px]">
                             <Typewriter
-                                text="An uncompromising study calendar and flashcard ecosystem. No watered-down concepts, no participation awards—just spaced repetition and an AI tutor who is mathematically certain he is smarter than you."
+                                text="An uncompromising study calendar and flashcard ecosystem. No watered-down concepts, no shortcuts—just spaced repetition and a high-standards visual AI tutor to optimize your long-term retention."
                                 delay={1200}
                                 speed={12}
                             />
@@ -226,49 +226,42 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                             </svg>
                         </motion.div>
 
-                        {/* Main Sheldon 3D circular pop-out container */}
+                        {/* Main visual mock container */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.7, x: 30 }}
                             animate={{ opacity: 1, scale: 1, x: 0 }}
                             transition={{ type: "spring", stiffness: 50, damping: 14, delay: 2.6 }}
-                            className="relative mr-0 ml-auto size-[380px] xl:size-[440px] rounded-full border-4 border-secondary bg-secondary shadow-2xl flex items-end justify-center z-10"
+                            className="relative mr-0 ml-auto size-[380px] xl:size-[440px] rounded-3xl border border-secondary bg-secondary/30 shadow-2xl flex items-center justify-center z-10 overflow-hidden"
                         >
-                            {/* Inner circle backdrop */}
-                            <div className="absolute inset-2.5 rounded-full bg-primary border border-secondary overflow-hidden" />
-                            
-                             {/* Sheldon popping out of the circle border */}
-                            <motion.img
-                                src="/sheldon.png"
-                                alt="Dr. Sheldon Cooper"
-                                initial={{ opacity: 0, y: 80, scale: 1.05, rotate: 0 }}
-                                animate={{ opacity: 1, y: 0, scale: 1.18, rotate: spinRotation }}
-                                transition={{
-                                    default: { type: "spring", stiffness: 60, damping: 16 },
-                                    opacity: { delay: 2.9 },
-                                    y: { delay: 2.9 },
-                                    scale: { delay: 2.9 },
-                                    rotate: { type: "spring", stiffness: 120, damping: 12 }
-                                }}
-                                whileHover={{ scale: 1.24 }}
-                                onClick={() => {
-                                    console.log("Sheldon clicked! Previous rotation:", spinRotation);
-                                    setSpinRotation((prev) => prev + 360);
-                                }}
-                                className="absolute bottom-0 h-[122%] w-auto object-contain object-bottom z-30 cursor-pointer"
-                            />
-                        </motion.div>
-
-                        {/* Floating pedantic quote badge */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.5, y: 15 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ type: "spring", stiffness: 90, damping: 11, delay: 3.5 }}
-                            className="absolute -bottom-2 right-4 rounded-xl border border-secondary bg-primary p-3.5 shadow-lg max-w-[220px] z-40 text-left"
-                        >
-                            <p className="font-display text-xs italic text-primary leading-snug">
-                                &ldquo;I&apos;m not insane. My mother had me tested.&rdquo;
-                            </p>
-                            <span className="block text-[9px] font-mono text-tertiary mt-2 uppercase tracking-wider">// Dr. Cooper</span>
+                            {/* Inner dashboard illustration */}
+                            <div className="absolute inset-4 rounded-2xl bg-primary border border-secondary p-6 flex flex-col justify-between shadow-skeuomorphic overflow-hidden text-left">
+                                <div className="flex items-center justify-between border-b border-secondary pb-3">
+                                    <div className="flex items-center gap-2">
+                                        <span className="size-2.5 rounded-full bg-red-400" />
+                                        <span className="size-2.5 rounded-full bg-yellow-400" />
+                                        <span className="size-2.5 rounded-full bg-green-400" />
+                                    </div>
+                                    <span className="font-mono text-[9px] text-tertiary">SPACED_REPETITION_MATRIX</span>
+                                </div>
+                                <div className="space-y-3 py-4 flex-1 justify-center flex flex-col">
+                                    <div className="h-7 w-full rounded-md bg-brand-primary/10 border border-brand/20 flex items-center px-3 justify-between">
+                                        <span className="text-[10px] font-semibold text-brand-secondary">Recall Accuracy</span>
+                                        <span className="text-[10px] font-bold text-brand-secondary">94.8%</span>
+                                    </div>
+                                    <div className="h-7 w-full rounded-md bg-secondary/50 border border-secondary flex items-center px-3 justify-between">
+                                        <span className="text-[10px] font-semibold text-secondary">Active Decks</span>
+                                        <span className="text-[10px] font-bold text-primary">6 modules</span>
+                                    </div>
+                                    <div className="h-7 w-full rounded-md bg-secondary/50 border border-secondary flex items-center px-3 justify-between">
+                                        <span className="text-[10px] font-semibold text-secondary">Study Streak</span>
+                                        <span className="text-[10px] font-bold text-primary">12 Days</span>
+                                    </div>
+                                </div>
+                                <div className="border-t border-secondary pt-3 flex items-center justify-between">
+                                    <span className="text-[9px] font-mono text-tertiary">SYSTEM STATUS: ACTIVE</span>
+                                    <span className="text-[9px] font-mono text-brand-secondary uppercase font-bold">de_study.ai</span>
+                                </div>
+                            </div>
                         </motion.div>
                     </div>
                 </div>
@@ -280,14 +273,14 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
             <div className="mx-auto max-w-4xl text-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-secondary bg-primary px-4 py-1.5 text-[10px] font-mono uppercase tracking-widest text-tertiary mb-8">
                     <span className="size-1.5 rounded-full bg-green-500 animate-pulse" />
-                    AI-powered &middot; Llama 70B &middot; Always judging you
+                    AI-powered &middot; Llama 70B &middot; Spaced Repetition
                 </div>
                 <blockquote>
                     <p className="font-logo text-2xl lg:text-3xl font-bold text-primary leading-snug tracking-tight">
-                        &ldquo;I weep for your neural pathways. Let&apos;s review these flashcards.&rdquo;
+                        &ldquo;True comprehension is not a matter of memorization; it is the visual mapping of logical pathways.&rdquo;
                     </p>
                     <footer className="mt-5 text-sm text-tertiary">
-                        — Dr. Cooper
+                        — AI STEM Tutor
                     </footer>
                 </blockquote>
             </div>
@@ -313,7 +306,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         <span className="text-fg-brand-primary">enlightenment.</span>
                     </h2>
                     <p className="mt-4 text-base text-tertiary leading-relaxed max-w-lg">
-                        Or as Dr. Cooper would say: a trivially simple process that even you should be able to follow.
+                        A rigorous, scientifically proven process designed to maximize your long-term memory retention.
                     </p>
                 </motion.div>
 
@@ -331,19 +324,19 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                             {
                                 step: "01",
                                 title: "Schedule your learning",
-                                desc: "Build a rigorous academic calendar. Dr. Cooper will ensure you stick to it, whether you like it or not.",
+                                desc: "Build a rigorous academic calendar. The system will ensure you stick to your daily review goals.",
                                 Icon: Atom01,
                             },
                             {
                                 step: "02",
                                 title: "Generate Flashcards",
-                                desc: "Upload your notes and watch Dr. Cooper transform your rambling text into precise, spaced-repetition flashcards.",
+                                desc: "Upload your study notes and watch the AI tutor transform your text into precise, spaced-repetition flashcards.",
                                 Icon: BookOpen01,
                             },
                             {
                                 step: "03",
                                 title: "Spaced Repetition",
-                                desc: "Review your cards on an optimized schedule, accompanied by unsolicited commentary on your intelligence.",
+                                desc: "Review your cards on an optimized schedule, driven by a dynamic forgetting curve algorithm.",
                                 Icon: Zap,
                             },
                         ].map((item, i) => (
@@ -393,10 +386,10 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                 <div className="mb-14 text-center">
                     <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary mb-3">Features</p>
                     <h2 className="font-logo text-3xl lg:text-4xl font-extrabold text-primary tracking-tight">
-                        Why suffer through this?
+                        Visual, structured, optimized
                     </h2>
                     <p className="mt-4 text-base text-tertiary max-w-xl mx-auto">
-                        Because despite the insults, you&apos;ll actually learn something. Probably.
+                        A structured study workspace engineered to eliminate the forgetting curve.
                     </p>
                 </div>
 
@@ -454,7 +447,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                                 Transform messy notes into precise flashcards
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed font-sans">
-                                Upload your study materials and Dr. Cooper will immediately identify your misunderstandings and generate a rigorous spaced-repetition deck to fix them.
+                                Upload your study materials and the AI tutor will immediately identify core concepts and generate a rigorous spaced-repetition deck to test you.
                             </p>
                         </div>
                     </motion.div>
@@ -468,10 +461,10 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                         {/* Top Quote */}
                         <div className="space-y-4">
                             <p className="text-sm font-medium text-primary italic leading-relaxed">
-                                &ldquo;I thought I knew the material until Dr. Cooper scheduled my flashcards. Now I realize my previous study habits were the academic equivalent of playing with blocks.&rdquo;
+                                &ldquo;I thought I understood calculus until I structured my calendar here. Spaced repetition has completely transformed how I retain technical material.&rdquo;
                             </p>
                             <div>
-                                <h4 className="text-xs font-bold text-primary">A Humbled Student</h4>
+                                <h4 className="text-xs font-bold text-primary">A Dedicated Student</h4>
                                 <p className="text-[10px] text-tertiary">Learning to actually retain information</p>
                             </div>
                         </div>
@@ -486,15 +479,15 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                             </div>
                             <div className="flex items-start gap-3">
                                 <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
-                                    100+
+                                    94.8%
                                 </span>
-                                <p className="text-xs text-tertiary mt-0.5">Total sarcastic remarks received when you forget a card you just reviewed.</p>
+                                <p className="text-xs text-tertiary mt-0.5">Average score on structured assessments and recall checks.</p>
                             </div>
                             <div className="flex items-start gap-3">
                                 <span className="bg-[#0f172a] text-white rounded px-2 py-1 text-[10px] font-mono font-bold shrink-0 min-w-[65px] text-center">
-                                    0%
+                                    0
                                 </span>
-                                <p className="text-xs text-tertiary mt-0.5">Chance of receiving any partial credit or participation trophies.</p>
+                                <p className="text-xs text-tertiary mt-0.5">Missing days on the optimal study and review plans.</p>
                             </div>
                         </div>
 
@@ -541,7 +534,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
 
                             {/* Result block */}
                             <div className="space-y-1.5">
-                                <div className="text-[9px] font-mono text-white/40">DR. COOPER&apos;S REVISION:</div>
+                                <div className="text-[9px] font-mono text-white/40">OPTIMIZED REVISION:</div>
                                 <div className="bg-emerald-950/80 border border-emerald-500/20 text-emerald-300 rounded-xl px-3 py-2 text-[11px] font-mono">
                                     Reviewing 20 cards daily at 08:00 to maximize synaptic retention.
                                 </div>
@@ -557,7 +550,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                                 A schedule designed for actual memory retention
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed font-sans">
-                                Stop procrastinating. Dr. Cooper will seamlessly block out your calendar with perfectly spaced review sessions, ensuring you never forget the difference between mitosis and meiosis again.
+                                Stop procrastinating. The system will seamlessly block out your calendar with perfectly spaced review sessions, ensuring you never forget core details.
                             </p>
                         </div>
                     </motion.div>
@@ -592,7 +585,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                             {/* Rule Action */}
                             <div className="bg-rose-950/60 border border-rose-500/20 text-rose-300 rounded-xl p-3 text-[11px] font-mono space-y-1">
                                 <div className="text-[9px] text-rose-400 font-bold uppercase tracking-wider">AI-Generated Outcome:</div>
-                                <div>schedule_immediate_review() &amp;&amp; add_sarcastic_comment()</div>
+                                <div>schedule_immediate_review() &amp;&amp; update_intervals()</div>
                             </div>
                         </div>
 
@@ -605,7 +598,7 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                                 Dynamic scheduling that adapts to your failures
                             </h3>
                             <p className="text-xs text-white/70 leading-relaxed font-sans">
-                                The AI tracks your forgetting curve in real-time. Struggle with a concept? It resurfaces immediately. Master it? It gets pushed out. It&apos;s like having a tutor who never sleeps and never forgets your mistakes.
+                                The AI tracks your forgetting curve in real-time. Struggle with a concept? It resurfaces immediately. Master it? It gets pushed out. It&apos;s like having a tutor who never sleeps and keeps your retention at 100%.
                             </p>
                         </div>
                     </motion.div>
@@ -619,10 +612,10 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                 <div className="lg:col-span-7 space-y-6">
                     <p className="text-[10px] font-mono uppercase tracking-widest text-brand-secondary">Free forever</p>
                     <h2 className="font-logo text-3xl lg:text-5xl font-extrabold text-primary tracking-tight leading-[1.1]">
-                        Ready to feel intellectually inadequate?
+                        Ready to supercharge your learning?
                     </h2>
                     <p className="text-base text-tertiary leading-relaxed max-w-xl">
-                        Create a free account and sync your calendar. Dr. Cooper is waiting to generate your flashcards. Impatiently. No credit card required. No hidden fees. Just pure, unfiltered condescension.
+                        Create a free account and sync your calendar. Your AI tutor is waiting to generate your visual lessons and flashcard decks. No credit card required. No hidden fees.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 pt-2">
                         {isAuthenticated ? (
@@ -667,10 +660,10 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-10">
                         <div className="max-w-sm">
                             <span className="font-logo text-lg font-extrabold text-primary tracking-tight">
-                                de_cooper.ai
+                                de_study.ai
                             </span>
                             <p className="mt-2 text-xs text-tertiary leading-relaxed">
-                                A satirical, non-commercial educational experiment. Built for fun, learning, and the relentless pursuit of academic pedantry.
+                                A premium, visual-first educational platform and STEM study calendar workspace. Built for optimal long-term knowledge retention.
                             </p>
                         </div>
                         <div className="flex gap-10 text-xs text-secondary">
@@ -683,8 +676,8 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                             <div className="flex flex-col gap-2">
                                 <span className="font-semibold text-primary uppercase tracking-wider text-[10px]">Legal</span>
                                 <Link href="/terms" onClick={(e) => { e.preventDefault(); setIsTermsOpen(true); }} className="hover:text-primary transition-colors">Terms &amp; Conditions</Link>
-                                <span className="text-tertiary">Parody &amp; Satire</span>
-                                <span className="text-tertiary">Non-Commercial Use</span>
+                                <span className="text-tertiary">Active Recall</span>
+                                <span className="text-tertiary">Spaced Repetition</span>
                             </div>
                         </div>
                     </div>
@@ -692,30 +685,21 @@ export default function HomePage({ initialAuthMode = null }: { initialAuthMode?:
                     {/* Divider */}
                     <div className="border-t border-secondary mb-6" />
 
-                    {/* Satire & Legal Disclaimer */}
-                    <div className="rounded-xl border border-secondary bg-primary p-5 mb-6">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mb-2">⚖️ Parody &amp; Satire Disclaimer</p>
+                    {/* Platform Info Disclaimer */}
+                    <div className="rounded-xl border border-secondary bg-primary p-5 mb-6 text-left">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-tertiary mb-2">⚡ de_study.ai Platform</p>
                         <p className="text-[11px] text-tertiary leading-relaxed">
-                            This website is a <strong className="text-secondary">non-commercial, satirical fan project</strong> created purely for educational and comedic purposes.
-                            It is <strong className="text-secondary">not affiliated with, endorsed by, or associated with</strong> CBS Studios, Warner Bros. Television,
-                            Chuck Lorre Productions, Bill Prady, or any cast members of <em>The Big Bang Theory</em>.
+                            This website is a premium, visual-first educational workspace utilizing advanced Llama models to deliver precise academic lessons, step-by-step mathematical proofs, and automated spaced-repetition flashcards.
                         </p>
                         <p className="text-[11px] text-tertiary leading-relaxed mt-2">
-                            The character &ldquo;Dr. Sheldon Cooper&rdquo; is a fictional character from the television series <em>The Big Bang Theory</em>,
-                            created by Chuck Lorre and Bill Prady. All related names, characters, and trademarks are the property of their respective owners.
-                            Any use of the character&apos;s name, likeness, or personality traits on this site is intended solely as <strong className="text-secondary">parody and transformative commentary</strong> under
-                            fair use principles.
-                        </p>
-                        <p className="text-[11px] text-tertiary leading-relaxed mt-2">
-                            This project generates <strong className="text-secondary">no revenue</strong> and is not offered for sale. No copyrighted material from the show is reproduced.
-                            If you are a rights holder and have concerns, please contact us and we will promptly address them.
+                            Designed to streamline long-term knowledge retention through highly optimized active recall intervals and clear concept-mapping visualizations.
                         </p>
                     </div>
 
                     {/* Bottom bar */}
                     <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] text-quaternary">
-                        <p>&copy; {new Date().getFullYear()} de_cooper.ai &mdash; A functional satire app with edtech. Not for profit. Not affiliated with CBS.</p>
-                        <p className="font-mono opacity-60">// bazinga.</p>
+                        <p>&copy; {new Date().getFullYear()} de_study.ai &mdash; A premium AI-powered study calendar app. All rights reserved.</p>
+                        <p className="font-mono opacity-60">// active recall.</p>
                     </div>
                 </div>
             </footer>

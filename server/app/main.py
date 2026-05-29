@@ -181,8 +181,8 @@ async def migrate_flashcards_nullable_calendar(conn):
 
 
 app = FastAPI(
-    title="de_cooper.ai API",
-    description="An AI teaching platform with the personality of Dr. Sheldon Cooper. You're welcome.",
+    title="de_study.ai API",
+    description="An AI-powered premium teaching platform and STEM study calendar workspace.",
     version="0.1.0",
     lifespan=lifespan,
 )

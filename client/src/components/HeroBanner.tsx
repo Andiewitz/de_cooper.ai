@@ -27,7 +27,7 @@ export default function HeroBanner({ name, onStartLearning }: HeroBannerProps) {
                     <p className="text-xs font-semibold uppercase tracking-wider text-brand-secondary">Your dashboard</p>
                     <h2 className="mt-1 font-display text-display-xs font-bold text-primary sm:text-display-sm">{greeting}</h2>
                     <p className="mt-2 max-w-xl text-md text-tertiary">
-                        Pick up where you left off or start a new topic. Dr. Cooper is standing by — reluctantly.
+                        Pick up where you left off or start a new topic. Your AI tutor is standing by.
                     </p>
                 </div>
                 {onStartLearning && (

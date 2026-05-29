@@ -6,7 +6,7 @@ from pydantic import field_validator
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./decooper.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./destudy.db"
 
     # OpenRouter AI
     OPENROUTER_API_KEY: str = ""
@@ -26,13 +26,13 @@ class Settings(BaseSettings):
 
     # App
     DEBUG: bool = True
-    APP_NAME: str = "de_cooper.ai"
+    APP_NAME: str = "de_study.ai"
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def assemble_db_url(cls, v: str | None) -> str:
         if not v or not v.strip():
-            return "sqlite+aiosqlite:///./decooper.db"
+            return "sqlite+aiosqlite:///./destudy.db"
         if v.startswith("postgresql://"):
             return v.replace("postgresql://", "postgresql+asyncpg://", 1)
         if v.startswith("postgres://"):

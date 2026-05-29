@@ -34,7 +34,7 @@ interface AuthModalProps {
 function deriveUsername(email: string): string {
     let base = email.split("@")[0]?.toLowerCase().replace(/[^a-z0-9_-]/g, "_") ?? "user";
     if (base.length < 3) {
-        base = `${base}_cooper`;
+        base = `${base}_student`;
     }
     return base.slice(0, 100);
 }
@@ -210,7 +210,7 @@ export function AuthModal({ isOpen, initialMode, onClose }: AuthModalProps) {
                             <p className="mt-2 text-sm text-tertiary">
                                 {mode === "login"
                                     ? "Access your learning workspace and personalized study tracks."
-                                    : "Start your tailored study plan with Dr. Cooper as your (reluctant) guide."}
+                                    : "Start your tailored study plan with premium, visual-first AI-driven lessons."}
                             </p>
                         </div>
 

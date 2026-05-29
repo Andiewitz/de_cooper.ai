@@ -8,7 +8,7 @@ export default function LearnCompetitivePage() {
         <LearnPlaceholderPage
             title="Competitive for Nerds"
             subtitle="Science and math challenges, LeetCode-style"
-            description="Timed problems across physics, math, and more — ranked runs, hints from Dr. Cooper, and bragging rights. We're building the arena now."
+            description="Timed problems across physics, math, and more — ranked runs, hints from the AI tutor, and bragging rights. We're building the arena now."
             icon={Atom01}
         />
     );

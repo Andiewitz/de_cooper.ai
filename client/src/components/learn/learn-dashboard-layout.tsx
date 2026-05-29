@@ -25,7 +25,7 @@ import { Tooltip } from "@/components/base/tooltip/tooltip";
 import { useAuth } from "@/providers/auth-provider";
 import { cx } from "@/utils/cx";
 
-const SIDEBAR_STORAGE_KEY = "decooper-sidebar-collapsed";
+const SIDEBAR_STORAGE_KEY = "destudy-sidebar-collapsed";
 const SIDEBAR_WIDTH_EXPANDED = 260;
 const SIDEBAR_WIDTH_COLLAPSED = 72;
 
@@ -75,7 +75,7 @@ const NAV_ITEMS: NavItem[] = [
     },
     {
         label: "Docs for devs",
-        href: "https://github.com/Andiewitz/de_cooper.ai",
+        href: "https://github.com/Andiewitz/de_study.ai",
         icon: FileCode01,
         external: true,
         isActive: () => false,
@@ -203,10 +203,10 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         <Link
                             href="/learn"
                             className="font-logo text-sm font-extrabold text-primary"
-                            title="de_cooper.ai"
+                            title="de_study.ai"
                             onClick={() => setMobileNavOpen(false)}
                         >
-                            dc
+                            ds
                         </Link>
                     ) : (
                         <div className="min-w-0 flex-1">
@@ -215,7 +215,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                 className="font-logo text-lg font-extrabold tracking-tight text-primary"
                                 onClick={() => setMobileNavOpen(false)}
                             >
-                                de_cooper.ai
+                                de_study.ai
                             </Link>
                             <p className="mt-0.5 text-xs font-medium uppercase tracking-wider text-tertiary">Learning workspace</p>
                         </div>

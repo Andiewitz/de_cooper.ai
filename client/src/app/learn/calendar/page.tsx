@@ -504,7 +504,7 @@ export default function LearnCalendarPage() {
                                     <div className="rounded-2xl border border-dashed border-secondary/80 py-10 flex flex-col items-center justify-center text-center space-y-3">
                                         <p className="text-sm font-semibold text-secondary">No flashcards yet</p>
                                         <p className="text-xs text-tertiary max-w-xs">
-                                            This lesson needs at least one chat exchange with Dr. Cooper before flashcards can be generated.
+                                            This lesson needs at least one chat exchange with the tutor before flashcards can be generated.
                                         </p>
                                     </div>
                                 ) : (

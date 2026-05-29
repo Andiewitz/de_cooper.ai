@@ -132,7 +132,7 @@ class Message(Base):
         String(36), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False
     )
     role: Mapped[str] = mapped_column(
-        String(20), nullable=False  # "sheldon" | "student"
+        String(20), nullable=False  # "assistant" | "student" | legacy: "sheldon"
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(

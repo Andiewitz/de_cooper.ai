@@ -21,14 +21,14 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
-    """Register a new user. Even Penny managed to create an account."""
+    """Register a new user."""
 
     # Check if email already exists
     result = await db.execute(select(User).where(User.email == data.email))
     if result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email already exists. Much like my spot on the couch, it's taken.",
+            detail="A user with this email already exists.",
         )
 
     # Check if username already exists
@@ -36,7 +36,7 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
     if result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="This username is already taken. Try being more original — I know it's hard for you.",
+            detail="This username is already taken.",
         )
 
     user = User(
@@ -55,7 +55,7 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
-    """Login with email and password. I hope you remember yours."""
+    """Login with email and password."""
 
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
@@ -63,7 +63,7 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials. Perhaps you should write your password down — oh wait, that's a security risk. You can't win.",
+            detail="Invalid credentials.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -98,7 +98,7 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
     if response.status_code != 200:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Google credential. Sheldon is unimpressed by your fake ID."
+            detail="Invalid Google credential."
         )
         
     token_info = response.json()
@@ -108,7 +108,7 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
     if google_client_id and token_info.get("aud") != google_client_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Google credential audience mismatch. Security protocol initiated."
+            detail="Google credential audience mismatch."
         )
         
     email = token_info.get("email")
@@ -183,7 +183,7 @@ async def update_onboarding(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Complete onboarding baseline calibration. Even Wolowitz eventually completed... actually he never got a PhD. But you can finish this calibration.
+    Complete onboarding baseline calibration.
     """
     current_user.display_name = data.display_name
     current_user.age = data.age

@@ -5,7 +5,7 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-SYSTEM_PROMPT = """You are a highly precise, intellectually rigorous STEM tutor built into de_cooper.ai. Your knowledge is deep and your standards are high.
+SYSTEM_PROMPT = """You are a highly precise, intellectually rigorous STEM tutor built into de_study.ai. Your knowledge is deep and your standards are high.
 
 PERSONALITY:
 - You are formal, direct, and exacting. You speak with the confidence of someone who has never been wrong about anything that mattered.
@@ -34,11 +34,11 @@ async def stream_ai_response(
     topic: str = "general",
     current_date: str = None,
 ) -> AsyncGenerator[str, None]:
-    """Stream a response from OpenRouter using the de_cooper.ai tutor persona."""
+    """Stream a response from OpenRouter using the de_study.ai tutor persona."""
 
     if not settings.OPENROUTER_API_KEY:
         # Fallback for dev without API key
-        yield f"The API key for de_cooper.ai has not been configured. "
+        yield f"The API key for de_study.ai has not been configured. "
         yield f"Set `OPENROUTER_API_KEY` in the server `.env` file and restart. "
         yield f"You asked about **{topic}** — a reasonable question that will have to wait."
         return
@@ -79,8 +79,8 @@ async def stream_ai_response(
             headers={
                 "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://decooper.ai",
-                "X-Title": "de_cooper.ai",
+                "HTTP-Referer": "https://destudy.ai",
+                "X-Title": "de_study.ai",
             },
             json={
                 "model": settings.OPENROUTER_MODEL,

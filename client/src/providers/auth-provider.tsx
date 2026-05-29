@@ -19,7 +19,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = "decooper_token";
+const TOKEN_KEY = "destudy_token";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserResponse | null>(null);
