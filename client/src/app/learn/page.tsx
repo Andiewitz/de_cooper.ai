@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType, SVGProps } from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -108,89 +108,10 @@ function StatCard({ icon: Icon, label, value, sublabel, className, iconClassName
     return (
         <div className={`rounded-2xl border border-secondary bg-primary p-4 text-center shadow-xs flex flex-col items-center justify-center relative overflow-hidden group ${className ?? ""}`}>
             {children}
-            <Icon className={`size-7 mb-2 relative z-10 ${iconClassName ?? "text-tertiary"}`} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-quaternary mb-1 relative z-10">{label}</span>
+            <Icon className={`size-7 mb-2 relative z-10 ${iconClassName ?? "text-secondary"}`} />
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-tertiary mb-1 relative z-10">{label}</span>
             <span className="font-display text-display-xs font-bold text-primary relative z-10">{value}</span>
-            <span className="text-xs text-quaternary mt-1 relative z-10">{sublabel}</span>
-        </div>
-    );
-}
-
-/* ────────────────────────── Loading Skeletons ───────────────── */
-
-function DashboardSkeleton() {
-    return (
-        <div className="mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                
-                {/* Main Workspace Skeleton */}
-                <div className="lg:col-span-8 space-y-10">
-                    
-                    {/* Hero Skeleton */}
-                    <div className="rounded-2xl border border-secondary bg-primary p-8 shadow-xs">
-                        <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                            <div className="flex-1 space-y-4">
-                                <div className="h-4 w-28 rounded-full bg-secondary animate-pulse" />
-                                <div className="h-12 w-3/4 rounded-xl bg-secondary animate-pulse" />
-                                <div className="space-y-2.5 mt-4">
-                                    <div className="h-4 w-full rounded-full bg-secondary/60 animate-pulse" />
-                                    <div className="h-4 w-5/6 rounded-full bg-secondary/60 animate-pulse" />
-                                </div>
-                            </div>
-                            <div className="size-28 rounded-full bg-secondary animate-pulse shrink-0" />
-                        </div>
-                    </div>
-
-                    {/* Module Cards Skeleton */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <div className="w-0.5 h-5 bg-brand-solid rounded-full" />
-                            <div className="h-4 w-44 rounded-full bg-secondary animate-pulse" />
-                        </div>
-                        <div className="space-y-4">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="rounded-2xl border border-secondary bg-primary p-6 flex items-center gap-6 shadow-xs">
-                                    <div className="size-16 rounded-xl bg-secondary animate-pulse shrink-0" />
-                                    <div className="flex-1 space-y-2.5">
-                                        <div className="h-5 w-36 rounded-lg bg-secondary animate-pulse" />
-                                        <div className="h-4 w-5/6 max-w-xl rounded-full bg-secondary/60 animate-pulse" />
-                                    </div>
-                                    <div className="h-8 w-20 rounded-full bg-secondary/40 animate-pulse shrink-0" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Sidebar Skeleton */}
-                <div className="lg:col-span-4 space-y-6">
-                    <div className="h-8 w-40 rounded-lg bg-secondary animate-pulse" />
-                    <div className="rounded-2xl border border-secondary bg-primary p-4 flex items-center gap-4 shadow-xs">
-                        <div className="size-12 rounded-full bg-secondary animate-pulse shrink-0" />
-                        <div className="space-y-2 flex-1">
-                            <div className="h-4 w-28 rounded-lg bg-secondary animate-pulse" />
-                            <div className="h-4 w-20 rounded-full bg-secondary/40 animate-pulse" />
-                        </div>
-                    </div>
-                    <div className="rounded-2xl border border-secondary bg-primary p-6 flex flex-col items-center gap-4 shadow-xs">
-                        <div className="size-28 rounded-full border-4 border-secondary/40 bg-transparent animate-pulse" />
-                        <div className="h-4 w-24 rounded-full bg-secondary animate-pulse" />
-                        <div className="h-3 w-40 rounded-full bg-secondary/40 animate-pulse" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="rounded-2xl border border-secondary bg-primary p-4 space-y-2 flex flex-col items-center shadow-xs">
-                            <div className="h-6 w-6 rounded bg-secondary animate-pulse" />
-                            <div className="h-8 w-10 rounded-lg bg-secondary animate-pulse" />
-                            <div className="h-3 w-16 rounded-full bg-secondary/40 animate-pulse" />
-                        </div>
-                        <div className="rounded-2xl border border-secondary bg-primary p-4 space-y-2 flex flex-col items-center shadow-xs">
-                            <div className="h-6 w-6 rounded bg-secondary animate-pulse" />
-                            <div className="h-8 w-10 rounded-lg bg-secondary animate-pulse" />
-                            <div className="h-3 w-16 rounded-full bg-secondary/40 animate-pulse" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <span className="text-xs text-tertiary mt-1 relative z-10">{sublabel}</span>
         </div>
     );
 }
@@ -198,7 +119,6 @@ function DashboardSkeleton() {
 export default function LearnPage() {
     const router = useRouter();
     const { user, isLoading, isAuthenticated } = useAuth();
-    const [isPageLoading, setIsPageLoading] = useState(true);
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
@@ -206,23 +126,7 @@ export default function LearnPage() {
         }
     }, [isLoading, isAuthenticated, router]);
 
-    useEffect(() => {
-        if (!isLoading) {
-            const timer = setTimeout(() => {
-                setIsPageLoading(false);
-            }, 800);
-            return () => clearTimeout(timer);
-        }
-    }, [isLoading]);
-
-    if (isPageLoading) {
-        return (
-            <LearnDashboardLayout title="Workspace Dashboard" subtitle="Interactive STEM Q&A and AI-Guided Lessons">
-                <DashboardSkeleton />
-            </LearnDashboardLayout>
-        );
-    }
-
+    if (isLoading) return null;
     if (!isAuthenticated) return null;
 
     if (user && !user.onboarding_completed) {
@@ -277,13 +181,13 @@ export default function LearnPage() {
 
                             <div className="relative z-10 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                                 <div className="flex-1">
-                                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-brand-secondary">
+                                    <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-brand-secondary">
                                         Dashboard Welcome
                                     </p>
-                                    <h2 className="mt-3 font-display text-display-sm sm:text-display-md font-bold text-primary leading-tight">
+                                    <h2 className="mt-3 font-display text-display-sm sm:text-display-md font-black text-primary leading-tight">
                                         Hey {displayName},<br />ready to learn?
                                     </h2>
-                                    <p className="mt-4 text-md text-tertiary leading-relaxed max-w-xl">
+                                    <p className="mt-4 text-md text-secondary leading-relaxed max-w-xl">
                                         Your AI tutor is standing by. Choose any STEM module from the curriculum roadmap below to launch an interactive, visual-first learning session.
                                     </p>
                                 </div>
@@ -304,7 +208,7 @@ export default function LearnPage() {
                         <section className="space-y-6">
                             <div className="flex items-center gap-3">
                                 <div className="w-0.5 h-5 bg-brand-solid rounded-full" />
-                                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-tertiary">
+                                <h3 className="text-xs font-extrabold uppercase tracking-[0.2em] text-secondary">
                                     STEM Curriculum Modules
                                 </h3>
                             </div>
@@ -321,7 +225,7 @@ export default function LearnPage() {
                                             transition={{ duration: 0.35, delay: idx * 0.06 }}
                                             whileHover={{ scale: 1.008, y: -1 }}
                                             onClick={() => router.push(`/learn/${topic.id}`)}
-                                            className={`group flex w-full items-center gap-6 rounded-xl border border-secondary/50 bg-primary/50 backdrop-blur-sm p-5 shadow-xs hover:shadow-lg ${topic.hoverRing} hover:ring-1 transition-all duration-200 cursor-pointer text-left outline-focus-ring`}
+                                            className={`group flex w-full items-center gap-6 rounded-xl border border-secondary bg-primary p-5 shadow-xs hover:shadow-lg ${topic.hoverRing} hover:ring-1 transition-all duration-200 cursor-pointer text-left outline-focus-ring`}
                                         >
                                             {/* Module Icon */}
                                             <div className={`flex size-14 shrink-0 items-center justify-center rounded-xl ${topic.accentBg} shadow-inner overflow-hidden relative`}>
@@ -334,7 +238,7 @@ export default function LearnPage() {
                                                 <h4 className={`text-md font-bold text-primary ${topic.hoverText} transition duration-100`}>
                                                     {topic.title}
                                                 </h4>
-                                                <p className="mt-1 text-sm text-tertiary line-clamp-2 max-w-xl">
+                                                <p className="mt-1 text-sm text-secondary line-clamp-2 max-w-xl">
                                                     {topic.description}
                                                 </p>
                                             </div>
@@ -385,7 +289,7 @@ export default function LearnPage() {
                                     <CircleProgressBar value={0} />
                                 </div>
                                 <p className="text-sm font-bold text-brand-secondary">0% complete</p>
-                                <p className="mt-1 text-xs text-quaternary">Start lessons to advance your standing</p>
+                                <p className="mt-1 text-xs text-tertiary">Start lessons to advance your standing</p>
                             </div>
                         </div>
 
@@ -419,7 +323,7 @@ export default function LearnPage() {
                                 }}
                             />
 
-                            <h4 className="text-xs font-bold uppercase tracking-[0.15em] text-tertiary mb-6 relative z-10">
+                            <h4 className="text-xs font-extrabold uppercase tracking-[0.2em] text-secondary mb-6 relative z-10">
                                 Your Learning Path
                             </h4>
 
@@ -433,8 +337,8 @@ export default function LearnPage() {
                                         ✓
                                     </div>
                                     <div>
-                                        <h5 className="text-sm font-bold text-secondary">Complete Onboarding</h5>
-                                        <p className="text-xs text-quaternary">Tuned study profile established</p>
+                                        <h5 className="text-sm font-bold text-primary">Complete Onboarding</h5>
+                                        <p className="text-xs text-tertiary">Tuned study profile established</p>
                                     </div>
                                 </div>
 
@@ -446,7 +350,7 @@ export default function LearnPage() {
                                     </div>
                                     <div>
                                         <h5 className="text-sm font-bold text-brand-secondary">Launch First Lesson</h5>
-                                        <p className="text-xs text-tertiary">Select any active module from the list</p>
+                                        <p className="text-xs text-secondary">Select any active module from the list</p>
                                     </div>
                                 </div>
 
@@ -456,8 +360,8 @@ export default function LearnPage() {
                                         3
                                     </div>
                                     <div>
-                                        <h5 className="text-sm font-bold text-secondary">Pass First Quiz</h5>
-                                        <p className="text-xs text-quaternary">Test your comprehension with customized quizzes</p>
+                                        <h5 className="text-sm font-bold text-tertiary">Pass First Quiz</h5>
+                                        <p className="text-xs text-tertiary">Test your comprehension with customized quizzes</p>
                                     </div>
                                 </div>
                             </div>
