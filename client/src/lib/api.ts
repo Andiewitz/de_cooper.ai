@@ -74,6 +74,7 @@ export interface UserResponse {
     last_activity_date: string | null;
     current_streak: number;
     longest_streak: number;
+    academic_elo: number;
 }
 
 export interface OnboardingData {

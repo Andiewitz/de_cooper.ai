@@ -40,6 +40,7 @@ class UserResponse(BaseModel):
     last_activity_date: datetime | None = None
     current_streak: int = 0
     longest_streak: int = 0
+    academic_elo: int = 500
 
     model_config = {"from_attributes": True}
 

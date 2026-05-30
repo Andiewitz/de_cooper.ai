@@ -38,6 +38,7 @@ class User(Base):
     last_activity_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     current_streak: Mapped[int] = mapped_column(default=0)
     longest_streak: Mapped[int] = mapped_column(default=0)
+    academic_elo: Mapped[int] = mapped_column(default=500)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
