@@ -22,10 +22,13 @@ export function MermaidRenderer({ chart, inline = true }: MermaidRendererProps) 
                 const mermaidMod = await import("mermaid");
                 const mermaid = mermaidMod.default;
 
+                if (!isMounted) return;
+
                 mermaid.initialize({
                     startOnLoad: false,
                     theme: "base",
                     securityLevel: "loose",
+                    suppressErrorRendering: true,
                     themeVariables: {
                         /* Brand-aligned purple palette */
                         background: "#FEFCF8",
@@ -43,7 +46,10 @@ export function MermaidRenderer({ chart, inline = true }: MermaidRendererProps) 
                     },
                 });
 
-                const { svg: renderedSvg } = await mermaid.render(id, chart);
+                if (!isMounted) return;
+
+                const dummyDiv = document.createElement("div");
+                const { svg: renderedSvg } = await mermaid.render(id, chart, dummyDiv);
                 if (isMounted) {
                     setSvg(renderedSvg);
                 }
