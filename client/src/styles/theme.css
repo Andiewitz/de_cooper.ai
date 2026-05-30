@@ -135,6 +135,19 @@
     --color-brand-900: rgb(66 48 125);
     --color-brand-950: rgb(44 28 95);
 
+    /* ACCENT — Warm amber/gold: achievement, streaks, highlights */
+    --color-accent-50:  rgb(255 251 235);
+    --color-accent-100: rgb(254 243 199);
+    --color-accent-200: rgb(253 230 138);
+    --color-accent-300: rgb(252 211 77);
+    --color-accent-400: rgb(251 191 36);
+    --color-accent-500: rgb(245 158 11);
+    --color-accent-600: rgb(217 119 6);
+    --color-accent-700: rgb(180 83 9);
+    --color-accent-800: rgb(146 64 14);
+    --color-accent-900: rgb(120 53 15);
+    --color-accent-950: rgb(69 26 3);
+
     /* LIGHT MODE VARIABLES */
 
     --color-alpha-white: rgb(254 252 248);

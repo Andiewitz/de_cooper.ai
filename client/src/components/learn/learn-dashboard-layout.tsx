@@ -93,56 +93,65 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
         const isCollapsed = forceExpanded ? false : collapsed;
 
         return (
-            <aside className="flex h-full w-full flex-col bg-primary">
+            <aside className="flex h-full w-full flex-col" style={{ background: "var(--color-brand-900)" }}>
                 {/* ── Header: App Branding ── */}
                 <div
                     className={cx(
-                        "flex items-center border-b border-secondary py-4",
+                        "flex items-center py-4",
                         isCollapsed ? "flex-col justify-center gap-2 px-2" : "justify-between gap-2 px-4",
                     )}
+                    style={{ borderBottom: "1px solid rgb(255 255 255 / 0.10)" }}
                 >
                     {isCollapsed ? (
-                        <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-brand-solid text-white font-bold text-sm shadow-sm select-none">
+                        <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg font-bold text-sm shadow-sm select-none" style={{ background: "var(--color-accent-500)", color: "#fff" }}>
                             C
                         </div>
                     ) : (
                         <div className="flex items-center gap-2.5 px-1 select-none min-w-0">
-                            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-brand-solid text-white font-bold text-sm shadow-sm">
+                            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg font-bold text-sm shadow-sm" style={{ background: "var(--color-accent-500)", color: "#fff" }}>
                                 C
                             </div>
                             <div className="grid leading-tight min-w-0">
-                                <span className="truncate text-sm font-bold text-primary">de Cooper</span>
-                                <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-quaternary/70">STEM Learning</span>
+                                <span className="truncate text-sm font-bold" style={{ color: "#fff" }}>de Cooper</span>
+                                <span className="truncate text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgb(214 187 251)" }}>STEM Learning</span>
                             </div>
                         </div>
                     )}
 
                     {!forceExpanded && (
-                        <Button
-                            color="tertiary"
-                            size="sm"
-                            className="hidden shrink-0 lg:inline-flex"
+                        <button
+                            type="button"
+                            className="hidden shrink-0 lg:inline-flex items-center justify-center rounded-md p-1.5 transition duration-150"
+                            style={{ color: "rgb(214 187 251)", background: "transparent" }}
                             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                            iconLeading={isCollapsed ? ChevronRight : ChevronLeft}
                             onClick={toggleCollapsed}
-                        />
+                            onMouseEnter={e => (e.currentTarget.style.background = "rgb(255 255 255 / 0.08)")}
+                            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                        >
+                            {isCollapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+                        </button>
                     )}
                 </div>
 
                 {/* ── Main Navigation List ── */}
-                <nav className={cx("flex flex-1 flex-col gap-1 py-4 overflow-y-auto", isCollapsed ? "px-2" : "px-3")}>
-                    
+                <nav className={cx("flex flex-1 flex-col gap-0.5 py-4 overflow-y-auto", isCollapsed ? "px-2" : "px-3")}>
+
                     {/* Home Link */}
                     <Link
                         href="/learn"
                         onClick={() => setMobileNavOpen(false)}
                         className={cx(
-                            "group/item flex w-full items-center rounded-lg outline-focus-ring transition duration-150 select-none",
-                            pathname === "/learn" ? "bg-secondary text-primary font-bold" : "hover:bg-primary_hover text-secondary",
+                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
                             isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
                         )}
+                        style={pathname === "/learn"
+                            ? { background: "var(--color-accent-500)", color: "#fff" }
+                            : { color: "rgb(214 187 251)" }
+                        }
+                        onMouseEnter={e => { if (pathname !== "/learn") (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                        onMouseLeave={e => { if (pathname !== "/learn") (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                     >
-                        <Home01 className={cx("size-5 shrink-0 transition-colors", pathname === "/learn" ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
+                        <Home01 className={cx("size-5 shrink-0 transition-colors", pathname === "/learn" ? "" : "")} style={{ color: pathname === "/learn" ? "#fff" : "var(--color-accent-300)" }} />
                         {!isCollapsed && <span className="text-sm font-semibold">Home</span>}
                     </Link>
 
@@ -156,12 +165,13 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                             // Collapsed Popover Trigger for Topics
                             <Dropdown.Root>
                                 <AriaButton
-                                    className={cx(
-                                        "group/item flex w-full items-center justify-center rounded-lg p-2.5 outline-none hover:bg-primary_hover text-secondary transition",
-                                        isAnyTopicActive ? "bg-secondary text-primary" : ""
-                                    )}
+                                    className="group/item flex w-full items-center justify-center rounded-lg p-2.5 outline-none transition"
+                                    style={isAnyTopicActive
+                                        ? { background: "var(--color-accent-500)", color: "#fff" }
+                                        : { color: "rgb(214 187 251)" }
+                                    }
                                 >
-                                    <Beaker01 className={cx("size-5 shrink-0 transition-colors", isAnyTopicActive ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
+                                    <Beaker01 className="size-5 shrink-0" style={{ color: isAnyTopicActive ? "#fff" : "var(--color-accent-300)" }} />
                                 </AriaButton>
                                 <Dropdown.Popover
                                     placement="right top"
@@ -198,20 +208,18 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                 <Collapsible.Trigger asChild>
                                     <button
                                         type="button"
-                                        className={cx(
-                                            "group/item flex w-full items-center justify-between rounded-lg p-2 text-sm font-semibold select-none cursor-pointer outline-none hover:bg-primary_hover transition duration-150",
-                                            isAnyTopicActive ? "text-primary" : "text-secondary"
-                                        )}
+                                        className="group/item flex w-full items-center justify-between rounded-lg p-2 text-sm font-semibold select-none cursor-pointer outline-none transition duration-150"
+                                        style={{ color: isAnyTopicActive ? "#fff" : "rgb(214 187 251)" }}
+                                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                                     >
                                         <div className="flex items-center gap-2.5">
-                                            <Beaker01 className={cx("size-5 shrink-0", isAnyTopicActive ? "text-fg-brand-primary" : "text-fg-quaternary")} />
+                                            <Beaker01 className="size-5 shrink-0" style={{ color: isAnyTopicActive ? "var(--color-accent-300)" : "var(--color-accent-300)" }} />
                                             <span>Topics</span>
                                         </div>
                                         <ChevronRight
-                                            className={cx(
-                                                "size-4 text-fg-quaternary transition-transform duration-200",
-                                                topicsOpen ? "rotate-90" : ""
-                                            )}
+                                            className={cx("size-4 transition-transform duration-200", topicsOpen ? "rotate-90" : "")}
+                                            style={{ color: "rgb(182 146 246)" }}
                                         />
                                     </button>
                                 </Collapsible.Trigger>
@@ -225,7 +233,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                                 transition={{ duration: 0.2, ease: "easeInOut" }}
                                                 className="overflow-hidden pl-3"
                                             >
-                                                <div className="mt-1 border-l-2 border-secondary/80 pl-2.5 space-y-1">
+                                                <div className="mt-1 pl-2.5 space-y-0.5" style={{ borderLeft: "2px solid rgb(255 255 255 / 0.15)" }}>
                                                     {TOPIC_ITEMS.map((topic) => {
                                                         const TopicIcon = topic.icon;
                                                         const active = isTopicRouteActive(topic.id);
@@ -234,13 +242,16 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                                                 key={topic.id}
                                                                 href={`/learn/${topic.id}`}
                                                                 onClick={() => setMobileNavOpen(false)}
-                                                                className={cx(
-                                                                    "group/sub flex items-center gap-2 rounded-md p-1.5 text-xs select-none transition duration-150",
-                                                                    active ? "bg-brand-primary text-brand-secondary font-bold" : "hover:bg-primary_hover text-secondary hover:text-primary"
-                                                                )}
+                                                                className="group/sub flex items-center gap-2 rounded-md p-1.5 text-xs select-none transition duration-150 outline-none"
+                                                                style={active
+                                                                    ? { background: "var(--color-accent-500)", color: "#fff" }
+                                                                    : { color: "rgb(214 187 251)" }
+                                                                }
+                                                                onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                                                                onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                                                             >
-                                                                <TopicIcon className={cx("size-4 shrink-0 transition-colors", active ? "text-brand-secondary" : "text-fg-quaternary group-hover/sub:text-fg-quaternary_hover")} />
-                                                                <span>{topic.label}</span>
+                                                                <TopicIcon className="size-4 shrink-0" style={{ color: active ? "#fff" : "var(--color-accent-300)" }} />
+                                                                <span className={active ? "font-bold" : ""}>{topic.label}</span>
                                                             </Link>
                                                         );
                                                     })}
@@ -258,12 +269,17 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         href="/learn/calendar"
                         onClick={() => setMobileNavOpen(false)}
                         className={cx(
-                            "group/item flex w-full items-center rounded-lg outline-focus-ring transition duration-150 select-none",
-                            pathname.startsWith("/learn/calendar") ? "bg-secondary text-primary font-bold" : "hover:bg-primary_hover text-secondary",
+                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
                             isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
                         )}
+                        style={pathname.startsWith("/learn/calendar")
+                            ? { background: "var(--color-accent-500)", color: "#fff" }
+                            : { color: "rgb(214 187 251)" }
+                        }
+                        onMouseEnter={e => { if (!pathname.startsWith("/learn/calendar")) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                        onMouseLeave={e => { if (!pathname.startsWith("/learn/calendar")) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                     >
-                        <Calendar className={cx("size-5 shrink-0 transition-colors", pathname.startsWith("/learn/calendar") ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
+                        <Calendar className="size-5 shrink-0" style={{ color: pathname.startsWith("/learn/calendar") ? "#fff" : "var(--color-accent-300)" }} />
                         {!isCollapsed && <span className="text-sm font-semibold">Calendar</span>}
                     </Link>
 
@@ -272,12 +288,17 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         href="/learn/leaderboards"
                         onClick={() => setMobileNavOpen(false)}
                         className={cx(
-                            "group/item flex w-full items-center rounded-lg outline-focus-ring transition duration-150 select-none",
-                            pathname.startsWith("/learn/leaderboards") ? "bg-secondary text-primary font-bold" : "hover:bg-primary_hover text-secondary",
+                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
                             isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
                         )}
+                        style={pathname.startsWith("/learn/leaderboards")
+                            ? { background: "var(--color-accent-500)", color: "#fff" }
+                            : { color: "rgb(214 187 251)" }
+                        }
+                        onMouseEnter={e => { if (!pathname.startsWith("/learn/leaderboards")) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                        onMouseLeave={e => { if (!pathname.startsWith("/learn/leaderboards")) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                     >
-                        <Trophy01 className={cx("size-5 shrink-0 transition-colors", pathname.startsWith("/learn/leaderboards") ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
+                        <Trophy01 className="size-5 shrink-0" style={{ color: pathname.startsWith("/learn/leaderboards") ? "#fff" : "var(--color-accent-300)" }} />
                         {!isCollapsed && <span className="text-sm font-semibold">Leaderboards</span>}
                     </Link>
 
@@ -286,12 +307,17 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         href="/learn/competitive"
                         onClick={() => setMobileNavOpen(false)}
                         className={cx(
-                            "group/item flex w-full items-center rounded-lg outline-focus-ring transition duration-150 select-none",
-                            pathname.startsWith("/learn/competitive") ? "bg-secondary text-primary font-bold" : "hover:bg-primary_hover text-secondary",
+                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
                             isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
                         )}
+                        style={pathname.startsWith("/learn/competitive")
+                            ? { background: "var(--color-accent-500)", color: "#fff" }
+                            : { color: "rgb(214 187 251)" }
+                        }
+                        onMouseEnter={e => { if (!pathname.startsWith("/learn/competitive")) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                        onMouseLeave={e => { if (!pathname.startsWith("/learn/competitive")) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                     >
-                        <Atom01 className={cx("size-5 shrink-0 transition-colors", pathname.startsWith("/learn/competitive") ? "text-fg-brand-primary" : "text-fg-quaternary group-hover/item:text-fg-quaternary_hover")} />
+                        <Atom01 className="size-5 shrink-0" style={{ color: pathname.startsWith("/learn/competitive") ? "#fff" : "var(--color-accent-300)" }} />
                         {!isCollapsed && <span className="text-sm font-semibold">Competitive Mode</span>}
                     </Link>
 
@@ -301,33 +327,42 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                         target="_blank"
                         rel="noopener noreferrer"
                         className={cx(
-                            "group/item flex w-full items-center rounded-lg outline-focus-ring transition duration-150 select-none hover:bg-primary_hover text-secondary",
+                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
                             isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
                         )}
+                        style={{ color: "rgb(214 187 251)" }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                     >
-                        <FileCode01 className="size-5 shrink-0 text-fg-quaternary group-hover/item:text-fg-quaternary_hover" />
+                        <FileCode01 className="size-5 shrink-0" style={{ color: "var(--color-accent-300)" }} />
                         {!isCollapsed && <span className="text-sm font-semibold">Docs for devs</span>}
                     </a>
 
                 </nav>
 
                 {/* ── Footer: User Profile Dropdown ── */}
-                <div className={cx("relative border-t border-secondary p-3", isCollapsed && "flex flex-col items-center gap-2")}>
+                <div
+                    className={cx("relative p-3", isCollapsed && "flex flex-col items-center gap-2")}
+                    style={{ borderTop: "1px solid rgb(255 255 255 / 0.10)" }}
+                >
                     <Dropdown.Root>
                         <AriaButton
                             className={cx(
-                                "flex w-full items-center gap-3 rounded-xl p-2.5 text-left hover:bg-primary_hover transition duration-150 select-none cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-solid/40",
+                                "flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition duration-150 select-none cursor-pointer outline-none",
                                 isCollapsed ? "justify-center" : ""
                             )}
+                            style={{ color: "#fff" }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                         >
-                            <Avatar size="sm" initials={initials} alt={displayName} className="ring-2 ring-secondary/50 shadow-inner" />
+                            <Avatar size="sm" initials={initials} alt={displayName} className="ring-2 shadow-inner" style={{ "--tw-ring-color": "rgb(255 255 255 / 0.25)" } as React.CSSProperties} />
                             {!isCollapsed && (
                                 <div className="min-w-0 flex-1 leading-tight">
-                                    <p className="truncate text-sm font-bold text-primary">{displayName}</p>
-                                    <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
+                                    <p className="truncate text-sm font-bold" style={{ color: "#fff" }}>{displayName}</p>
+                                    <p className="truncate text-[10px]" style={{ color: "rgb(214 187 251)" }}>{user?.email}</p>
                                 </div>
                             )}
-                            {!isCollapsed && <ChevronRight className="size-4 shrink-0 text-fg-quaternary" />}
+                            {!isCollapsed && <ChevronRight className="size-4 shrink-0" style={{ color: "rgb(182 146 246)" }} />}
                         </AriaButton>
                         <Dropdown.Popover
                             placement={isCollapsed ? "right bottom" : "top right"}
@@ -344,7 +379,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                                 <Dropdown.Item
                                     onAction={() => router.push("/learn/upgrade")}
                                 >
-                                    <span className="text-amber-500 font-bold select-none text-base leading-none mr-2">✦</span>
+                                    <span className="font-bold select-none text-base leading-none mr-2" style={{ color: "var(--color-accent-500)" }}>✦</span>
                                     <span className="font-semibold text-brand-secondary">Upgrade to Pro</span>
                                 </Dropdown.Item>
                                 <Dropdown.Item
@@ -394,16 +429,19 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
             {/* Sidebar Shell */}
             <div
                 className={cx(
-                    "fixed inset-y-0 left-0 z-50 border-r border-secondary bg-primary transition-[width] duration-200 ease-linear lg:translate-x-0",
+                    "fixed inset-y-0 left-0 z-50 transition-[width] duration-200 ease-linear lg:translate-x-0",
                     mobileNavOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
                 )}
-                style={{ width: mobileNavOpen ? SIDEBAR_WIDTH_EXPANDED : sidebarWidth }}
+                style={{ width: mobileNavOpen ? SIDEBAR_WIDTH_EXPANDED : sidebarWidth, background: "var(--color-brand-900)", borderRight: "1px solid rgb(255 255 255 / 0.08)" }}
             >
-                <div className="flex h-12 items-center justify-end border-b border-secondary px-3 lg:hidden">
+                <div className="flex h-12 items-center justify-end px-3 lg:hidden" style={{ borderBottom: "1px solid rgb(255 255 255 / 0.10)" }}>
                     <button
                         type="button"
                         aria-label="Close menu"
-                        className="rounded-md p-2 text-fg-quaternary hover:bg-primary_hover"
+                        className="rounded-md p-2 transition"
+                        style={{ color: "rgb(214 187 251)" }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                         onClick={() => setMobileNavOpen(false)}
                     >
                         <X className="size-5" />
