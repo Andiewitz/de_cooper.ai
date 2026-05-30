@@ -355,7 +355,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
                             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
                             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                         >
-                            <Avatar size="sm" initials={initials} alt={displayName} className="ring-2 shadow-inner" style={{ "--tw-ring-color": "rgb(255 255 255 / 0.25)" } as React.CSSProperties} />
+                            <Avatar size="sm" initials={initials} alt={displayName} className="ring-2 ring-[rgba(255,255,255,0.25)] shadow-inner" />
                             {!isCollapsed && (
                                 <div className="min-w-0 flex-1 leading-tight">
                                     <p className="truncate text-sm font-bold" style={{ color: "#fff" }}>{displayName}</p>
