@@ -124,13 +124,16 @@ function groupMessagesToExchanges(messages: any[]): Exchange[] {
                 list.push({
                     id: currentExchange.id || crypto.randomUUID(),
                     question: currentExchange.question || "",
+                    displayQuestion: currentExchange.displayQuestion,
                     answer: currentExchange.answer || "",
                     displayed: currentExchange.displayed || currentExchange.answer || "",
                 });
             }
+            const isSystemNotification = msg.content.startsWith("[System Notification: The user has completed the flashcard review.");
             currentExchange = {
                 id: msg.id,
                 question: msg.content,
+                displayQuestion: isSystemNotification ? "I've completed reviewing the flashcards." : undefined,
                 answer: "",
                 displayed: "",
             };
@@ -154,6 +157,7 @@ function groupMessagesToExchanges(messages: any[]): Exchange[] {
         list.push({
             id: currentExchange.id || crypto.randomUUID(),
             question: currentExchange.question || "",
+            displayQuestion: currentExchange.displayQuestion,
             answer: currentExchange.answer || "",
             displayed: currentExchange.displayed || "",
         });
