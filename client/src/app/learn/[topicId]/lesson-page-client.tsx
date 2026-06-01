@@ -563,14 +563,14 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
                                 {/* Text caption */}
                                 {!isWaiting && displayedText && (
-                                    <div className="w-full max-w-2xl text-center shrink-0">
+                                    <div className={`w-full max-w-2xl text-center shrink-0 ${flashcards ? "mt-2" : ""}`}>
                                         <div className="prose max-w-none">
                                             <ReactMarkdown
                                                 remarkPlugins={[remarkMath]}
                                                 rehypePlugins={[rehypeKatex]}
                                                 components={{
                                                     p: ({ children }) => (
-                                                        <p className="text-md sm:text-lg text-primary leading-relaxed mb-3 last:mb-0">
+                                                        <p className={`leading-relaxed mb-3 last:mb-0 ${flashcards ? "text-xs text-tertiary" : "text-md sm:text-lg text-primary"}`}>
                                                             {children}
                                                         </p>
                                                     ),

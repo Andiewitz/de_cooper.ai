@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, HelpCircle } from "@untitledui/icons";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, HelpCircle, RefreshCcw01, Check } from "@untitledui/icons";
 
 interface FlashcardData {
     front: string;
@@ -21,23 +21,26 @@ const DEFAULT_CARDS = [
     { id: 5, q: "What does DNA stand for?", a: "Deoxyribonucleic Acid — carries genetic information." },
 ];
 
+// Stack depth layers — top card is layer 0
 const DEPTH = [
-    { scale: 1,    dy: 0,  rot: 0,    z: 10 },
-    { scale: 0.965, dy: 9,  rot: -2.1, z: 9 },
-    { scale: 0.93, dy: 17, rot: 2.6,  z: 8 },
-    { scale: 0.895, dy: 24, rot: -1.3, z: 7 },
+    { scale: 1,     dy: 0,  rot: 0,    z: 10 },
+    { scale: 0.96,  dy: 12, rot: -2.1, z: 9 },
+    { scale: 0.92,  dy: 22, rot: 2.6,  z: 8 },
+    { scale: 0.88,  dy: 30, rot: -1.3, z: 7 },
 ];
 
-const W = 290;
-const H = 190;
+const W = 400;
+const H = 260;
 const THROW_PX = 88;
 const THROW_VEL = 0.32;
 
 export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
     const [deck, setDeck] = useState<any[]>([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
     const [flipped, setFlipped] = useState(false);
     const [drag, setDrag] = useState({ on: false, x: 0, y: 0, ox: 0, oy: 0 });
-    const [exit, setExit] = useState<any>(null); // { x, y, rot } — top card flying off
+    const [exit, setExit] = useState<any>(null);
+    const [completed, setCompleted] = useState(false);
 
     const topRef = useRef<HTMLDivElement>(null);
     const velBuf = useRef<any[]>([]);
@@ -49,11 +52,38 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
         } else {
             setDeck(DEFAULT_CARDS);
         }
+        setCurrentIndex(0);
         setFlipped(false);
+        setCompleted(false);
     }, [cards]);
 
+    const totalCards = deck.length;
+    const remaining = deck.slice(currentIndex);
+
+    const advanceCard = useCallback(() => {
+        const nextIdx = currentIndex + 1;
+        if (nextIdx >= totalCards) {
+            setCompleted(true);
+        }
+        setCurrentIndex(nextIdx);
+        setFlipped(false);
+    }, [currentIndex, totalCards]);
+
+    const goBack = useCallback(() => {
+        if (currentIndex <= 0) return;
+        setCurrentIndex(prev => prev - 1);
+        setFlipped(false);
+        setCompleted(false);
+    }, [currentIndex]);
+
+    const restart = useCallback(() => {
+        setCurrentIndex(0);
+        setFlipped(false);
+        setCompleted(false);
+    }, []);
+
     const doThrow = useCallback((vx: number, vy: number, dir: "left" | "right") => {
-        if (exit || deck.length === 0) return;
+        if (exit || remaining.length === 0) return;
         const speed = Math.max(Math.abs(vx) * 280, 460);
         const ex = dir === "left" ? -speed : speed;
         const ey = vy * 60 - 55;
@@ -64,14 +94,10 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
         setExit({ x: ex, y: ey, rot: er });
         setFlipped(false);
         setTimeout(() => {
-            setDeck(prev => {
-                if (prev.length <= 1) return prev;
-                const [h, ...t] = prev;
-                return [...t, h];
-            });
+            advanceCard();
             setExit(null);
         }, 420);
-    }, [exit, deck.length]);
+    }, [exit, remaining.length, advanceCard]);
 
     const onPD = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
         if (exit) return;
@@ -104,20 +130,59 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
         }
     }, [drag, doThrow]);
 
+    // Keyboard controls — only arrow keys advance/go back, space flips
     useEffect(() => {
         const h = (e: KeyboardEvent) => {
             if (e.key === "ArrowRight") doThrow(0, 0, "left");
-            else if (e.key === "ArrowLeft") doThrow(0, 0, "right");
+            else if (e.key === "ArrowLeft") goBack();
             else if (e.key === " ") {
                 e.preventDefault();
-                if (!exit && !drag.on) setFlipped(f => !f);
+                if (!exit && !drag.on && !completed) setFlipped(f => !f);
             }
         };
         window.addEventListener("keydown", h);
         return () => window.removeEventListener("keydown", h);
-    }, [doThrow, exit, drag.on]);
+    }, [doThrow, goBack, exit, drag.on, completed]);
 
     if (deck.length === 0) return null;
+
+    // Completed state
+    if (completed) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
+                className="w-full max-w-lg select-none"
+            >
+                <div className="rounded-2xl border border-brand/20 bg-brand-primary p-8 flex flex-col items-center gap-5">
+                    <div className="flex size-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                        <Check className="size-7 text-emerald-500" />
+                    </div>
+                    <div className="text-center">
+                        <h4 className="text-lg font-bold text-primary mb-1">
+                            Deck Complete!
+                        </h4>
+                        <p className="text-sm text-secondary">
+                            You reviewed all {totalCards} cards
+                        </p>
+                    </div>
+                    {/* Progress bar — full */}
+                    <div className="w-full max-w-xs h-1.5 rounded-full bg-secondary/30 overflow-hidden">
+                        <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: "100%" }} />
+                    </div>
+                    <button
+                        type="button"
+                        onClick={restart}
+                        className="flex items-center gap-2 rounded-xl border border-secondary bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-secondary hover:bg-secondary/40 transition duration-150 cursor-pointer"
+                    >
+                        <RefreshCcw01 className="size-3.5" />
+                        Review Again
+                    </button>
+                </div>
+            </motion.div>
+        );
+    }
 
     const dragRot = drag.on ? drag.x * 0.07 : 0;
     const dragLift = drag.on ? Math.min(Math.abs(drag.x) * 0.065, 14) : 0;
@@ -126,17 +191,20 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
 
     // As you drag the top card away, the stack underneath rises toward you
     const stackRise = sp;
-    const visible = deck.slice(0, 4);
+    const visible = remaining.slice(0, 4);
+
+    // Progress
+    const progressPct = totalCards > 0 ? ((currentIndex) / totalCards) * 100 : 0;
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.1 }}
-            className="w-full max-w-md rounded-2xl border border-brand/20 bg-brand-primary p-6 shadow-sm flex flex-col items-center select-none overflow-hidden relative"
+            className="w-full max-w-lg select-none overflow-visible relative"
         >
-            {/* Header Title */}
-            <div className="flex w-full items-center gap-3 mb-6">
+            {/* Header */}
+            <div className="flex w-full items-center gap-3 mb-5">
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-solid text-white shadow-inner">
                     <HelpCircle className="size-4.5" />
                 </div>
@@ -145,13 +213,24 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
                         Review Deck
                     </h4>
                     <p className="text-[10px] text-secondary mt-0.5 font-medium">
-                        {deck.length} concept cards — swipe to learn
+                        {currentIndex + 1} of {totalCards} — swipe or tap to study
                     </p>
                 </div>
+                <span className="text-xs font-mono font-bold text-quaternary tabular-nums">
+                    {currentIndex + 1}/{totalCards}
+                </span>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full h-1 rounded-full bg-secondary/30 mb-6 overflow-hidden">
+                <div
+                    className="h-full rounded-full bg-brand-solid transition-all duration-500 ease-out"
+                    style={{ width: `${progressPct}%` }}
+                />
             </div>
 
             {/* Stack Area */}
-            <div className="relative" style={{ width: W, height: H + 28 }}>
+            <div className="relative mx-auto" style={{ width: W, height: H + 34 }}>
                 {/* Render back-to-front so top card is last in DOM */}
                 {[...visible].reverse().map((card, ri) => {
                     const idx = visible.length - 1 - ri;
@@ -226,7 +305,8 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
                             {isTop ? (
                                 <TopCard
                                     card={card}
-                                    deck={deck}
+                                    cardNumber={currentIndex + 1}
+                                    totalCards={totalCards}
                                     flipped={flipped}
                                     sd={sd}
                                     sp={sp}
@@ -239,27 +319,13 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
                 })}
             </div>
 
-            {/* Progress Pills */}
-            <div className="flex gap-1.5 items-center justify-center mt-5">
-                {deck.map((c) => {
-                    const cur = deck[0]?.id === c.id;
-                    return (
-                        <div
-                            key={c.id}
-                            className={`h-1 rounded-full transition-all duration-300 ${
-                                cur ? "w-6 bg-brand-solid" : "w-1.5 bg-secondary/60"
-                            }`}
-                        />
-                    );
-                })}
-            </div>
-
-            {/* Throw Buttons */}
-            <div className="flex gap-3 mt-6">
+            {/* Navigation Buttons */}
+            <div className="flex gap-3 mt-6 justify-center">
                 <button
                     type="button"
-                    onClick={() => doThrow(0, 0, "right")}
-                    className="flex items-center gap-1.5 rounded-lg border border-secondary bg-primary px-4 py-2 text-[10px] font-extrabold uppercase tracking-widest text-secondary hover:bg-secondary/40 transition duration-150 cursor-pointer"
+                    onClick={goBack}
+                    disabled={currentIndex <= 0}
+                    className="flex items-center gap-1.5 rounded-lg border border-secondary bg-primary px-5 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-secondary hover:bg-secondary/40 transition duration-150 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     <ChevronLeft className="size-3.5 stroke-[2.5]" />
                     Back
@@ -267,31 +333,33 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
                 <button
                     type="button"
                     onClick={() => doThrow(0, 0, "left")}
-                    className="flex items-center gap-1.5 rounded-lg border border-secondary bg-primary px-4 py-2 text-[10px] font-extrabold uppercase tracking-widest text-secondary hover:bg-secondary/40 transition duration-150 cursor-pointer"
+                    disabled={remaining.length === 0}
+                    className="flex items-center gap-1.5 rounded-lg border border-secondary bg-primary px-5 py-2.5 text-[10px] font-extrabold uppercase tracking-widest text-secondary hover:bg-secondary/40 transition duration-150 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     Next
                     <ChevronRight className="size-3.5 stroke-[2.5]" />
                 </button>
             </div>
 
-            <div className="mt-4 text-[8px] text-tertiary font-extrabold uppercase tracking-[0.2em]">
+            <div className="mt-4 text-[8px] text-tertiary font-extrabold uppercase tracking-[0.2em] text-center">
                 Drag · Tap to Flip · Arrow Keys · Space
             </div>
         </motion.div>
     );
 }
 
+/* ────────────────────────── Sub-components ────────────────────────── */
+
 interface TopCardProps {
     card: any;
-    deck: any[];
+    cardNumber: number;
+    totalCards: number;
     flipped: boolean;
     sd: "l" | "r" | null;
     sp: number;
 }
 
-function TopCard({ card, deck, flipped, sd, sp }: TopCardProps) {
-    const cardIndex = deck.findIndex(c => c.id === card.id) + 1;
-
+function TopCard({ card, cardNumber, totalCards, flipped, sd, sp }: TopCardProps) {
     return (
         <div
             className="w-full h-full relative transition-transform duration-500"
@@ -302,34 +370,34 @@ function TopCard({ card, deck, flipped, sd, sp }: TopCardProps) {
         >
             {/* Question Side */}
             <div
-                className="absolute inset-0 rounded-2xl border border-secondary bg-primary flex flex-col p-5 justify-between overflow-hidden"
+                className="absolute inset-0 rounded-2xl border border-secondary bg-primary flex flex-col p-6 justify-between overflow-hidden"
                 style={{ backfaceVisibility: "hidden" }}
             >
                 <div className="flex justify-between items-center">
-                    <span className="text-[8px] font-extrabold uppercase tracking-[0.2em] text-brand-secondary">
+                    <span className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-brand-secondary">
                         Question Focus
                     </span>
-                    <span className="text-[9px] font-mono font-bold text-quaternary">
-                        {cardIndex} / {deck.length}
+                    <span className="text-[10px] font-mono font-bold text-quaternary">
+                        {cardNumber} / {totalCards}
                     </span>
                 </div>
 
-                <div className="flex-1 flex items-center justify-center text-sm font-bold text-primary text-center px-2 py-4 leading-relaxed font-sans">
+                <div className="flex-1 flex items-center justify-center text-base font-bold text-primary text-center px-3 py-5 leading-relaxed font-sans">
                     {card.q}
                 </div>
 
-                <div className="text-center text-[8px] font-extrabold uppercase tracking-[0.18em] text-quaternary">
+                <div className="text-center text-[9px] font-extrabold uppercase tracking-[0.18em] text-quaternary">
                     tap to reveal answer
                 </div>
 
                 {/* Swipe Overlay Tints */}
                 {sd === "l" && (
                     <div
-                        className="absolute inset-0 rounded-2xl flex items-center justify-end pr-6 pointer-events-none transition duration-75"
+                        className="absolute inset-0 rounded-2xl flex items-center justify-end pr-8 pointer-events-none transition duration-75"
                         style={{ background: `rgba(240,68,56,${sp * 0.08})` }}
                     >
                         <span
-                            className="text-[9px] font-extrabold uppercase tracking-widest text-red-500"
+                            className="text-[10px] font-extrabold uppercase tracking-widest text-red-500"
                             style={{ opacity: sp }}
                         >
                             next →
@@ -338,11 +406,11 @@ function TopCard({ card, deck, flipped, sd, sp }: TopCardProps) {
                 )}
                 {sd === "r" && (
                     <div
-                        className="absolute inset-0 rounded-2xl flex items-center justify-start pl-6 pointer-events-none transition duration-75"
+                        className="absolute inset-0 rounded-2xl flex items-center justify-start pl-8 pointer-events-none transition duration-75"
                         style={{ background: `rgba(18,183,106,${sp * 0.08})` }}
                     >
                         <span
-                            className="text-[9px] font-extrabold uppercase tracking-widest text-emerald-600"
+                            className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-600"
                             style={{ opacity: sp }}
                         >
                             ← back
@@ -353,26 +421,26 @@ function TopCard({ card, deck, flipped, sd, sp }: TopCardProps) {
 
             {/* Answer Side */}
             <div
-                className="absolute inset-0 rounded-2xl border border-brand-secondary bg-[#1c1917] flex flex-col p-5 justify-between"
+                className="absolute inset-0 rounded-2xl border border-brand-secondary bg-[#1c1917] flex flex-col p-6 justify-between"
                 style={{
                     backfaceVisibility: "hidden",
                     transform: "rotateY(180deg)",
                 }}
             >
                 <div className="flex justify-between items-center">
-                    <span className="text-[8px] font-extrabold uppercase tracking-[0.2em] text-brand-secondary">
+                    <span className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-brand-secondary">
                         Answer Core
                     </span>
-                    <span className="text-[9px] font-mono font-bold text-brand-secondary">
-                        {cardIndex} / {deck.length}
+                    <span className="text-[10px] font-mono font-bold text-brand-secondary">
+                        {cardNumber} / {totalCards}
                     </span>
                 </div>
 
-                <div className="flex-1 flex items-center justify-center text-xs font-semibold text-[#f0ebe3] text-center px-2 py-4 leading-relaxed font-sans">
+                <div className="flex-1 flex items-center justify-center text-sm font-semibold text-[#f0ebe3] text-center px-3 py-5 leading-relaxed font-sans">
                     {card.a}
                 </div>
 
-                <div className="text-center text-[8px] font-extrabold uppercase tracking-[0.18em] text-brand-secondary">
+                <div className="text-center text-[9px] font-extrabold uppercase tracking-[0.18em] text-brand-secondary">
                     swipe to continue
                 </div>
             </div>
