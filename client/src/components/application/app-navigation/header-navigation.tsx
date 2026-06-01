@@ -1,6 +1,7 @@
 "use client";
 
 import { type FC, type ReactNode } from "react";
+import Link from "next/link";
 import { Bell01, LifeBuoy01, SearchLg, Settings01 } from "@untitledui/icons";
 import { TabList, Tabs } from "@/components/application/tabs/tabs";
 import { BadgeWithDot } from "@/components/base/badges/badges";
@@ -166,13 +167,13 @@ export const HeaderNavigationBase = ({
                 >
                     <div className={cx("flex w-full max-w-container items-center pr-3 pl-4 md:px-8", centered && "gap-8")}>
                         <div className={cx("flex items-center", centered ? "flex-1" : "mr-4")}>
-                            <a
+                            <Link
                                 aria-label="Go to homepage"
                                 href="/"
                                 className="rounded-xs outline-focus-ring focus-visible:outline-2 focus-visible:outline-offset-2"
                             >
                                 <UntitledLogo className="h-6" />
-                            </a>
+                            </Link>
                         </div>
 
                         <nav>

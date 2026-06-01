@@ -192,7 +192,11 @@ const Trigger = ({ className, children, asChild, direction, style, ...props }: T
     const handleClick = () => {
         if (isDisabled) return;
 
-        direction === "prev" ? scrollPrev() : scrollNext();
+        if (direction === "prev") {
+            scrollPrev();
+        } else {
+            scrollNext();
+        }
     };
 
     const computedClassName = typeof className === "function" ? className({ isDisabled }) : className;
