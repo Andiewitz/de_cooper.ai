@@ -203,32 +203,6 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
             transition={{ duration: 0.35, delay: 0.1 }}
             className="w-full max-w-lg select-none overflow-visible relative"
         >
-            {/* Header */}
-            <div className="flex w-full items-center gap-3 mb-5">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-solid text-white shadow-inner">
-                    <HelpCircle className="size-4.5" />
-                </div>
-                <div className="min-w-0 flex-1 text-left">
-                    <h4 className="text-xs font-extrabold uppercase tracking-[0.15em] text-primary">
-                        Review Deck
-                    </h4>
-                    <p className="text-[10px] text-secondary mt-0.5 font-medium">
-                        {currentIndex + 1} of {totalCards} — swipe or tap to study
-                    </p>
-                </div>
-                <span className="text-xs font-mono font-bold text-quaternary tabular-nums">
-                    {currentIndex + 1}/{totalCards}
-                </span>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="w-full h-1 rounded-full bg-secondary/30 mb-6 overflow-hidden">
-                <div
-                    className="h-full rounded-full bg-brand-solid transition-all duration-500 ease-out"
-                    style={{ width: `${progressPct}%` }}
-                />
-            </div>
-
             {/* Stack Area */}
             <div className="relative mx-auto" style={{ width: W, height: H + 34 }}>
                 {/* Render back-to-front so top card is last in DOM */}
@@ -300,7 +274,7 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
                                         : "0 12px 36px rgba(0,0,0,0.08), 0 3px 8px rgba(0,0,0,0.04)"
                                     : `0 ${3 + idx * 2}px ${8 + idx * 4}px rgba(0,0,0,${0.04 + idx * 0.02})`,
                                 touchAction: "none",
-                            }}
+                             }}
                         >
                             {isTop ? (
                                 <TopCard
@@ -339,10 +313,6 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
                     Next
                     <ChevronRight className="size-3.5 stroke-[2.5]" />
                 </button>
-            </div>
-
-            <div className="mt-4 text-[8px] text-tertiary font-extrabold uppercase tracking-[0.2em] text-center">
-                Drag · Tap to Flip · Arrow Keys · Space
             </div>
         </motion.div>
     );

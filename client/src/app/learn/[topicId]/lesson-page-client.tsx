@@ -409,23 +409,25 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                     </span>
                 </button>
 
-                <div className="flex items-center gap-4">
-                    {hasSlides && (
-                        <span className="text-[10px] font-mono text-quaternary tabular-nums">
-                            {currentSlide + 1} / {exchanges.length}
-                        </span>
-                    )}
-                    <div className="flex items-center gap-2.5">
-                        {topicConfig[topicId] && (
-                            <div className={`flex size-8 items-center justify-center rounded-lg ${topicConfig[topicId].gradient} text-white shadow-xs`}>
-                                {(() => { const TIcon = topicConfig[topicId].Icon; return <TIcon className="size-4" aria-hidden />; })()}
-                            </div>
+                {!flashcards && (
+                    <div className="flex items-center gap-4">
+                        {hasSlides && (
+                            <span className="text-[10px] font-mono text-quaternary tabular-nums">
+                                {currentSlide + 1} / {exchanges.length}
+                            </span>
                         )}
-                        <p className="text-xs font-bold uppercase tracking-widest text-primary">
-                            {topicLabels[topicId] || topicId}
-                        </p>
+                        <div className="flex items-center gap-2.5">
+                            {topicConfig[topicId] && (
+                                <div className={`flex size-8 items-center justify-center rounded-lg ${topicConfig[topicId].gradient} text-white shadow-xs`}>
+                                    {(() => { const TIcon = topicConfig[topicId].Icon; return <TIcon className="size-4" aria-hidden />; })()}
+                                </div>
+                            )}
+                            <p className="text-xs font-bold uppercase tracking-widest text-primary">
+                                {topicLabels[topicId] || topicId}
+                            </p>
+                        </div>
                     </div>
-                </div>
+                )}
             </header>
 
             {/* ═══════════════ Slide Viewer ═══════════════ */}
@@ -435,7 +437,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                 <div className="pointer-events-none absolute bottom-20 -left-16 size-48 rounded-full bg-[#FEF08A]/10 opacity-30 blur-3xl" />
 
                 {/* Dot indicators */}
-                {hasSlides && exchanges.length > 1 && (
+                {hasSlides && exchanges.length > 1 && !flashcards && (
                     <div className="flex items-center justify-center gap-1.5 pt-4 pb-2 shrink-0 relative z-10">
                         {exchanges.map((_, i) => (
                             <button
@@ -456,7 +458,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                 {/* Main slide area */}
                 <div className="flex-1 min-h-0 flex items-center justify-center relative overflow-hidden">
                     {/* Prev arrow */}
-                    {hasSlides && currentSlide > 0 && (
+                    {hasSlides && currentSlide > 0 && !flashcards && (
                         <button
                             type="button"
                             onClick={() => goToSlide(currentSlide - 1)}
@@ -468,7 +470,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                     )}
 
                     {/* Next arrow */}
-                    {hasSlides && currentSlide < exchanges.length - 1 && (
+                    {hasSlides && currentSlide < exchanges.length - 1 && !flashcards && (
                         <button
                             type="button"
                             onClick={() => goToSlide(currentSlide + 1)}
@@ -509,7 +511,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                 )}
 
                                 {/* Concept label + display title */}
-                                {!isWaiting && (
+                                {!isWaiting && !flashcards && (
                                     <>
                                         <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-secondary mb-3 shrink-0">
                                             Concept Focus
@@ -562,7 +564,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                 )}
 
                                 {/* Text caption */}
-                                {!isWaiting && displayedText && (
+                                {!isWaiting && displayedText && !flashcards && (
                                     <div className={`w-full max-w-2xl text-center shrink-0 ${flashcards ? "mt-2" : ""}`}>
                                         <div className="prose max-w-none">
                                             <ReactMarkdown
@@ -803,48 +805,50 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                     </div>
 
                     {/* Curated STEM Pills below the text area */}
-                    <div className="flex flex-wrap items-center justify-center gap-2 pt-1.5">
-                        <button
-                            type="button"
-                            onClick={() => setInput("Explain the formulas and derivations of ")}
-                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
-                        >
-                            <span className="text-brand-secondary">✎</span>
-                            <span>Write</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setInput("Teach me the core concepts of ")}
-                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
-                        >
-                            <span>🎓</span>
-                            <span>Learn</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setInput("Provide a practical algorithm or code for ")}
-                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
-                        >
-                            <span className="font-mono text-brand-secondary">&lt;/&gt;</span>
-                            <span>Code</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setInput("Give me the fundamental equations for ")}
-                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
-                        >
-                            <span>💡</span>
-                            <span>Formulas</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => sendMessage("Surprise me with a challenging STEM problem!")}
-                            className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
-                        >
-                            <span>🔮</span>
-                            <span>Tutor's Choice</span>
-                        </button>
-                    </div>
+                    {!flashcards && (
+                        <div className="flex flex-wrap items-center justify-center gap-2 pt-1.5">
+                            <button
+                                type="button"
+                                onClick={() => setInput("Explain the formulas and derivations of ")}
+                                className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                            >
+                                <span className="text-brand-secondary">✎</span>
+                                <span>Write</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setInput("Teach me the core concepts of ")}
+                                className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                            >
+                                <span>🎓</span>
+                                <span>Learn</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setInput("Provide a practical algorithm or code for ")}
+                                className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                            >
+                                <span className="font-mono text-brand-secondary">&lt;/&gt;</span>
+                                <span>Code</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setInput("Give me the fundamental equations for ")}
+                                className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                            >
+                                <span>💡</span>
+                                <span>Formulas</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => sendMessage("Surprise me with a challenging STEM problem!")}
+                                className="flex items-center gap-1.5 rounded-full border border-secondary px-4.5 py-2 text-xs font-semibold text-secondary hover:bg-primary_hover active:scale-[0.98] transition cursor-pointer"
+                            >
+                                <span>🔮</span>
+                                <span>Tutor's Choice</span>
+                            </button>
+                        </div>
+                    )}
 
                 </div>
             </div>
