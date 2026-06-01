@@ -503,33 +503,33 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     stiffness: 300,
                                     damping: 30,
                                 }}
-                                className="absolute inset-0 flex flex-col items-center justify-center px-16 sm:px-20 lg:px-28 py-6 overflow-y-auto overflow-x-hidden relative z-10"
+                                className="absolute inset-0 flex flex-col items-center justify-center px-16 sm:px-20 lg:px-28 py-6 overflow-hidden relative z-10"
                             >
-                                {/* Waiting state */}
-                                {isWaiting && (
-                                    <div className="flex flex-col items-center gap-4">
-                                        <ThinkingDots />
-                                        <span className="text-xs text-tertiary font-semibold">
-                                            Constructing visual...
-                                        </span>
-                                    </div>
-                                )}
+                            {isWaiting ? (
+                                <div className="flex flex-col items-center justify-center gap-4">
+                                    <ThinkingDots />
+                                    <span className="text-xs text-tertiary font-semibold">
+                                        Constructing visual...
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="w-full max-w-3xl flex flex-col items-start justify-center min-h-0 flex-1 relative mx-auto">
 
                                 {/* Concept label + display title */}
                                 {!isWaiting && !flashcards && (
-                                    <>
-                                        <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-secondary mb-3 shrink-0">
+                                    <div className="w-full text-left mb-4 shrink-0 max-w-3xl mx-auto">
+                                        <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-secondary mb-1.5">
                                             Concept Focus
                                         </p>
-                                        <h2 className="font-display text-display-xs sm:text-display-sm font-bold text-primary tracking-tight text-center leading-tight max-w-3xl mb-6 shrink-0">
+                                        <h2 className="font-display text-display-xs sm:text-display-sm font-bold text-primary tracking-tight leading-tight">
                                             {active.displayQuestion || active.question}
                                         </h2>
-                                    </>
+                                    </div>
                                 )}
 
                                 {/* Diagram: constructing placeholder */}
                                 {!isWaiting && !diagram && diagramPending && (
-                                    <div className="w-full max-w-3xl aspect-[16/9] rounded-2xl bg-brand-primary border border-brand/20 flex flex-col items-center justify-center mb-6 shadow-xs">
+                                    <div className="w-full max-w-3xl mx-auto aspect-[16/9] rounded-2xl bg-brand-primary border border-brand/20 flex flex-col items-center justify-center mb-4 shadow-xs shrink min-h-0">
                                         <div className="flex items-center gap-2.5">
                                             <span className="size-2.5 rounded-full bg-brand-solid animate-pulse" />
                                             <span className="text-xs font-bold text-brand-secondary">
@@ -541,7 +541,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
                                 {/* Diagram: rendered */}
                                 {!isWaiting && diagram && (
-                                    <div className="w-full max-w-3xl rounded-2xl bg-brand-primary border border-brand/20 p-6 shadow-xs overflow-hidden mb-6 min-h-[180px] flex items-center justify-center">
+                                    <div className="w-full max-w-3xl mx-auto rounded-2xl bg-brand-primary border border-brand/20 p-4 shadow-xs overflow-hidden mb-4 min-h-[140px] flex items-center justify-center shrink min-h-0">
                                         <MermaidRenderer
                                             chart={diagram}
                                             inline={false}
@@ -551,7 +551,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
                                 {/* Flashcard Widget: constructing placeholder */}
                                 {!isWaiting && !flashcards && flashcardsPending && (
-                                    <div className="w-full max-w-md aspect-[4/3] rounded-2xl bg-brand-primary border border-brand/20 flex flex-col items-center justify-center mb-6 shadow-xs">
+                                    <div className="w-full max-w-md mx-auto aspect-[4/3] rounded-2xl bg-brand-primary border border-brand/20 flex flex-col items-center justify-center mb-4 shadow-xs shrink min-h-0">
                                         <div className="flex items-center gap-2.5">
                                             <span className="size-2.5 rounded-full bg-brand-solid animate-pulse" />
                                             <span className="text-xs font-bold text-brand-secondary">
@@ -563,7 +563,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
                                 {/* Flashcard Widget: rendered */}
                                 {!isWaiting && flashcards && (
-                                    <div className="mb-6">
+                                    <div className="w-full flex justify-center mb-4 shrink min-h-0">
                                         <FlashcardWidget
                                             cards={flashcards}
                                             onComplete={(results) => {
@@ -581,14 +581,14 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
                                 {/* Text caption */}
                                 {!isWaiting && displayedText && !flashcards && (
-                                    <div className={`w-full max-w-2xl text-center shrink-0 ${flashcards ? "mt-2" : ""}`}>
+                                    <div className={`w-full max-w-3xl mx-auto text-left shrink-0 ${flashcards ? "mt-2" : ""}`}>
                                         <div className="prose max-w-none">
                                             <ReactMarkdown
                                                 remarkPlugins={[remarkMath]}
                                                 rehypePlugins={[rehypeKatex]}
                                                 components={{
                                                     p: ({ children }) => (
-                                                        <p className={`leading-relaxed mb-3 last:mb-0 ${flashcards ? "text-xs text-tertiary" : "text-md sm:text-lg text-primary"}`}>
+                                                        <p className={`leading-relaxed mb-2 last:mb-0 ${flashcards ? "text-xs text-tertiary" : "text-sm sm:text-md text-primary"}`}>
                                                             {children}
                                                         </p>
                                                     ),
@@ -603,22 +603,22 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                                         </em>
                                                     ),
                                                     h2: ({ children }) => (
-                                                        <h3 className="text-display-xs font-bold text-primary mt-4 mb-2 tracking-tight">
+                                                        <h3 className="text-md font-bold text-primary mt-2 mb-1 tracking-tight">
                                                             {children}
                                                         </h3>
                                                     ),
                                                     h3: ({ children }) => (
-                                                        <h4 className="text-xl font-bold text-primary mt-3 mb-2 tracking-tight">
+                                                        <h4 className="text-sm font-bold text-primary mt-1.5 mb-1 tracking-tight">
                                                             {children}
                                                         </h4>
                                                     ),
                                                     ul: ({ children }) => (
-                                                        <ul className="text-left text-sm text-secondary list-disc list-inside space-y-1 my-2">
+                                                        <ul className="text-left text-xs text-secondary list-disc list-inside space-y-0.5 my-1">
                                                             {children}
                                                         </ul>
                                                     ),
                                                     ol: ({ children }) => (
-                                                        <ol className="text-left text-sm text-secondary list-decimal list-inside space-y-1 my-2">
+                                                        <ol className="text-left text-xs text-secondary list-decimal list-inside space-y-0.5 my-1">
                                                             {children}
                                                         </ol>
                                                     ),
@@ -655,6 +655,8 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                         </div>
                                     </div>
                                 )}
+                                </div>
+                            )}
                             </motion.div>
                         </AnimatePresence>
                     )}
