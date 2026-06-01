@@ -340,7 +340,7 @@ function TopCard({ card, cardNumber, totalCards, flipped, sd, sp }: TopCardProps
         >
             {/* Question Side */}
             <div
-                className="absolute inset-0 rounded-2xl border border-secondary bg-primary flex flex-col p-6 justify-between overflow-hidden"
+                className="absolute inset-0 rounded-2xl border border-secondary bg-white flex flex-col p-6 justify-between overflow-hidden"
                 style={{ backfaceVisibility: "hidden" }}
             >
                 <div className="flex justify-between items-center">

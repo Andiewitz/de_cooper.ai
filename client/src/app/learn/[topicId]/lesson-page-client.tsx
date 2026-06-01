@@ -394,7 +394,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
     };
 
     return (
-        <div className="flex h-dvh flex-col bg-primary overflow-hidden">
+        <div className={`flex h-dvh flex-col ${flashcards ? "bg-[#efebe3]" : "bg-primary"} overflow-hidden transition-colors duration-300`}>
             {/* ═══════════════ Header ═══════════════ */}
             <header className="shrink-0 flex items-center justify-between px-6 py-4 sm:px-10 lg:px-12">
                 <button
@@ -646,7 +646,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
             </div>
 
             {/* ═══════════════ Premium Prompt Input Card ═══════════════ */}
-            <div className="shrink-0 bg-primary px-4 sm:px-8 py-5 border-t border-secondary/50">
+            <div className={`shrink-0 ${flashcards ? "bg-[#efebe3]" : "bg-primary"} px-4 sm:px-8 py-5 border-t border-secondary/50 transition-colors duration-300`}>
                 <div className="max-w-2xl mx-auto space-y-4">
                     
                     {/* Prompt Box */}
