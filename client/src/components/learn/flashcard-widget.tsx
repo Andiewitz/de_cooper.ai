@@ -11,6 +11,7 @@ interface FlashcardData {
 
 interface FlashcardWidgetProps {
     cards: FlashcardData[];
+    onComplete?: (results: any[]) => void;
 }
 
 const DEFAULT_CARDS = [
@@ -34,13 +35,17 @@ const H = 260;
 const THROW_PX = 88;
 const THROW_VEL = 0.32;
 
-export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
+export function FlashcardWidget({ cards, onComplete }: FlashcardWidgetProps) {
     const [deck, setDeck] = useState<any[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [flipped, setFlipped] = useState(false);
     const [drag, setDrag] = useState({ on: false, x: 0, y: 0, ox: 0, oy: 0 });
     const [exit, setExit] = useState<any>(null);
     const [completed, setCompleted] = useState(false);
+
+    const [interactions, setInteractions] = useState<Record<number, any>>({});
+    const [cardStartTime, setCardStartTime] = useState<number>(Date.now());
+    const [hasFlippedCurrent, setHasFlippedCurrent] = useState(false);
 
     const topRef = useRef<HTMLDivElement>(null);
     const velBuf = useRef<any[]>([]);
@@ -55,31 +60,89 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
         setCurrentIndex(0);
         setFlipped(false);
         setCompleted(false);
+        setInteractions({});
+        setCardStartTime(Date.now());
+        setHasFlippedCurrent(false);
     }, [cards]);
+
+    useEffect(() => {
+        setCardStartTime(Date.now());
+        setHasFlippedCurrent(false);
+    }, [currentIndex]);
+
+    useEffect(() => {
+        if (flipped) {
+            setHasFlippedCurrent(true);
+        }
+    }, [flipped]);
 
     const totalCards = deck.length;
     const remaining = deck.slice(currentIndex);
 
     const advanceCard = useCallback(() => {
         const nextIdx = currentIndex + 1;
+        const currentCard = deck[currentIndex];
+        if (currentCard) {
+            const duration = (Date.now() - cardStartTime) / 1000;
+            setInteractions(prev => ({
+                ...prev,
+                [currentIndex]: {
+                    q: currentCard.q,
+                    a: currentCard.a,
+                    flipped: hasFlippedCurrent,
+                    timeSpent: (prev[currentIndex]?.timeSpent || 0) + duration
+                }
+            }));
+        }
+
         if (nextIdx >= totalCards) {
             setCompleted(true);
+            if (onComplete && currentCard) {
+                const duration = (Date.now() - cardStartTime) / 1000;
+                const finalInteraction = {
+                    q: currentCard.q,
+                    a: currentCard.a,
+                    flipped: hasFlippedCurrent,
+                    timeSpent: (interactions[currentIndex]?.timeSpent || 0) + duration
+                };
+                const allInteractions = deck.map((c, i) => {
+                    if (i === currentIndex) return finalInteraction;
+                    return interactions[i] || { q: c.q, a: c.a, flipped: false, timeSpent: 0 };
+                });
+                onComplete(allInteractions);
+            }
         }
         setCurrentIndex(nextIdx);
         setFlipped(false);
-    }, [currentIndex, totalCards]);
+    }, [currentIndex, totalCards, deck, cardStartTime, hasFlippedCurrent, interactions, onComplete]);
 
     const goBack = useCallback(() => {
         if (currentIndex <= 0) return;
+        const currentCard = deck[currentIndex];
+        if (currentCard) {
+            const duration = (Date.now() - cardStartTime) / 1000;
+            setInteractions(prev => ({
+                ...prev,
+                [currentIndex]: {
+                    q: currentCard.q,
+                    a: currentCard.a,
+                    flipped: hasFlippedCurrent,
+                    timeSpent: (prev[currentIndex]?.timeSpent || 0) + duration
+                }
+            }));
+        }
         setCurrentIndex(prev => prev - 1);
         setFlipped(false);
         setCompleted(false);
-    }, [currentIndex]);
+    }, [currentIndex, deck, cardStartTime, hasFlippedCurrent]);
 
     const restart = useCallback(() => {
         setCurrentIndex(0);
         setFlipped(false);
         setCompleted(false);
+        setInteractions({});
+        setCardStartTime(Date.now());
+        setHasFlippedCurrent(false);
     }, []);
 
     const doThrow = useCallback((vx: number, vy: number, dir: "left" | "right") => {
@@ -148,6 +211,7 @@ export function FlashcardWidget({ cards }: FlashcardWidgetProps) {
 
     // Completed state
     if (completed) {
+        if (onComplete) return null;
         return (
             <motion.div
                 initial={{ opacity: 0, y: 12 }}

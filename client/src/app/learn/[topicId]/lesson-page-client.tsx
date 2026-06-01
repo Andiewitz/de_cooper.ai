@@ -31,6 +31,7 @@ import { LoadingIndicator } from "@/components/application/loading-indicator/loa
 interface Exchange {
     id: string;
     question: string;
+    displayQuestion?: string;
     answer: string;
     displayed: string;
     isStreaming?: boolean;
@@ -296,14 +297,14 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
 
     /* ── Send a message ── */
     const sendMessage = useCallback(
-        async (customText?: string) => {
+        async (customText?: string, displayVal?: string) => {
             const text = customText || input.trim();
             if (!text || !lessonId || !token || isStreaming) return;
 
             const id = crypto.randomUUID();
             setExchanges((prev) => [
                 ...prev,
-                { id, question: text, answer: "", displayed: "", isStreaming: true },
+                { id, question: text, displayQuestion: displayVal, answer: "", displayed: "", isStreaming: true },
             ]);
             if (!customText) setInput("");
             setIsStreaming(true);
@@ -517,7 +518,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                             Concept Focus
                                         </p>
                                         <h2 className="font-display text-display-xs sm:text-display-sm font-bold text-primary tracking-tight text-center leading-tight max-w-3xl mb-6 shrink-0">
-                                            {active.question}
+                                            {active.displayQuestion || active.question}
                                         </h2>
                                     </>
                                 )}
@@ -559,7 +560,18 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                 {/* Flashcard Widget: rendered */}
                                 {!isWaiting && flashcards && (
                                     <div className="mb-6">
-                                        <FlashcardWidget cards={flashcards} />
+                                        <FlashcardWidget
+                                            cards={flashcards}
+                                            onComplete={(results) => {
+                                                const summary = results.map((r, i) => {
+                                                    return `Card ${i + 1}: Question: "${r.q}", Answer: "${r.a}". User ${r.flipped ? "flipped the card to reveal the answer" : "did not flip the card to reveal the answer"}. Time spent: ${r.timeSpent.toFixed(1)} seconds.`;
+                                                }).join("\n");
+
+                                                const prompt = `[System Notification: The user has completed the flashcard review. Here are the detailed results of their interactions:\n${summary}\n\nPlease greet the user, congratulate them on finishing, evaluate their study performance based on these metrics, point out any concepts they might have struggled with (or got quickly), and ask how they want to proceed.]`;
+                                                
+                                                sendMessage(prompt, "I've completed reviewing the flashcards.");
+                                            }}
+                                        />
                                     </div>
                                 )}
 
