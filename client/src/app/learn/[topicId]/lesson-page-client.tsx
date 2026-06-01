@@ -498,7 +498,7 @@ export default function LessonPageClient({ topicId }: LessonPageClientProps) {
                                     stiffness: 300,
                                     damping: 30,
                                 }}
-                                className="absolute inset-0 flex flex-col items-center justify-center px-16 sm:px-20 lg:px-28 py-6 overflow-y-auto relative z-10"
+                                className="absolute inset-0 flex flex-col items-center justify-center px-16 sm:px-20 lg:px-28 py-6 overflow-y-auto overflow-x-hidden relative z-10"
                             >
                                 {/* Waiting state */}
                                 {isWaiting && (
