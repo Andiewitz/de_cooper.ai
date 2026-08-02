@@ -1,51 +1,24 @@
 "use client";
 
 import type { ReactNode } from "react";
-import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-    Atom01,
-    Beaker01,
-    Calendar,
-    ChevronLeft,
-    ChevronRight,
-    FileCode01,
-    Home01,
-    LogOut01,
-    Menu01,
-    SearchLg,
-    Trophy01,
-    X,
-    BookOpen01,
-    Calculator,
-    Code01,
-    Globe01,
-} from "@untitledui/icons";
+    HomeIcon,
+    TvIcon,
+    Cog6ToothIcon,
+    PowerIcon,
+    BeakerIcon,
+    BookOpenIcon,
+    CalendarDaysIcon,
+    SparklesIcon,
+} from "@heroicons/react/24/outline";
+import { PlayIcon } from "@heroicons/react/24/solid";
 import { Avatar } from "@/components/base/avatar/avatar";
-import { Button } from "@/components/base/buttons/button";
-import { Input } from "@/components/base/input/input";
-import { Tooltip } from "@/components/base/tooltip/tooltip";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
-import * as Collapsible from "@radix-ui/react-collapsible";
-import { AnimatePresence, motion } from "framer-motion";
 import { Button as AriaButton } from "react-aria-components";
 import { useAuth } from "@/providers/auth-provider";
 import { cx } from "@/utils/cx";
-
-const SIDEBAR_STORAGE_KEY = "destudy-sidebar-collapsed";
-const SIDEBAR_WIDTH_EXPANDED = 260;
-const SIDEBAR_WIDTH_COLLAPSED = 72;
-
-const TOPIC_ITEMS = [
-    { id: "physics", label: "Physics", icon: Atom01 },
-    { id: "mathematics", label: "Mathematics", icon: Calculator },
-    { id: "computer-science", label: "Computer Science", icon: Code01 },
-    { id: "chemistry", label: "Chemistry", icon: Beaker01 },
-    { id: "astronomy", label: "Astronomy", icon: Globe01 },
-    { id: "general", label: "Ask Anything", icon: BookOpen01 },
-];
-
 
 interface LearnDashboardLayoutProps {
     children: ReactNode;
@@ -57,26 +30,7 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
     const pathname = usePathname();
     const router = useRouter();
     const { user, logout } = useAuth();
-    const [mobileNavOpen, setMobileNavOpen] = useState(false);
-    const [collapsed, setCollapsed] = useState(false);
-    const [topicsOpen, setTopicsOpen] = useState(true);
 
-    useEffect(() => {
-        const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
-        if (stored === "true") {
-            setCollapsed(true);
-        }
-    }, []);
-
-    const toggleCollapsed = () => {
-        setCollapsed((prev) => {
-            const next = !prev;
-            localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
-            return next;
-        });
-    };
-
-    const sidebarWidth = collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED;
     const displayName = user?.display_name || user?.username || "Learner";
     const initials = displayName
         .split(" ")
@@ -85,399 +39,223 @@ export function LearnDashboardLayout({ children, title, subtitle }: LearnDashboa
         .slice(0, 2)
         .toUpperCase();
 
-    // Check if any topic sub-route is currently active
-    const isTopicRouteActive = (topicId: string) => pathname === `/learn/${topicId}`;
-    const isAnyTopicActive = TOPIC_ITEMS.some((t) => isTopicRouteActive(t.id));
-
-    const sidebar = (forceExpanded = false) => {
-        const isCollapsed = forceExpanded ? false : collapsed;
-
-        return (
-            <aside className="flex h-full w-full flex-col" style={{ background: "var(--color-brand-900)" }}>
-                {/* ── Header: App Branding ── */}
-                <div
-                    className={cx(
-                        "flex items-center py-4",
-                        isCollapsed ? "flex-col justify-center gap-2 px-2" : "justify-between gap-2 px-4",
-                    )}
-                    style={{ borderBottom: "1px solid rgb(255 255 255 / 0.10)" }}
-                >
-                    {isCollapsed ? (
-                        <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg font-bold text-sm shadow-sm select-none" style={{ background: "var(--color-accent-500)", color: "#fff" }}>
-                            C
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2.5 px-1 select-none min-w-0">
-                            <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg font-bold text-sm shadow-sm" style={{ background: "var(--color-accent-500)", color: "#fff" }}>
-                                C
-                            </div>
-                            <div className="grid leading-tight min-w-0">
-                                <span className="truncate text-sm font-bold" style={{ color: "#fff" }}>de Cooper</span>
-                                <span className="truncate text-[10px] font-semibold uppercase tracking-wider" style={{ color: "rgb(214 187 251)" }}>STEM Learning</span>
-                            </div>
-                        </div>
-                    )}
-
-                    {!forceExpanded && (
-                        <button
-                            type="button"
-                            className="hidden shrink-0 lg:inline-flex items-center justify-center rounded-md p-1.5 transition duration-150"
-                            style={{ color: "rgb(214 187 251)", background: "transparent" }}
-                            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                            onClick={toggleCollapsed}
-                            onMouseEnter={e => (e.currentTarget.style.background = "rgb(255 255 255 / 0.08)")}
-                            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                        >
-                            {isCollapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
-                        </button>
-                    )}
-                </div>
-
-                {/* ── Main Navigation List ── */}
-                <nav className={cx("flex flex-1 flex-col gap-0.5 py-4 overflow-y-auto", isCollapsed ? "px-2" : "px-3")}>
-
-                    {/* Home Link */}
-                    <Link
-                        href="/learn"
-                        onClick={() => setMobileNavOpen(false)}
-                        className={cx(
-                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
-                            isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
-                        )}
-                        style={pathname === "/learn"
-                            ? { background: "var(--color-accent-500)", color: "#fff" }
-                            : { color: "rgb(214 187 251)" }
-                        }
-                        onMouseEnter={e => { if (pathname !== "/learn") (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                        onMouseLeave={e => { if (pathname !== "/learn") (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                    >
-                        <Home01 className={cx("size-5 shrink-0 transition-colors", pathname === "/learn" ? "" : "")} style={{ color: pathname === "/learn" ? "#fff" : "var(--color-accent-300)" }} />
-                        {!isCollapsed && <span className="text-sm font-semibold">Home</span>}
-                    </Link>
-
-                    {/* Collapsible Topics Accordion */}
-                    <Collapsible.Root
-                        open={isCollapsed ? false : topicsOpen}
-                        onOpenChange={setTopicsOpen}
-                        className="w-full"
-                    >
-                        {isCollapsed ? (
-                            // Collapsed Popover Trigger for Topics
-                            <Dropdown.Root>
-                                <AriaButton
-                                    className="group/item flex w-full items-center justify-center rounded-lg p-2.5 outline-none transition"
-                                    style={isAnyTopicActive
-                                        ? { background: "var(--color-accent-500)", color: "#fff" }
-                                        : { color: "rgb(214 187 251)" }
-                                    }
-                                >
-                                    <Beaker01 className="size-5 shrink-0" style={{ color: isAnyTopicActive ? "#fff" : "var(--color-accent-300)" }} />
-                                </AriaButton>
-                                <Dropdown.Popover
-                                    placement="right top"
-                                    className="z-[9999] w-56 rounded-b-xl bg-secondary_alt"
-                                >
-                                    <Dropdown.Menu className="rounded-b-xl bg-primary ring-1 ring-secondary">
-                                        <Dropdown.SectionHeader className="px-4 pt-1.5 pb-0.5 text-xs font-semibold text-brand-secondary">
-                                            STEM Modules
-                                        </Dropdown.SectionHeader>
-                                        {TOPIC_ITEMS.map((topic) => {
-                                            const TopicIcon = topic.icon;
-                                            const active = isTopicRouteActive(topic.id);
-                                            return (
-                                                <Dropdown.Item
-                                                    key={topic.id}
-                                                    id={topic.id}
-                                                    onAction={() => {
-                                                        router.push(`/learn/${topic.id}`);
-                                                        setMobileNavOpen(false);
-                                                    }}
-                                                    selectionIndicator={active ? "checkmark" : "none"}
-                                                >
-                                                    <TopicIcon className="size-4 shrink-0 text-fg-quaternary mr-2" />
-                                                    <span>{topic.label}</span>
-                                                </Dropdown.Item>
-                                            );
-                                        })}
-                                    </Dropdown.Menu>
-                                </Dropdown.Popover>
-                            </Dropdown.Root>
-                        ) : (
-                            // Expanded Accordion Trigger
-                            <>
-                                <Collapsible.Trigger asChild>
-                                    <button
-                                        type="button"
-                                        className="group/item flex w-full items-center justify-between rounded-lg p-2 text-sm font-semibold select-none cursor-pointer outline-none transition duration-150"
-                                        style={{ color: isAnyTopicActive ? "#fff" : "rgb(214 187 251)" }}
-                                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                                    >
-                                        <div className="flex items-center gap-2.5">
-                                            <Beaker01 className="size-5 shrink-0" style={{ color: isAnyTopicActive ? "var(--color-accent-300)" : "var(--color-accent-300)" }} />
-                                            <span>Topics</span>
-                                        </div>
-                                        <ChevronRight
-                                            className={cx("size-4 transition-transform duration-200", topicsOpen ? "rotate-90" : "")}
-                                            style={{ color: "rgb(182 146 246)" }}
-                                        />
-                                    </button>
-                                </Collapsible.Trigger>
-                                <AnimatePresence initial={false}>
-                                    {topicsOpen && (
-                                        <Collapsible.Content asChild>
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: "auto", opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.2, ease: "easeInOut" }}
-                                                className="overflow-hidden pl-3"
-                                            >
-                                                <div className="mt-1 pl-2.5 space-y-0.5" style={{ borderLeft: "2px solid rgb(255 255 255 / 0.15)" }}>
-                                                    {TOPIC_ITEMS.map((topic) => {
-                                                        const TopicIcon = topic.icon;
-                                                        const active = isTopicRouteActive(topic.id);
-                                                        return (
-                                                            <Link
-                                                                key={topic.id}
-                                                                href={`/learn/${topic.id}`}
-                                                                onClick={() => setMobileNavOpen(false)}
-                                                                className="group/sub flex items-center gap-2 rounded-md p-1.5 text-xs select-none transition duration-150 outline-none"
-                                                                style={active
-                                                                    ? { background: "var(--color-accent-500)", color: "#fff" }
-                                                                    : { color: "rgb(214 187 251)" }
-                                                                }
-                                                                onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                                                                onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                                                            >
-                                                                <TopicIcon className="size-4 shrink-0" style={{ color: active ? "#fff" : "var(--color-accent-300)" }} />
-                                                                <span className={active ? "font-bold" : ""}>{topic.label}</span>
-                                                            </Link>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </motion.div>
-                                        </Collapsible.Content>
-                                    )}
-                                </AnimatePresence>
-                            </>
-                        )}
-                    </Collapsible.Root>
-
-                    {/* Calendar */}
-                    <Link
-                        href="/learn/calendar"
-                        onClick={() => setMobileNavOpen(false)}
-                        className={cx(
-                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
-                            isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
-                        )}
-                        style={pathname.startsWith("/learn/calendar")
-                            ? { background: "var(--color-accent-500)", color: "#fff" }
-                            : { color: "rgb(214 187 251)" }
-                        }
-                        onMouseEnter={e => { if (!pathname.startsWith("/learn/calendar")) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                        onMouseLeave={e => { if (!pathname.startsWith("/learn/calendar")) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                    >
-                        <Calendar className="size-5 shrink-0" style={{ color: pathname.startsWith("/learn/calendar") ? "#fff" : "var(--color-accent-300)" }} />
-                        {!isCollapsed && <span className="text-sm font-semibold">Calendar</span>}
-                    </Link>
-
-                    {/* Leaderboards */}
-                    <Link
-                        href="/learn/leaderboards"
-                        onClick={() => setMobileNavOpen(false)}
-                        className={cx(
-                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
-                            isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
-                        )}
-                        style={pathname.startsWith("/learn/leaderboards")
-                            ? { background: "var(--color-accent-500)", color: "#fff" }
-                            : { color: "rgb(214 187 251)" }
-                        }
-                        onMouseEnter={e => { if (!pathname.startsWith("/learn/leaderboards")) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                        onMouseLeave={e => { if (!pathname.startsWith("/learn/leaderboards")) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                    >
-                        <Trophy01 className="size-5 shrink-0" style={{ color: pathname.startsWith("/learn/leaderboards") ? "#fff" : "var(--color-accent-300)" }} />
-                        {!isCollapsed && <span className="text-sm font-semibold">Leaderboards</span>}
-                    </Link>
-
-                    {/* Competitive Mode */}
-                    <Link
-                        href="/learn/competitive"
-                        onClick={() => setMobileNavOpen(false)}
-                        className={cx(
-                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
-                            isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
-                        )}
-                        style={pathname.startsWith("/learn/competitive")
-                            ? { background: "var(--color-accent-500)", color: "#fff" }
-                            : { color: "rgb(214 187 251)" }
-                        }
-                        onMouseEnter={e => { if (!pathname.startsWith("/learn/competitive")) (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                        onMouseLeave={e => { if (!pathname.startsWith("/learn/competitive")) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                    >
-                        <Atom01 className="size-5 shrink-0" style={{ color: pathname.startsWith("/learn/competitive") ? "#fff" : "var(--color-accent-300)" }} />
-                        {!isCollapsed && <span className="text-sm font-semibold">Competitive Mode</span>}
-                    </Link>
-
-                    {/* Docs for Devs */}
-                    <a
-                        href="https://github.com/Andiewitz/de_study.ai"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cx(
-                            "group/item flex w-full items-center rounded-lg transition duration-150 select-none outline-none",
-                            isCollapsed ? "justify-center p-2.5" : "gap-2.5 p-2"
-                        )}
-                        style={{ color: "rgb(214 187 251)" }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                    >
-                        <FileCode01 className="size-5 shrink-0" style={{ color: "var(--color-accent-300)" }} />
-                        {!isCollapsed && <span className="text-sm font-semibold">Docs for devs</span>}
-                    </a>
-
-                </nav>
-
-                {/* ── Footer: User Profile Dropdown ── */}
-                <div
-                    className={cx("relative p-3", isCollapsed && "flex flex-col items-center gap-2")}
-                    style={{ borderTop: "1px solid rgb(255 255 255 / 0.10)" }}
-                >
-                    <Dropdown.Root>
-                        <AriaButton
-                            className={cx(
-                                "flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition duration-150 select-none cursor-pointer outline-none",
-                                isCollapsed ? "justify-center" : ""
-                            )}
-                            style={{ color: "#fff" }}
-                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                        >
-                            <Avatar size="sm" initials={initials} alt={displayName} className="ring-2 ring-[rgba(255,255,255,0.25)] shadow-inner" />
-                            {!isCollapsed && (
-                                <div className="min-w-0 flex-1 leading-tight">
-                                    <p className="truncate text-sm font-bold" style={{ color: "#fff" }}>{displayName}</p>
-                                    <p className="truncate text-[10px]" style={{ color: "rgb(214 187 251)" }}>{user?.email}</p>
-                                </div>
-                            )}
-                            {!isCollapsed && <ChevronRight className="size-4 shrink-0" style={{ color: "rgb(182 146 246)" }} />}
-                        </AriaButton>
-                        <Dropdown.Popover
-                            placement={isCollapsed ? "right bottom" : "top right"}
-                            className="z-[9999] w-[230px] rounded-xl bg-primary shadow-lg ring-1 ring-secondary overflow-hidden"
-                        >
-                            <div className="flex items-center gap-3 px-3.5 py-3 select-none border-b border-secondary bg-primary">
-                                <Avatar size="sm" initials={initials} alt={displayName} />
-                                <div className="min-w-0 flex-1 leading-tight">
-                                    <p className="truncate text-sm font-bold text-primary">{displayName}</p>
-                                    <p className="truncate text-[10px] text-tertiary">{user?.email}</p>
-                                </div>
-                            </div>
-                            <Dropdown.Menu className="bg-primary">
-                                <Dropdown.Item
-                                    onAction={() => router.push("/learn/upgrade")}
-                                >
-                                    <span className="font-bold select-none text-base leading-none mr-2" style={{ color: "var(--color-accent-500)" }}>✦</span>
-                                    <span className="font-semibold text-brand-secondary">Upgrade to Pro</span>
-                                </Dropdown.Item>
-                                <Dropdown.Item
-                                    onAction={() => router.push("/settings")}
-                                >
-                                    <span className="text-fg-quaternary text-base leading-none mr-2">⚙</span>
-                                    <span>Account & Settings</span>
-                                </Dropdown.Item>
-                                <Dropdown.Item
-                                    onAction={() => router.push("/billing")}
-                                >
-                                    <span className="text-fg-quaternary text-base leading-none mr-2">💳</span>
-                                    <span>Billing details</span>
-                                </Dropdown.Item>
-                                <Dropdown.Separator />
-                                <Dropdown.Item
-                                    onAction={() => {
-                                        logout();
-                                        router.push("/login");
-                                    }}
-                                    className="text-error-primary hover:bg-error-primary/10 hover:text-error-primary_hover focus:bg-error-primary/10"
-                                >
-                                    <div className="flex items-center gap-2.5">
-                                        <LogOut01 className="size-4 shrink-0 text-fg-error-secondary" />
-                                        <span className="font-semibold">Log out</span>
-                                    </div>
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown.Popover>
-                    </Dropdown.Root>
-                </div>
-            </aside>
-        );
-    };
+    // User ELO display (defaults to 4k or formatted user ELO)
+    const rawElo = user?.academic_elo ?? 4000;
+    const eloDisplay = rawElo >= 1000 ? `${(rawElo / 1000).toFixed(rawElo % 1000 === 0 ? 0 : 1)}k` : `${rawElo}`;
 
     return (
-        <div className="min-h-dvh bg-primary" style={{ "--sidebar-width": `${sidebarWidth}px` } as React.CSSProperties}>
-            {mobileNavOpen && (
-                <button
-                    type="button"
-                    aria-label="Close navigation"
-                    className="fixed inset-0 z-40 bg-overlay/60 lg:hidden"
-                    onClick={() => setMobileNavOpen(false)}
-                />
-            )}
+        <div className="min-h-dvh bg-primary text-primary font-sans">
+            {/* ── Top HUD Navigation Bar (No heavy borders or CS badges) ── */}
+            <header className="sticky top-0 z-40 w-full border-b border-secondary bg-primary/90 backdrop-blur-md transition-all duration-200">
+                <div className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 max-w-7xl">
+                    
+                    {/* Far Left: Brand & Utility Icons */}
+                    <div className="flex items-center gap-4">
+                        {/* Brand Logo */}
+                        <Link href="/learn" className="font-logo text-lg font-black tracking-tight text-primary select-none hover:text-brand-secondary transition-colors">
+                            de_study.ai
+                        </Link>
 
-            {/* Sidebar Shell */}
-            <div
-                className={cx(
-                    "fixed inset-y-0 left-0 z-50 transition-[width] duration-200 ease-linear lg:translate-x-0",
-                    mobileNavOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-                )}
-                style={{ width: mobileNavOpen ? SIDEBAR_WIDTH_EXPANDED : sidebarWidth, background: "var(--color-brand-900)", borderRight: "1px solid rgb(255 255 255 / 0.08)" }}
-            >
-                <div className="flex h-12 items-center justify-end px-3 lg:hidden" style={{ borderBottom: "1px solid rgb(255 255 255 / 0.10)" }}>
-                    <button
-                        type="button"
-                        aria-label="Close menu"
-                        className="rounded-md p-2 transition"
-                        style={{ color: "rgb(214 187 251)" }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgb(255 255 255 / 0.08)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-                        onClick={() => setMobileNavOpen(false)}
-                    >
-                        <X className="size-5" />
-                    </button>
-                </div>
-                {sidebar(mobileNavOpen)}
-            </div>
+                        {/* Utility Icons (Clean & Borderless) */}
+                        <div className="flex items-center gap-1">
+                            <Link
+                                href="/learn"
+                                title="Home"
+                                className={cx(
+                                    "p-2 rounded-lg transition-colors cursor-pointer",
+                                    pathname === "/learn"
+                                        ? "text-brand-secondary bg-brand-secondary/10 font-bold"
+                                        : "text-tertiary hover:text-primary hover:bg-secondary/50"
+                                )}
+                            >
+                                <HomeIcon className="size-4" />
+                            </Link>
 
-            {/* Main Content Pane */}
-            <div className="transition-[padding] duration-200 ease-linear lg:pl-(--sidebar-width)">
-                <header className="sticky top-0 z-30 border-b border-secondary bg-primary/95 backdrop-blur-md">
-                    <div className="flex items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
-                        <button
-                            type="button"
-                            aria-label="Open menu"
-                            className="rounded-md p-2 text-fg-quaternary hover:bg-primary_hover lg:hidden"
-                            onClick={() => setMobileNavOpen(true)}
-                        >
-                            <Menu01 className="size-5" />
-                        </button>
+                            <Link
+                                href="/learn/leaderboards"
+                                title="TV & Leaderboards"
+                                className={cx(
+                                    "p-2 rounded-lg transition-colors cursor-pointer",
+                                    pathname === "/learn/leaderboards"
+                                        ? "text-brand-secondary bg-brand-secondary/10 font-bold"
+                                        : "text-tertiary hover:text-primary hover:bg-secondary/50"
+                                )}
+                            >
+                                <TvIcon className="size-4" />
+                            </Link>
 
-                        <div className="min-w-0 flex-1">
-                            {title && (
-                                <h1 className="truncate font-display text-lg font-semibold text-primary sm:text-xl">{title}</h1>
-                            )}
-                            {subtitle && <p className="truncate text-sm text-tertiary">{subtitle}</p>}
-                        </div>
+                            <Link
+                                href="/settings"
+                                title="Settings"
+                                className={cx(
+                                    "p-2 rounded-lg transition-colors cursor-pointer",
+                                    pathname === "/settings"
+                                        ? "text-brand-secondary bg-brand-secondary/10 font-bold"
+                                        : "text-tertiary hover:text-primary hover:bg-secondary/50"
+                                )}
+                            >
+                                <Cog6ToothIcon className="size-4" />
+                            </Link>
 
-                        <div className="hidden w-full max-w-sm sm:block sm:max-w-xs lg:max-w-sm">
-                            <Input size="sm" aria-label="Search courses" placeholder="Search topics..." icon={SearchLg} />
+                            <button
+                                type="button"
+                                title="Log out"
+                                onClick={() => {
+                                    logout();
+                                    router.push("/login");
+                                }}
+                                className="p-2 rounded-lg text-tertiary hover:text-error-primary hover:bg-error-primary/10 transition-colors cursor-pointer"
+                            >
+                                <PowerIcon className="size-4" />
+                            </button>
                         </div>
                     </div>
-                </header>
 
-                <main className="px-4 py-6 sm:px-6 lg:px-8">{children}</main>
-            </div>
+                    {/* Center: Clean Navigation Bar (PLAY in center) */}
+                    <nav className="flex items-center gap-2 sm:gap-4 font-mono text-xs uppercase tracking-widest font-bold select-none">
+                        {/* 1. Learn */}
+                        <Link
+                            href="/learn"
+                            className={cx(
+                                "px-3.5 py-2 rounded-lg transition-all",
+                                pathname === "/learn"
+                                    ? "text-brand-secondary font-black"
+                                    : "text-secondary hover:text-primary"
+                            )}
+                        >
+                            Learn
+                        </Link>
+
+                        {/* 2. Labs */}
+                        <Link
+                            href="/learn/competitive"
+                            className={cx(
+                                "px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5",
+                                pathname.startsWith("/learn/competitive")
+                                    ? "text-brand-secondary font-black"
+                                    : "text-secondary hover:text-primary"
+                            )}
+                        >
+                            <BeakerIcon className="size-3.5" />
+                            <span>Labs</span>
+                        </Link>
+
+                        {/* 3. PLAY (Center & Highlighted) */}
+                        <Link
+                            href="/learn/physics"
+                            className="relative group px-6 py-2.5 rounded-xl bg-brand-solid text-white font-extrabold text-sm tracking-wider uppercase shadow-md hover:bg-brand-solid/90 transition-all duration-200 flex items-center gap-2 scale-105"
+                        >
+                            <PlayIcon className="size-4 fill-white" />
+                            <span>PLAY</span>
+                        </Link>
+
+                        {/* 4. Docs for nerds */}
+                        <a
+                            href="https://github.com/Andiewitz/de_study.ai"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3.5 py-2 rounded-lg text-secondary hover:text-primary transition-all flex items-center gap-1.5"
+                        >
+                            <BookOpenIcon className="size-3.5" />
+                            <span>Docs for nerds</span>
+                        </a>
+
+                        {/* 5. Calendars */}
+                        <Link
+                            href="/learn/calendar"
+                            className={cx(
+                                "px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5",
+                                pathname.startsWith("/learn/calendar")
+                                    ? "text-brand-secondary font-black"
+                                    : "text-secondary hover:text-primary"
+                            )}
+                        >
+                            <CalendarDaysIcon className="size-3.5" />
+                            <span>Calendars</span>
+                        </Link>
+                    </nav>
+
+                    {/* Far Right: User Profile & 4k ELO */}
+                    <div className="flex items-center gap-3">
+                        {/* ELO Rating Badge (Blue for 4k) */}
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-mono font-black tracking-tight select-none shadow-xs">
+                            <SparklesIcon className="size-3.5 text-blue-200" />
+                            <span className="text-blue-200 text-[10px] uppercase font-bold">ELO</span>
+                            <span className="text-white font-black text-sm">{eloDisplay}</span>
+                        </div>
+
+                        {/* Profile Picture Avatar & Dropdown */}
+                        <Dropdown.Root>
+                            <AriaButton className="flex items-center gap-2 rounded-full p-0.5 outline-none cursor-pointer">
+                                <Avatar
+                                    size="sm"
+                                    initials={initials}
+                                    alt={displayName}
+                                    className="ring-2 ring-brand-secondary/40"
+                                />
+                            </AriaButton>
+                            <Dropdown.Popover
+                                placement="bottom right"
+                                className="z-[9999] w-60 rounded-xl bg-primary border border-secondary shadow-xl p-1"
+                            >
+                                <div className="flex items-center gap-3 p-3 border-b border-secondary">
+                                    <Avatar size="sm" initials={initials} alt={displayName} />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-bold text-primary">{displayName}</p>
+                                        <p className="truncate text-xs text-tertiary">{user?.email || "4k ELO"}</p>
+                                    </div>
+                                </div>
+                                <Dropdown.Menu className="py-1">
+                                    <Dropdown.Item
+                                        onAction={() => router.push("/learn/upgrade")}
+                                        className="rounded-lg px-3 py-2 text-xs font-semibold text-primary hover:bg-secondary cursor-pointer"
+                                    >
+                                        ✦ Upgrade to Pro
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        onAction={() => router.push("/settings")}
+                                        className="rounded-lg px-3 py-2 text-xs font-semibold text-primary hover:bg-secondary cursor-pointer"
+                                    >
+                                        ⚙ Account & Settings
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        onAction={() => router.push("/billing")}
+                                        className="rounded-lg px-3 py-2 text-xs font-semibold text-primary hover:bg-secondary cursor-pointer"
+                                    >
+                                        💳 Billing details
+                                    </Dropdown.Item>
+                                    <Dropdown.Separator className="my-1 h-px bg-secondary" />
+                                    <Dropdown.Item
+                                        onAction={() => {
+                                            logout();
+                                            router.push("/login");
+                                        }}
+                                        className="rounded-lg px-3 py-2 text-xs font-semibold text-error-primary hover:bg-error-primary/10 cursor-pointer"
+                                    >
+                                        🚪 Log out
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown.Popover>
+                        </Dropdown.Root>
+                    </div>
+
+                </div>
+            </header>
+
+            {/* Page Header (if provided) */}
+            {(title || subtitle) && (
+                <div className="border-b border-secondary bg-secondary/20 px-4 py-4 sm:px-6 sm:py-5">
+                    <div className="mx-auto max-w-6xl">
+                        {title && <h1 className="font-display text-xl font-bold text-primary sm:text-2xl">{title}</h1>}
+                        {subtitle && <p className="mt-1 text-sm text-tertiary">{subtitle}</p>}
+                    </div>
+                </div>
+            )}
+
+            {/* Main Content Area */}
+            <main className="w-full">
+                {children}
+            </main>
         </div>
     );
 }

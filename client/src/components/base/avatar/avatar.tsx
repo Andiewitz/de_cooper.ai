@@ -7,7 +7,7 @@ import { AvatarOnlineIndicator, VerifiedTick } from "./base-components";
 import { AvatarCount } from "./base-components/avatar-count";
 
 export interface AvatarProps {
-    size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+    size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
     className?: string;
     /**
      * The class name for the main child of the avatar.
@@ -75,6 +75,8 @@ const styles = {
     lg: { root: "size-12", rootWithBorder: "p-[1.5px]", initials: "text-lg font-semibold", icon: "size-7" },
     xl: { root: "size-14", rootWithBorder: "p-0.5", initials: "text-xl font-semibold", icon: "size-8" },
     "2xl": { root: "size-16", rootWithBorder: "p-0.5", initials: "text-display-xs font-semibold", icon: "size-8" },
+    "3xl": { root: "size-24", rootWithBorder: "p-1", initials: "text-display-md font-bold", icon: "size-12" },
+    "4xl": { root: "size-32", rootWithBorder: "p-1", initials: "text-display-lg font-bold", icon: "size-16" },
 };
 
 export const Avatar = ({

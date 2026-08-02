@@ -1,93 +1,53 @@
 "use client";
 
-import type { ComponentType, SVGProps } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-    BookOpen01,
-    Atom01,
-    Beaker01,
-    Calculator,
-    Code01,
-    Globe01,
-    Zap,
-    ArrowRight,
-    Trophy01,
-    GraduationHat01,
-} from "@untitledui/icons";
+import { ShieldCheckIcon } from "@heroicons/react/24/solid";
 import { useAuth } from "@/providers/auth-provider";
 import OnboardingWizard from "@/components/onboarding-wizard";
 import { LearnDashboardLayout } from "@/components/learn/learn-dashboard-layout";
+import { Avatar } from "@/components/base/avatar/avatar";
 
-export const topics = [
-    {
-        id: "physics",
-        title: "Physics",
-        description: "Quantum mechanics, thermodynamics, electromagnetism, and the mathematical framework governing the physical universe.",
-        icon: Atom01,
-        accentBg: "bg-[#E8F0FE]",
-        accentGradient: "from-blue-400/20 to-purple-500/20",
-        accentIcon: "text-blue-600",
-        hoverRing: "hover:ring-brand/40",
-        hoverText: "group-hover:text-brand-secondary",
-    },
-    {
-        id: "mathematics",
-        title: "Mathematics",
-        description: "Calculus, linear algebra, topology, and formal proofs. The foundational language underpinning all STEM disciplines.",
-        icon: Calculator,
-        accentBg: "bg-[#E6F4EA]",
-        accentGradient: "from-emerald-400/20 to-teal-500/20",
-        accentIcon: "text-emerald-600",
-        hoverRing: "hover:ring-emerald-400/50",
-        hoverText: "group-hover:text-emerald-600",
-    },
-    {
-        id: "computer-science",
-        title: "Computer Science",
-        description: "Algorithms, complexity theory, data structures, and software engineering principles designed to scale.",
-        icon: Code01,
-        accentBg: "bg-[#FCE8E6]",
-        accentGradient: "from-red-400/20 to-rose-500/20",
-        accentIcon: "text-red-600",
-        hoverRing: "hover:ring-red-400/50",
-        hoverText: "group-hover:text-red-600",
-    },
-    {
-        id: "chemistry",
-        title: "Chemistry",
-        description: "Molecular orbital theory, reaction kinetics, organic synthesis, and the physical chemistry of materials.",
-        icon: Beaker01,
-        accentBg: "bg-[#E8F0FE]",
-        accentGradient: "from-indigo-400/20 to-violet-500/20",
-        accentIcon: "text-indigo-600",
-        hoverRing: "hover:ring-indigo-400/50",
-        hoverText: "group-hover:text-indigo-600",
-    },
-    {
-        id: "astronomy",
-        title: "Astronomy",
-        description: "Astrophysics, stellar evolution, cosmology, and the exploration of orbital dynamics and celestial bodies.",
-        icon: Globe01,
-        accentBg: "bg-[#FDF2F8]",
-        accentGradient: "from-pink-400/20 to-fuchsia-500/20",
-        accentIcon: "text-pink-600",
-        hoverRing: "hover:ring-pink-400/50",
-        hoverText: "group-hover:text-pink-600",
-    },
-    {
-        id: "general",
-        title: "Ask Anything",
-        description: "Open-ended STEM inquiry. Ask any question across disciplines and receive a rigorous, visual-first explanation.",
-        icon: BookOpen01,
-        accentBg: "bg-secondary",
-        accentGradient: "from-neutral-400/20 to-slate-500/20",
-        accentIcon: "text-secondary",
-        hoverRing: "hover:ring-secondary/60",
-        hoverText: "group-hover:text-secondary",
-    },
-];
+// CS2 Premier ELO tier color system
+function getEloTier(elo: number) {
+    if (elo >= 30000) return { bg: "#2A2000", stripe: "#D4A017", text: "#F5C518" };
+    if (elo >= 25000) return { bg: "#2A0808", stripe: "#CC1111", text: "#FF4444" };
+    if (elo >= 20000) return { bg: "#1E0030", stripe: "#AA00CC", text: "#CC44FF" };
+    if (elo >= 15000) return { bg: "#001233", stripe: "#1A56C8", text: "#4C9BFF" };
+    if (elo >= 10000) return { bg: "#001820", stripe: "#0097A7", text: "#00D6F0" };
+    if (elo >= 5000)  return { bg: "#000E33", stripe: "#2962FF", text: "#6699FF" };
+    return                 { bg: "#0D1C26", stripe: "#3B8FA8", text: "#5FC8E0" };
+}
+
+function PremierBadge({ elo }: { elo: number }) {
+    const tier = getEloTier(elo);
+    const eloFormatted = elo.toLocaleString();
+
+    return (
+        /* Slanted box with sharp square edges (~20% scaled down) */
+        <div
+            className="-skew-x-[12deg] relative flex items-center shadow-xl overflow-hidden rounded-none"
+            style={{ background: tier.bg, height: 28, minWidth: 84 }}
+        >
+            {/* The 2 slanted vertical lines */}
+            <div className="flex gap-0.5 pl-2.5 pr-1.5 py-1 shrink-0 h-full items-center">
+                <div className="w-1 h-full" style={{ background: tier.stripe }} />
+                <div className="w-1 h-full" style={{ background: tier.stripe }} />
+            </div>
+
+            {/* ELO Number only (unskewed text) */}
+            <div className="skew-x-[12deg] pr-3 pl-1 flex items-center justify-center select-none">
+                <span
+                    className="font-black text-xs leading-none tracking-tight tabular-nums italic"
+                    style={{ color: tier.text, textShadow: `0 0 8px ${tier.stripe}66` }}
+                >
+                    {eloFormatted}
+                </span>
+            </div>
+        </div>
+    );
+}
 
 export default function LearnPage() {
     const router = useRouter();
@@ -107,142 +67,37 @@ export default function LearnPage() {
     }
 
     const displayName = user?.display_name || user?.username || "Learner";
-    const elo = user?.academic_elo ?? 500;
+    const initials = displayName
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
 
-    // Determine ranking title based on ELO
-    let rankTitle = "STEM Novice";
-    let rankBadgeColor = "text-blue-500 bg-blue-500/10 border-blue-500/20";
-    if (elo >= 1200) {
-        rankTitle = "Grandmaster Polymath";
-        rankBadgeColor = "text-purple-500 bg-purple-500/10 border-purple-500/20 animate-pulse";
-    } else if (elo >= 1000) {
-        rankTitle = "Master Scholar";
-        rankBadgeColor = "text-amber-500 bg-amber-500/10 border-amber-500/20";
-    } else if (elo >= 800) {
-        rankTitle = "STEM Elite";
-        rankBadgeColor = "text-rose-500 bg-rose-500/10 border-rose-500/20";
-    } else if (elo >= 650) {
-        rankTitle = "Advanced Researcher";
-        rankBadgeColor = "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
-    } else if (elo >= 550) {
-        rankTitle = "STEM Explorer";
-        rankBadgeColor = "text-cyan-500 bg-cyan-500/10 border-cyan-500/20";
-    }
+    const rawElo = user?.academic_elo ?? 4000;
 
     return (
-        <LearnDashboardLayout title="Workspace Dashboard" subtitle="Interactive STEM Q&A and AI-Guided Lessons">
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4 }}
-                className="mx-auto max-w-4xl space-y-8"
-            >
-                {/* ── Beautiful Premium Glassmorphic Header & Academic ELO Panel ── */}
-                <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="relative rounded-2xl border border-secondary bg-primary/60 backdrop-blur-xl p-6 sm:p-8 shadow-xl overflow-hidden group flex flex-col md:flex-row md:items-center md:justify-between gap-6"
-                >
-                    {/* Coordinate Grid Overlay */}
-                    <div
-                        className="absolute inset-0 pointer-events-none opacity-[0.03]"
-                        style={{
-                            backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)",
-                            backgroundSize: "20px 20px",
-                        }}
-                    />
+        <LearnDashboardLayout>
+            <div className="flex flex-col items-center justify-center w-full min-h-[75vh] pt-32 space-y-3 select-none text-center">
 
-                    {/* Ambient brand glow */}
-                    <div className="pointer-events-none absolute -right-20 -top-20 size-60 rounded-full bg-brand-secondary/30 opacity-40 blur-3xl group-hover:opacity-60 transition-opacity duration-500" />
-                    <div className="pointer-events-none absolute bottom-0 left-0 h-32 w-1/2 bg-[#FEF08A]/10 opacity-20 blur-3xl" />
+                {/* Profile Avatar (20% smaller: size-24 / 3xl) */}
+                <Avatar
+                    size="3xl"
+                    initials={initials}
+                    alt={displayName}
+                    className="ring-4 ring-blue-500/20 shadow-2xl"
+                />
 
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2.5">
-                            <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-brand-secondary">
-                                Workspace Dashboard
-                            </span>
-                            <span className="text-quaternary font-mono text-[10px]">Active</span>
-                        </div>
-                        <h2 className="mt-3 font-display text-display-xs sm:text-display-sm font-black text-primary leading-tight">
-                            Welcome back, {displayName}
-                        </h2>
-                        <p className="mt-2 text-sm sm:text-md text-secondary leading-relaxed max-w-xl">
-                            Select any active STEM curriculum module below to engage with your personal AI-guided tutor.
-                        </p>
-                    </div>
+                {/* CS2 Premier Rank Badge (~20% smaller) */}
+                <PremierBadge elo={rawElo} />
 
-                    {/* ELO Display */}
-                    <div className="shrink-0 flex items-center gap-4 rounded-xl border border-secondary bg-secondary/35 p-4 sm:p-5 relative overflow-hidden min-w-[200px] shadow-sm select-none">
-                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-primary border border-brand/20 shadow-inner relative">
-                            <Trophy01 className="size-5 text-brand-secondary animate-bounce" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-tertiary">
-                                Academic ELO
-                            </p>
-                            <p className="font-display text-2xl font-black text-primary tracking-tight mt-0.5">
-                                {elo}
-                            </p>
-                            <div className={`mt-1.5 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold ${rankBadgeColor}`}>
-                                {rankTitle}
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
+                {/* Name below badge (20% smaller) */}
+                <div className="flex items-center justify-center gap-1.5 font-sans font-semibold text-base text-primary tracking-tight">
+                    <ShieldCheckIcon className="size-4 text-blue-500 shrink-0" />
+                    <span>{displayName}</span>
+                </div>
 
-                {/* ── STEM Curriculum Modules Roadmap ── */}
-                <section className="space-y-6">
-                    <div className="flex items-center gap-3">
-                        <div className="w-0.5 h-5 bg-brand-solid rounded-full" />
-                        <h3 className="text-xs font-extrabold uppercase tracking-[0.2em] text-secondary">
-                            STEM Curriculum Roadmap
-                        </h3>
-                    </div>
-
-                    <div className="space-y-4">
-                        {topics.map((topic, idx) => {
-                            const Icon = topic.icon;
-                            return (
-                                <motion.button
-                                    key={topic.id}
-                                    type="button"
-                                    initial={{ opacity: 0, y: 12 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.35, delay: idx * 0.05 }}
-                                    whileHover={{ scale: 1.008, y: -1 }}
-                                    onClick={() => router.push(`/learn/${topic.id}`)}
-                                    className={`group flex w-full items-center gap-6 rounded-xl border border-secondary bg-primary p-5 shadow-xs hover:shadow-lg ${topic.hoverRing} hover:ring-1 transition-all duration-200 cursor-pointer text-left outline-focus-ring`}
-                                >
-                                    {/* Module Icon */}
-                                    <div className={`flex size-14 shrink-0 items-center justify-center rounded-xl ${topic.accentBg} shadow-inner overflow-hidden relative`}>
-                                        <div className={`absolute inset-0 bg-linear-to-br ${topic.accentGradient} z-0`} />
-                                        <Icon className={`size-6 ${topic.accentIcon} relative z-10`} aria-hidden />
-                                    </div>
-
-                                    {/* Module Info */}
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className={`text-md font-bold text-primary ${topic.hoverText} transition duration-100`}>
-                                            {topic.title}
-                                        </h4>
-                                        <p className="mt-1 text-sm text-secondary line-clamp-2 max-w-xl">
-                                            {topic.description}
-                                        </p>
-                                    </div>
-
-                                    {/* Action Badge */}
-                                    <div className="shrink-0 flex items-center gap-2.5 rounded-full bg-secondary/50 border border-secondary/60 px-4 py-2 group-hover:bg-brand-solid group-hover:border-brand-solid group-hover:text-white transition duration-200">
-                                        <span className="text-xs font-bold text-secondary group-hover:text-white transition duration-200">
-                                            {topic.id === "general" ? "Open Q&A" : "Ready"}
-                                        </span>
-                                        <ArrowRight className="size-3.5 text-tertiary group-hover:text-white transition duration-200" aria-hidden />
-                                    </div>
-                                </motion.button>
-                            );
-                        })}
-                    </div>
-                </section>
-            </motion.div>
+            </div>
         </LearnDashboardLayout>
     );
 }
